@@ -29,7 +29,7 @@ end
 # unset irrelevant variables
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV /home/ubuntu/codebase/eSim/esim-env
+set -gx VIRTUAL_ENV /home/ubuntu/codebase/eSim/eSim_simplified/esim-env
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"bin $PATH
