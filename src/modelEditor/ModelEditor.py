@@ -1,3 +1,9 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from configuration.Appconfig import Appconfig
+
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.Qt import QTableWidgetItem
 import xml.etree.ElementTree as ET

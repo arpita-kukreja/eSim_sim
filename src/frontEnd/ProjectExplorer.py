@@ -31,31 +31,10 @@ class ProjectExplorer(QtWidgets.QWidget):
         header = QtWidgets.QTreeWidgetItem(["Projects", "path"])
         self.treewidget.setHeaderItem(header)
         self.treewidget.setColumnHidden(1, True)
-
-        # CSS
-        init_path = '../../'
-        if os.name == 'nt':
-            init_path = ''
-
-        self.treewidget.setStyleSheet(" \
-            QTreeView { border-radius: 15px; border: 1px \
-            solid gray; padding: 5px; width: 200px; height: 150px;  }\
-            QTreeView::branch:has-siblings:!adjoins-item { \
-            border-image: url(" + init_path + "images/vline.png) 0;} \
-            QTreeView::branch:has-siblings:adjoins-item { \
-            border-image: url(" + init_path + "images/branch-more.png) 0; } \
-            QTreeView::branch:!has-children:!has-siblings:adjoins-item { \
-            border-image: url(" + init_path + "images/branch-end.png) 0; } \
-            QTreeView::branch:has-children:!has-siblings:closed, \
-            QTreeView::branch:closed:has-children:has-siblings { \
-            border-image: none; \
-            image: url(" + init_path + "images/branch-closed.png); } \
-            QTreeView::branch:open:has-children:!has-siblings, \
-            QTreeView::branch:open:has-children:has-siblings  { \
-            border-image: none; \
-            image: url(" + init_path + "images/branch-open.png); } \
-        ")
-
+        
+        # Initialize with light theme by default
+        self.apply_light_theme()
+        
         for parents, children in list(
                 self.obj_appconfig.project_explorer.items()):
             os.path.join(parents)
@@ -75,6 +54,100 @@ class ProjectExplorer(QtWidgets.QWidget):
         self.treewidget.customContextMenuRequested.connect(self.openMenu)
         self.setLayout(self.window)
         self.show()
+
+    def apply_dark_theme(self):
+        """Apply dark theme to the project explorer"""
+        self.treewidget.setStyleSheet('''
+            QHeaderView::section {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #40c4ff;
+                font-weight: 700;
+                font-size: 17px;
+                border: none;
+                border-radius: 0;
+                padding: 12px 0px 12px 18px;
+                letter-spacing: 0.5px;
+            }
+            QTreeWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                border: 1px solid #23273a;
+                border-radius: 12px;
+                selection-background-color: #40c4ff;
+                selection-color: #181b24;
+                font-weight: 600;
+            }
+            QTreeWidget::item:hover {
+                background: #23273a;
+                color: #40c4ff;
+            }
+            QTreeWidget::item:selected {
+                background: #40c4ff;
+                color: #181b24;
+                font-weight: 700;
+            }
+            QTreeView::branch {
+                background: transparent;
+                width: 16px;
+            }
+            QTreeView::branch:has-children:!has-siblings:closed,
+            QTreeView::branch:closed:has-children:has-siblings {
+                image: url(images/branch-closed.png);
+            }
+            QTreeView::branch:open:has-children:!has-siblings,
+            QTreeView::branch:open:has-children:has-siblings {
+                image: url(images/branch-open.png);
+            }
+        ''')
+
+    def apply_light_theme(self):
+        """Apply light theme to the project explorer"""
+        self.treewidget.setStyleSheet('''
+            QHeaderView::section {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                    stop:0 #ffffff, stop:1 #f8f9fa);
+                color: #1976d2;
+                font-weight: 700;
+                font-size: 17px;
+                border: none;
+                border-radius: 0;
+                padding: 12px 0px 12px 18px;
+                letter-spacing: 0.5px;
+            }
+            QTreeWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #ffffff, stop:1 #f8f9fa);
+                color: #2c3e50;
+                border: 1px solid #e1e4e8;
+                border-radius: 12px;
+                selection-background-color: #1976d2;
+                selection-color: #ffffff;
+                font-weight: 600;
+            }
+            QTreeWidget::item:hover {
+                background: #f1f4f9;
+                color: #1976d2;
+            }
+            QTreeWidget::item:selected {
+                background: #1976d2;
+                color: #ffffff;
+                font-weight: 700;
+            }
+            QTreeView::branch {
+                background: transparent;
+                width: 16px;
+            }
+            QTreeView::branch:has-children:!has-siblings:closed,
+            QTreeView::branch:closed:has-children:has-siblings {
+                image: url(images/branch-closed.png);
+            }
+            QTreeView::branch:open:has-children:!has-siblings,
+            QTreeView::branch:open:has-children:has-siblings {
+                image: url(images/branch-open.png);
+            }
+        ''')
 
     def refreshInstant(self):
         for i in range(self.treewidget.topLevelItemCount()):
@@ -141,6 +214,71 @@ class ProjectExplorer(QtWidgets.QWidget):
             self.textwindow.setMinimumSize(600, 500)
             self.textwindow.setGeometry(QtCore.QRect(400, 150, 400, 400))
             self.textwindow.setWindowTitle(filename)
+
+            # Apply dark theme and custom scrollbar
+            premium_dark_stylesheet = """
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                    stop:0 #0a0e1a, stop:0.3 #1a1d29, stop:0.7 #1e2124, stop:1 #0f1419);
+                color: #e8eaed;
+                font-family: 'Fira Sans', 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+                font-size: 15px;
+                font-weight: 500;
+            }
+            QTextEdit {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                border: 1px solid #23273a;
+                border-radius: 10px;
+                padding: 16px 20px;
+                font-weight: 500;
+                font-size: 15px;
+                selection-background-color: #40c4ff;
+                selection-color: #181b24;
+            }
+            QScrollBar:vertical, QScrollBar:horizontal {
+                background: #23273a;
+                border-radius: 6px;
+                margin: 0;
+            }
+            QScrollBar::handle:vertical, QScrollBar::handle:horizontal {
+                background: #40c4ff;
+                border-radius: 6px;
+                min-height: 30px;
+                min-width: 30px;
+                margin: 2px;
+            }
+            QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover {
+                background: #1976d2;
+            }
+            QScrollBar::add-line, QScrollBar::sub-line {
+                background: none;
+                border: none;
+            }
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #40c4ff, stop:1 #1976d2);
+                color: #181b24;
+                border: 1px solid #40c4ff;
+                padding: 12px 24px;
+                border-radius: 10px;
+                font-weight: 700;
+                font-size: 15px;
+                letter-spacing: 0.5px;
+            }
+            QPushButton:hover {
+                background: #1976d2;
+                color: #fff;
+                border: 1.5px solid #1976d2;
+            }
+            QPushButton:pressed {
+                background: #23273a;
+                color: #40c4ff;
+                border: 1.5px solid #40c4ff;
+            }
+            """
+            self.textwindow.setStyleSheet(premium_dark_stylesheet)
 
             self.text = QtWidgets.QTextEdit()
             self.save = QtWidgets.QPushButton('Save and Exit')

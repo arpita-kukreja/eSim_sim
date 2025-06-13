@@ -11,15 +11,133 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Terminal Simulator</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QWidget {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #0a0e1a, stop:0.3 #1a1d29, stop:0.7 #1e2124, stop:1 #0f1419);
+    color: #e8eaed;
+    font-family: 'Fira Sans', 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+}
+
+/* Enhanced text areas with subtle shadows and better borders */
+QTextEdit, QLineEdit, QPlainTextEdit {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #23273a, stop:1 #181b24);
+    color: #e8eaed;
+    border: 2px solid #2d3142;
+    border-radius: 12px;
+    padding: 20px 24px;
+    font-weight: 500;
+    font-size: 18px;
+    selection-background-color: #40c4ff;
+    selection-color: #181b24;
+    /* Subtle inner shadow for depth */
+    background-clip: padding-box;
+}
+
+QTextEdit:focus, QLineEdit:focus, QPlainTextEdit:focus {
+    border: 2px solid #40c4ff;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2a2e41, stop:1 #1f222b);
+}
+
+/* Enhanced buttons with better visual hierarchy */
+QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #40c4ff, stop:1 #1976d2);
+    color: #181b24;
+    border: 2px solid #40c4ff;
+    padding: 16px 32px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    min-width: 120px;
+}
+
+QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #1976d2, stop:1 #0d47a1);
+    color: #fff;
+    border: 2px solid #1976d2;
+    transform: translateY(-2px);
+}
+
+QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #23273a, stop:1 #1a1e27);
+    color: #40c4ff;
+    border: 2px solid #40c4ff;
+    transform: translateY(0px);
+}
+
+/* Special styling for the light/dark mode toggle button */
+QPushButton#lightDarkModeButton {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #2d3142, stop:1 #23273a);
+    border: 2px solid #40c4ff;
+    border-radius: 18px;
+    padding: 8px;
+    min-width: 35px;
+    max-width: 35px;
+    font-size: 16px;
+}
+
+QPushButton#lightDarkModeButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+        stop:0 #40c4ff, stop:1 #1976d2);
+    color: #181b24;
+}
+
+/* Enhanced labels with better contrast */
+QLabel {
+    color: #e8eaed;
+    font-weight: 600;
+    font-size: 18px;
+    letter-spacing: 0.2px;
+    padding: 4px 0px;
+}
+
+/* Improved progress bar with modern styling */
+QProgressBar {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #23273a, stop:1 #1a1e27);
+    border: 2px solid #2d3142;
+    border-radius: 12px;
+    text-align: center;
+    color: #e8eaed;
+    font-weight: 600;
+    font-size: 18px;
+    padding: 2px;
+}
+
+QProgressBar::chunk {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #40c4ff, stop:0.5 #1976d2, stop:1 #40c4ff);
+    border-radius: 10px;
+    margin: 1px;
+}
+
+/* Container styling for better organization */
+QWidget#verticalLayoutWidget {
+    background: rgba(45, 49, 66, 0.3);
+    border-radius: 16px;
+    border: 1px solid rgba(64, 196, 255, 0.1);
+}
+   </string>
   </property>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>1131</width>
-     <height>471</height>
+     <x>20</x>
+     <y>20</y>
+     <width>1204</width>
+     <height>604</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -27,133 +145,291 @@
      <enum>QLayout::SetDefaultConstraint</enum>
     </property>
     <property name="leftMargin">
-     <number>15</number>
+     <number>24</number>
     </property>
     <property name="topMargin">
-     <number>15</number>
+     <number>24</number>
     </property>
     <property name="rightMargin">
-     <number>15</number>
+     <number>24</number>
     </property>
     <property name="bottomMargin">
-     <number>15</number>
+     <number>24</number>
+    </property>
+    <property name="spacing">
+     <number>20</number>
     </property>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <!-- Header section with title -->
+     <widget class="QLabel" name="titleLabel">
+      <property name="text">
+       <string>Terminal Simulation Console</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">
+        QLabel {
+         font-size: 24px;
+         font-weight: 700;
+         color: #40c4ff;
+         padding: 12px 0px;
+         letter-spacing: 1px;
+        }
+       </string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <!-- Control panel section -->
+     <layout class="QHBoxLayout" name="controlLayout">
       <property name="spacing">
-       <number>6</number>
+       <number>16</number>
       </property>
       <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
-       <widget class="QProgressBar" name="progressBar">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <!-- Progress section with label -->
+       <layout class="QVBoxLayout" name="progressLayout">
+        <property name="spacing">
+         <number>8</number>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>35</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QProgressBar::chunk {
-	background-color: rgb(54,158,225);
-}</string>
-        </property>
-        <property name="maximum">
-         <number>0</number>
-        </property>
-        <property name="value">
-         <number>-1</number>
-        </property>
-        <property name="format">
-         <string/>
-        </property>
-       </widget>
+        <item>
+         <widget class="QLabel" name="progressLabel">
+          <property name="text">
+           <string>Simulation Progress</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">
+            QLabel {
+             font-size: 16px;
+             font-weight: 600;
+             color: #b0bec5;
+             padding: 0px;
+            }
+           </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="progressBar">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>300</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximum">
+           <number>0</number>
+          </property>
+          <property name="value">
+           <number>-1</number>
+          </property>
+          <property name="format">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
-       <widget class="QPushButton" name="redoSimulationButton">
-        <property name="maximumSize">
+       <!-- Spacer for better alignment -->
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::MinimumExpanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
          <size>
-          <width>16777215</width>
-          <height>35</height>
+          <width>20</width>
+          <height>20</height>
          </size>
         </property>
-        <property name="text">
-         <string>Resimulate</string>
-        </property>
-       </widget>
+       </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="cancelSimulationButton">
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>35</height>
-         </size>
+       <!-- Action buttons section -->
+       <layout class="QHBoxLayout" name="buttonLayout">
+        <property name="spacing">
+         <number>12</number>
         </property>
-        <property name="text">
-         <string>Cancel Simulation</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="lightDarkModeButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>35</width>
-          <height>35</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
+        <item>
+         <widget class="QPushButton" name="redoSimulationButton">
+          <property name="minimumSize">
+           <size>
+            <width>140</width>
+            <height>56</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>56</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>↻  Resimulate</string>
+          </property>
+          <property name="toolTip">
+           <string>Start a new simulation</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">
+            QPushButton {
+             font-size: 24px;
+             font-weight: 800;
+             min-height: 24px;
+             max-height: 24px;
+            }
+           </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="cancelSimulationButton">
+          <property name="minimumSize">
+           <size>
+            <width>140</width>
+            <height>56</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>56</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>✕  Cancel</string>
+          </property>
+          <property name="toolTip">
+           <string>Stop current simulation</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">
+            QPushButton {
+             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                 stop:0 #ff5722, stop:1 #d32f2f);
+             color: #fff;
+             border: 2px solid #ff5722;
+             font-size: 24px;
+             font-weight: 800;
+             min-height: 24px;
+             max-height: 24px;
+            }
+            QPushButton:hover {
+             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                 stop:0 #d32f2f, stop:1 #b71c1c);
+             border: 2px solid #d32f2f;
+            }
+           </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="lightDarkModeButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>40</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>☀</string>
+          </property>
+          <property name="toolTip">
+           <string>Toggle light/dark mode</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>
     <item>
-     <widget class="QTextEdit" name="simulationConsole">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     <!-- Console section with label -->
+     <layout class="QVBoxLayout" name="consoleLayout">
+      <property name="spacing">
+       <number>12</number>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>400</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QTextEdit {
-	background-color: rgb(36, 31, 49);
-	color: white;
-}</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Ubuntu'; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="textInteractionFlags">
-       <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
-      </property>
-     </widget>
+      <item>
+       <widget class="QLabel" name="consoleLabel">
+        <property name="text">
+         <string>Console Output</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+          QLabel {
+           font-size: 20px;
+           font-weight: 700;
+           color: #e8eaed;
+           padding: 8px 0px;
+           border-bottom: 2px solid rgba(64, 196, 255, 0.3);
+          }
+         </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="simulationConsole">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>350</height>
+         </size>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
+        </property>
+        <property name="placeholderText">
+         <string>Simulation output will appear here...</string>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+          QTextEdit {
+           font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+           line-height: 1.4;
+           padding: 24px;
+          }
+         </string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

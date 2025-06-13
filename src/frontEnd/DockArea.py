@@ -45,19 +45,16 @@ class DockArea(QtWidgets.QMainWindow):
             dock[dockName] = QtWidgets.QDockWidget(dockName)
             self.welcomeWidget = QtWidgets.QWidget()
             self.welcomeLayout = QtWidgets.QVBoxLayout()
+            # Set smaller margins for the layout
+            self.welcomeLayout.setContentsMargins(4, 4, 4, 4)
+            self.welcomeLayout.setSpacing(4)
             self.welcomeLayout.addWidget(Welcome())  # Call browser
 
             # Adding to main Layout
             self.welcomeWidget.setLayout(self.welcomeLayout)
             dock[dockName].setWidget(self.welcomeWidget)
-            # CSS
-            dock[dockName].setStyleSheet(" \
-            QWidget { border-radius: 15px; border: 1px solid gray;\
-                padding: 5px; width: 200px; height: 150px;  } \
-            ")
             self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock[dockName])
 
-        # self.tabifyDockWidget(dock['Notes'],dock['Blank'])
         self.show()
 
     def createTestEditor(self):
@@ -67,65 +64,38 @@ class DockArea(QtWidgets.QMainWindow):
         self.testWidget = QtWidgets.QWidget()
         self.testArea = QtWidgets.QTextEdit()
         self.testLayout = QtWidgets.QVBoxLayout()
+        # Set smaller margins for the layout
+        self.testLayout.setContentsMargins(4, 4, 4, 4)
+        self.testLayout.setSpacing(4)
         self.testLayout.addWidget(self.testArea)
 
         # Adding to main Layout
         self.testWidget.setLayout(self.testLayout)
-        dock['Tips-' + str(count)] = \
-            QtWidgets.QDockWidget('Tips-' + str(count))
+        dock['Tips-' + str(count)] = QtWidgets.QDockWidget('Tips-' + str(count))
         dock['Tips-' + str(count)].setWidget(self.testWidget)
-        self.addDockWidget(QtCore.Qt.TopDockWidgetArea,
-                           dock['Tips-' + str(count)])
-        self.tabifyDockWidget(
-            dock['Welcome'], dock['Tips-' + str(count)])
+        self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock['Tips-' + str(count)])
+        self.tabifyDockWidget(dock['Welcome'], dock['Tips-' + str(count)])
 
         dock['Tips-' + str(count)].setVisible(True)
         dock['Tips-' + str(count)].setFocus()
-
         dock['Tips-' + str(count)].raise_()
 
         temp = self.obj_appconfig.current_project['ProjectName']
         if temp:
-            self.obj_appconfig.dock_dict[temp].append(
-                dock['Tips-' + str(count)]
-            )
+            self.obj_appconfig.dock_dict[temp].append(dock['Tips-' + str(count)])
         count = count + 1
 
     def plottingEditor(self):
-        """This function create widget for interactive PythonPlotting."""
+        """This function creates or updates the widget for interactive PythonPlotting, now as a single instance with navigation."""
         self.projDir = self.obj_appconfig.current_project["ProjectName"]
         self.projName = os.path.basename(self.projDir)
-        dockName = f'Plotting-{self.projName}-'
-        # self.project = os.path.join(self.projDir, self.projName)
-
-        global count
-        self.plottingWidget = QtWidgets.QWidget()
-
-        self.plottingLayout = QtWidgets.QVBoxLayout()
-        self.plottingLayout.addWidget(plotWindow(self.projDir, self.projName))
-
-        # Adding to main Layout
-        self.plottingWidget.setLayout(self.plottingLayout)
-        dock[dockName + str(count)
-             ] = QtWidgets.QDockWidget(dockName
-                                       + str(count))
-        dock[dockName + str(count)] \
-            .setWidget(self.plottingWidget)
-        self.addDockWidget(QtCore.Qt.TopDockWidgetArea,
-                           dock[dockName + str(count)])
-        self.tabifyDockWidget(dock['Welcome'],
-                              dock[dockName + str(count)])
-
-        dock[dockName + str(count)].setVisible(True)
-        dock[dockName + str(count)].setFocus()
-        dock[dockName + str(count)].raise_()
-
-        temp = self.obj_appconfig.current_project['ProjectName']
-        if temp:
-            self.obj_appconfig.dock_dict[temp].append(
-                dock[dockName + str(count)]
-            )
-        count = count + 1
+        # Use the static add_output method to manage outputs and window
+        from ngspiceSimulation.pythonPlotting import plotWindow
+        plotWindow.add_output(self.projDir, self.projName)
+        # Bring the window to focus if it exists
+        if plotWindow.instance:
+            plotWindow.instance.show()
+            plotWindow.instance.raise_()
 
     def ngspiceEditor(self, projName, netlist, simEndSignal, plotFlag):
         """ This function creates widget for Ngspice window."""
@@ -133,29 +103,18 @@ class DockArea(QtWidgets.QMainWindow):
         self.ngspiceWidget = QtWidgets.QWidget()
 
         self.ngspiceLayout = QtWidgets.QVBoxLayout()
-        self.ngspiceLayout.addWidget(
-            NgspiceWidget(netlist, simEndSignal, plotFlag)
-        )
+        # Set smaller margins for the layout
+        self.ngspiceLayout.setContentsMargins(4, 4, 4, 4)
+        self.ngspiceLayout.setSpacing(4)
+        self.ngspiceLayout.addWidget(NgspiceWidget(netlist, simEndSignal, plotFlag))
 
         # Adding to main Layout
         self.ngspiceWidget.setLayout(self.ngspiceLayout)
         dockName = f'Simulation-{projName}-'
-        dock[dockName + str(count)
-             ] = QtWidgets.QDockWidget(dockName
-                                       + str(count))
-        dock[dockName + str(count)] \
-            .setWidget(self.ngspiceWidget)
-        self.addDockWidget(QtCore.Qt.TopDockWidgetArea,
-                           dock[dockName + str(count)])
-        self.tabifyDockWidget(dock['Welcome'],
-                              dock[dockName
-                                   + str(count)])
-
-        # CSS
-        dock[dockName + str(count)].setStyleSheet(" \
-        .QWidget { border-radius: 15px; border: 1px solid gray; padding: 0px;\
-            width: 200px; height: 150px;  } \
-        ")
+        dock[dockName + str(count)] = QtWidgets.QDockWidget(dockName + str(count))
+        dock[dockName + str(count)].setWidget(self.ngspiceWidget)
+        self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock[dockName + str(count)])
+        self.tabifyDockWidget(dock['Welcome'], dock[dockName + str(count)])
 
         dock[dockName + str(count)].setVisible(True)
         dock[dockName + str(count)].setFocus()
@@ -163,9 +122,7 @@ class DockArea(QtWidgets.QMainWindow):
 
         temp = self.obj_appconfig.current_project['ProjectName']
         if temp:
-            self.obj_appconfig.dock_dict[temp].append(
-                dock[dockName + str(count)]
-            )
+            self.obj_appconfig.dock_dict[temp].append(dock[dockName + str(count)])
         count = count + 1
 
     def eSimConverter(self):
@@ -304,54 +261,30 @@ class DockArea(QtWidgets.QMainWindow):
         count = count + 1
 
     def modelEditor(self):
-        """This function defines UI for model editor."""
-        print("in model editor")
+        """This function creates a widget for model editor."""
         global count
 
-        projDir = self.obj_appconfig.current_project["ProjectName"]
-        if projDir is None:
-            """ when projDir is None that is clicking on subcircuit icon
-                without any project selection """
-            self.msg = QtWidgets.QErrorMessage()
-            self.msg.setModal(True)
-            self.msg.setWindowTitle("Error Message")
-            self.msg.showMessage(
-                'Please select the project first.'
-                ' You can either create new project or open existing project'
-            )
-            self.msg.exec_()
-            return
-        projName = os.path.basename(projDir)
-        dockName = f'Model Editor-{projName}-'
-
         self.modelwidget = QtWidgets.QWidget()
-
         self.modellayout = QtWidgets.QVBoxLayout()
+        # Set smaller margins for the layout
+        self.modellayout.setContentsMargins(4, 4, 4, 4)
+        self.modellayout.setSpacing(4)
         self.modellayout.addWidget(ModelEditorclass())
 
         # Adding to main Layout
         self.modelwidget.setLayout(self.modellayout)
+        dock['Model Editor-' + str(count)] = QtWidgets.QDockWidget('Model Editor-' + str(count))
+        dock['Model Editor-' + str(count)].setWidget(self.modelwidget)
+        self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock['Model Editor-' + str(count)])
+        self.tabifyDockWidget(dock['Welcome'], dock['Model Editor-' + str(count)])
 
-        dock[dockName +
-             str(count)] = QtWidgets.QDockWidget(dockName
-                                                 + str(count))
-        dock[dockName + str(count)] \
-            .setWidget(self.modelwidget)
-        self.addDockWidget(QtCore.Qt.TopDockWidgetArea,
-                           dock[dockName + str(count)])
-        self.tabifyDockWidget(dock['Welcome'],
-                              dock[dockName + str(count)])
+        dock['Model Editor-' + str(count)].setVisible(True)
+        dock['Model Editor-' + str(count)].setFocus()
+        dock['Model Editor-' + str(count)].raise_()
 
-        # CSS
-        dock[dockName + str(count)].setStyleSheet(" \
-            .QWidget { border-radius: 15px; border: 1px solid gray; \
-                padding: 5px; width: 200px; height: 150px;  } \
-            ")
-
-        dock[dockName + str(count)].setVisible(True)
-        dock[dockName + str(count)].setFocus()
-        dock[dockName + str(count)].raise_()
-
+        temp = self.obj_appconfig.current_project['ProjectName']
+        if temp:
+            self.obj_appconfig.dock_dict[temp].append(dock['Model Editor-' + str(count)])
         count = count + 1
 
     def kicadToNgspiceEditor(self, clarg1, clarg2=None):
