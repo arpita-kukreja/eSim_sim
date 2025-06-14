@@ -2,60 +2,145 @@
 
     <head>
         <style>
+            :root {
+                --text-color: #2c3e50;
+                --bg-color: #ffffff;
+                --accent-color: #3491ee;
+                --accent-hover: #2980db;
+                --container-bg: #ffffff;
+                --container-shadow: rgba(0,0,0,0.08);
+                --heading-bg: #ffffff;
+                --link-color: #3491ee;
+                --link-hover: #2980db;
+                --text-size: 16px;
+                --heading-size: 28px;
+            }
+
+            body.dark-theme {
+                --text-color: #e8eaed;
+                --bg-color: #1e1e1e;
+                --accent-color: #3491ee;
+                --accent-hover: #61dafb;
+                --container-bg: linear-gradient(135deg, #23273a 0%, #181b24 100%);
+                --container-shadow: rgba(52,145,238,0.15);
+                --heading-bg: linear-gradient(90deg, #23273a 0%, #181b24 100%);
+                --link-color: #3491ee;
+                --link-hover: #61dafb;
+                --text-size: 17px;
+                --heading-size: 32px;
+            }
+
             body {
                 font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
                 margin: 0px;
                 padding: 0px;
-                background: linear-gradient(135deg, #23273a 0%, #181b24 100%);
-                color: #e8eaed;
+                background: var(--bg-color);
+                color: var(--text-color);
+                transition: all 0.3s ease;
             }
 
-            h1{
-                font-weight: bold;
-                font-size: 28px;
-                color: #40c4ff;
-                padding: 18px 24px 12px 24px;
-                background: linear-gradient(90deg, #23273a 0%, #181b24 100%);
+            h1 {
+                font-weight: 800;
+                font-size: var(--heading-size);
+                color: var(--accent-color);
+                padding: 24px 32px 16px 32px;
+                background: var(--heading-bg);
                 border-radius: 16px 16px 0 0;
                 border: none;
-                margin: 0 0 18px 0;
+                margin: 0 0 24px 0;
                 letter-spacing: 0.5px;
+                transition: all 0.3s ease;
             }
 
-            p{
-                margin: 0px 24px 18px 24px;
-                font-size: 16px;
-                line-height: 1.7;
-                color: #e8eaed;
+            p {
+                margin: 0px 32px 24px 32px;
+                font-size: var(--text-size);
+                line-height: 1.8;
+                color: var(--text-color);
                 font-weight: 500;
+                transition: all 0.3s ease;
+                letter-spacing: 0.2px;
             }
 
             a {
-                color: #40c4ff;
+                color: var(--accent-color);
                 text-decoration: none;
                 font-weight: 600;
-                transition: color 0.2s;
-            }
-            a:hover {
-                color: #61dafb;
-                text-decoration: underline;
+                transition: all 0.3s ease;
+                letter-spacing: 0.3px;
+                position: relative;
             }
 
-            #license{
-                font-size:12px;
-                color: #b0b3b8;
+            a:hover {
+                color: var(--accent-hover);
+                text-decoration: none;
+            }
+
+            a:hover::after {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 1px;
+                bottom: -1px;
+                left: 0;
+                background-color: var(--accent-hover);
+                transform: scaleX(1);
+                transition: transform 0.3s ease;
+            }
+
+            #license {
+                font-size: calc(var(--text-size) - 2px);
+                color: var(--text-color);
+                opacity: 0.8;
+                font-weight: 500;
             }
 
             .about-container {
-                background: linear-gradient(135deg, #23273a 0%, #181b24 100%);
-                border-radius: 18px;
-                box-shadow: 0 4px 32px 0 rgba(64,196,255,0.08);
-                max-width: 700px;
+                background: var(--container-bg);
+                border-radius: 20px;
+                box-shadow: 0 8px 32px 0 var(--container-shadow);
+                max-width: 800px;
                 margin: 40px auto 0 auto;
-                padding: 32px 0 32px 0;
+                padding: 40px 0 40px 0;
+                transition: all 0.3s ease;
             }
+
             .logo {
-                margin: 0 0 18px 0;
+                margin: 0 0 24px 0;
+            }
+
+            b {
+                color: var(--accent-color);
+                font-weight: 700;
+                letter-spacing: 0.3px;
+                transition: all 0.3s ease;
+            }
+
+            .highlight {
+                color: var(--accent-color);
+                font-weight: 600;
+                letter-spacing: 0.3px;
+                position: relative;
+            }
+
+            body.dark-theme .highlight {
+                color: var(--accent-color);
+            }
+
+            body.dark-theme a {
+                color: var(--accent-color);
+            }
+
+            body.dark-theme a:hover {
+                color: var(--accent-hover);
+            }
+
+            body.dark-theme p {
+                color: #e8eaed;
+            }
+
+            body.dark-theme b {
+                color: var(--accent-color);
             }
         </style>
     </head>
@@ -65,23 +150,23 @@
             <h1>About eSim</h1>
             <center class="logo"><img src="../../images/logo.png" alt="eSim logo" height="100" width="100"></center>
             <p>
-                <b style="color: #40c4ff; font-weight: 700;">eSim</b> is an open source EDA tool for circuit design, simulation, analysis and PCB design. It is an integrated tool built using open source softwares such as 
-                <a href="https://www.kicad.org/">KiCad</a>,
-                <a href="https://ngspice.sourceforge.io/">Ngspice</a>,
-                <a href="http://ghdl.free.fr">GHDL</a>,
-                <a href="https://www.veripool.org/verilator/">Verilator</a>,
-                <a href="https://www.makerchip.com/">Makerchip IDE</a>, and
-                <a href="https://skywater-pdk.rtfd.io/">SkyWater SKY130 PDK</a>.
-                eSim source is released under <b style="color: #40c4ff; font-weight: 700;">GNU General Public License.</b>
+                <b>eSim</b> is an open source EDA tool for circuit design, simulation, analysis and PCB design. It is an integrated tool built using open source softwares such as 
+                <a href="https://www.kicad.org/" class="highlight">KiCad</a>,
+                <a href="https://ngspice.sourceforge.io/" class="highlight">Ngspice</a>,
+                <a href="http://ghdl.free.fr" class="highlight">GHDL</a>,
+                <a href="https://www.veripool.org/verilator/" class="highlight">Verilator</a>,
+                <a href="https://www.makerchip.com/" class="highlight">Makerchip IDE</a>, and
+                <a href="https://skywater-pdk.rtfd.io/" class="highlight">SkyWater SKY130 PDK</a>.
+                eSim source is released under <b>GNU General Public License.</b>
             </p>
             <p>
-                This tool is developed by the <b style="color: #40c4ff; font-weight: 700;">eSim Team at FOSSEE, IIT Bombay</b>.<br>
+                This tool is developed by the <b>eSim Team at FOSSEE, IIT Bombay</b>.<br>
                 To know more about eSim, please visit:
-                <a href="https://esim.fossee.in/">https://esim.fossee.in/</a>.
+                <a href="https://esim.fossee.in/" class="highlight">https://esim.fossee.in/</a>.
             </p>
             <p>
                 To discuss more about eSim, please visit:
-                <a href="https://forums.fossee.in/">https://forums.fossee.in/</a>
+                <a href="https://forums.fossee.in/" class="highlight">https://forums.fossee.in/</a>
             </p>
         </div>
     </body>
