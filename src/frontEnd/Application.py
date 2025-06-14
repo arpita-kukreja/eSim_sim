@@ -2769,71 +2769,19 @@ class MainView(QtWidgets.QWidget):
         # call init method of superclass
         QtWidgets.QWidget.__init__(self, *args)
 
-        self.obj_appconfig = Appconfig()
+        # Initialize theme state
+        self.is_dark_theme = False
 
+        # Create main layout
+        self.mainLayout = QtWidgets.QHBoxLayout()
         self.leftSplit = QtWidgets.QSplitter()
-        self.middleSplit = QtWidgets.QSplitter()
-
-        self.mainLayout = QtWidgets.QVBoxLayout()
-        # Intermediate Widget
         self.middleContainer = QtWidgets.QWidget()
         self.middleContainerLayout = QtWidgets.QVBoxLayout()
+        self.middleSplit = QtWidgets.QSplitter()
+        self.noteArea = QtWidgets.QTextBrowser()
 
-        # Area to be included in MainView
-        self.noteArea = QtWidgets.QTextEdit()
-        self.noteArea.setReadOnly(True)
-        self.noteArea.setAcceptRichText(True)
-        self.noteArea.setStyleSheet("""
-            QTextEdit {
-                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-                border: 1.5px solid #23273a;
-                border-radius: 14px;
-                padding: 18px 24px;
-                font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
-                font-size: 15px;
-                font-weight: 500;
-                letter-spacing: 0.1px;
-            }
-            QTextEdit QScrollBar:vertical, QTextEdit QScrollBar:horizontal {
-                background: #23273a;
-                border-radius: 6px;
-            }
-            QTextEdit a {
-                color: #40c4ff;
-                text-decoration: none;
-                font-weight: 600;
-            }
-        """)
-        welcome_html = '''
-<div style="color: #e8eaed; background-color: transparent; font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;">
-    <h2 style="color: #e8eaed; margin-bottom: 16px; font-weight: 700; letter-spacing: 0.5px;">
-        Welcome to <span style='color: #40c4ff; font-weight: 700;'>eSim</span>
-    </h2>
-    <p style="color: #e8eaed; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-        <b style="color: #40c4ff; font-weight: 700;">eSim</b> is an open source EDA tool for circuit design, simulation, analysis and PCB design.<br>
-        It is an integrated tool built using open source software such as
-        <a href="https://www.kicad.org/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">KiCad</a>,
-        <a href="https://ngspice.sourceforge.io/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">Ngspice</a>,
-        <a href="http://ghdl.free.fr" style="color: #40c4ff; text-decoration: none; font-weight: 600;">GHDL</a>,
-        <a href="https://www.veripool.org/verilator/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">Verilator</a>,
-        <a href="https://www.makerchip.com/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">Makerchip IDE</a>, and
-        <a href="https://skywater-pdk.rtfd.io/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">SkyWater SKY130 PDK</a>.<br>
-        eSim source is released under <b style="color: #40c4ff; font-weight: 700;">GNU General Public License</b>.
-    </p>
-    <p style="color: #e8eaed; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-        This tool is developed by the <b style="color: #40c4ff; font-weight: 700;">eSim Team at FOSSEE, IIT Bombay</b>.<br>
-        To know more about eSim, please visit:
-        <a href="https://esim.fossee.in/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">https://esim.fossee.in/</a>.
-    </p>
-    <p style="color: #e8eaed; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-        To discuss more about eSim, please visit:
-        <a href="https://forums.fossee.in/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">https://forums.fossee.in/</a>
-    </p>
-</div>
-'''
-        self.noteArea.setHtml(welcome_html)
+        # Initialize welcome message with light theme by default
+        self.apply_light_theme_welcome()
 
         self.obj_dockarea = DockArea.DockArea()
         self.obj_projectExplorer = ProjectExplorer.ProjectExplorer()
@@ -2857,12 +2805,9 @@ class MainView(QtWidgets.QWidget):
         self.middleSplit.setSizes([self.width(), int(self.height() / 2)])
         self.setLayout(self.mainLayout)
 
-        # Initialize welcome message with light theme by default
-        self.welcome_browser = QtWidgets.QTextBrowser()
-        self.apply_light_theme_welcome()
-
     def apply_dark_theme_welcome(self):
         """Apply dark theme to welcome message"""
+        self.is_dark_theme = True
         welcome_html = '''
         <div style="color: #e8eaed; background-color: transparent; font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;">
             <h2 style="color: #e8eaed; margin-bottom: 16px; font-weight: 700; letter-spacing: 0.5px;">
@@ -2890,8 +2835,8 @@ class MainView(QtWidgets.QWidget):
             </p>
         </div>
         '''
-        self.welcome_browser.setHtml(welcome_html)
-        self.welcome_browser.setStyleSheet('''
+        self.noteArea.setHtml(welcome_html)
+        self.noteArea.setStyleSheet('''
             QTextBrowser {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                     stop:0 #23273a, stop:1 #181b24);
@@ -2919,6 +2864,7 @@ class MainView(QtWidgets.QWidget):
 
     def apply_light_theme_welcome(self):
         """Apply light theme to welcome message"""
+        self.is_dark_theme = False
         welcome_html = '''
         <div style="color: #2c3e50; background-color: transparent; font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;">
             <h2 style="color: #2c3e50; margin-bottom: 16px; font-weight: 700; letter-spacing: 0.5px;">
@@ -2946,8 +2892,8 @@ class MainView(QtWidgets.QWidget):
             </p>
         </div>
         '''
-        self.welcome_browser.setHtml(welcome_html)
-        self.welcome_browser.setStyleSheet('''
+        self.noteArea.setHtml(welcome_html)
+        self.noteArea.setStyleSheet('''
             QTextBrowser {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                     stop:0 #ffffff, stop:1 #f8f9fa);
