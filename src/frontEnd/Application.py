@@ -2864,56 +2864,57 @@ class MainView(QtWidgets.QWidget):
     def apply_dark_theme_welcome(self):
         """Apply dark theme to welcome message"""
         welcome_html = '''
-        <div style="color: #e8eaed; background-color: transparent; font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;">
-            <h2 style="color: #e8eaed; margin-bottom: 16px; font-weight: 700; letter-spacing: 0.5px;">
-                Welcome to <span style='color: #40c4ff; font-weight: 700;'>eSim</span>
+        <div style="color: #e8eaed; background-color: #1a1f2e; font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif; padding: 20px; border-radius: 12px;">
+            <h2 style="color: #e8eaed; margin-bottom: 18px; font-weight: 700; letter-spacing: 0.3px;">
+                About eSim
             </h2>
-            <p style="color: #e8eaed; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-                <b style="color: #40c4ff; font-weight: 700;">eSim</b> is an open source EDA tool for circuit design, simulation, analysis and PCB design.<br>
-                It is an integrated tool built using open source software such as
-                <a href="https://www.kicad.org/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">KiCad</a>,
-                <a href="https://ngspice.sourceforge.io/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">Ngspice</a>,
-                <a href="http://ghdl.free.fr" style="color: #40c4ff; text-decoration: none; font-weight: 600;">GHDL</a>,
-                <a href="https://www.veripool.org/verilator/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">Verilator</a>,
-                <a href="https://www.makerchip.com/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">Makerchip IDE</a>, and
-                <a href="https://skywater-pdk.rtfd.io/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">SkyWater SKY130 PDK</a>.<br>
-                eSim source is released under <b style="color: #40c4ff; font-weight: 700;">GNU General Public License</b>.
+            <p style="color: #e8eaed; margin-bottom: 16px; line-height: 1.7; font-weight: 400;">
+                <b style="color: #60a5fa; font-weight: 700;">eSim</b> is an open source EDA tool for circuit design, simulation, analysis, and PCB design. It is an integrated tool built using open source software such as
+                <a href="https://www.kicad.org/" style="color: #60a5fa; text-decoration: none; font-weight: 500; transition: color 0.2s;">KiCad</a>,
+                <a href="https://ngspice.sourceforge.io/" style="color: #60a5fa; text-decoration: none; font-weight: 500; transition: color 0.2s;">Ngspice</a>,
+                <a href="http://ghdl.free.fr" style="color: #60a5fa; text-decoration: none; font-weight: 500; transition: color 0.2s;">GHDL</a>,
+                <a href="https://www.veripool.org/verilator/" style="color: #60a5fa; text-decoration: none; font-weight: 500; transition: color 0.2s;">Verilator</a>,
+                <a href="https://www.makerchip.com/" style="color: #60a5fa; text-decoration: none; font-weight: 500; transition: color 0.2s;">Makerchip IDE</a>, and
+                <a href="https://skywater-pdk.rtfd.io/" style="color: #60a5fa; text-decoration: none; font-weight: 500; transition: color 0.2s;">SkyWater SKY130 PDK</a>.<br>
+                eSim source is released under <b style="color: #60a5fa; font-weight: 700;">GNU General Public License</b>.
             </p>
-            <p style="color: #e8eaed; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-                This tool is developed by the <b style="color: #40c4ff; font-weight: 700;">eSim Team at FOSSEE, IIT Bombay</b>.<br>
+            <p style="color: #e8eaed; margin-bottom: 16px; line-height: 1.7; font-weight: 400;">
+                This tool is developed by the <b style="color: #60a5fa; font-weight: 700;">eSim Team at FOSSEE, IIT Bombay</b>.<br>
                 To know more about eSim, please visit:
-                <a href="https://esim.fossee.in/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">https://esim.fossee.in/</a>.
+                <a href="https://esim.fossee.in/" style="color: #60a5fa; text-decoration: none; font-weight: 500; transition: color 0.2s;">https://esim.fossee.in/</a>.
             </p>
-            <p style="color: #e8eaed; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
+            <p style="color: #e8eaed; margin-bottom: 16px; line-height: 1.7; font-weight: 400;">
                 To discuss more about eSim, please visit:
-                <a href="https://forums.fossee.in/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">https://forums.fossee.in/</a>
+                <a href="https://forums.fossee.in/" style="color: #60a5fa; text-decoration: none; font-weight: 500; transition: color 0.2s;">https://forums.fossee.in/</a>
             </p>
+            <style>
+                a:hover { color: #93c5fd; text-decoration: underline; }
+            </style>
         </div>
         '''
         self.welcome_browser.setHtml(welcome_html)
         self.welcome_browser.setStyleSheet('''
             QTextBrowser {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
+                background: #1a1f2e;
                 color: #e8eaed;
-                border: 1px solid #23273a;
+                border: 1px solid #2d3748;
                 border-radius: 12px;
-                padding: 16px;
-                selection-background-color: #40c4ff;
-                selection-color: #181b24;
+                padding: 20px;
+                selection-background-color: #60a5fa;
+                selection-color: #1a1f2e;
             }
             QScrollBar:vertical {
-                background: #23273a;
-                width: 12px;
-                border-radius: 6px;
+                background: #2d3748;
+                width: 10px;
+                border-radius: 5px;
             }
             QScrollBar::handle:vertical {
-                background: #40c4ff;
-                min-height: 20px;
-                border-radius: 6px;
+                background: #60a5fa;
+                min-height: 24px;
+                border-radius: 5px;
             }
             QScrollBar::handle:vertical:hover {
-                background: #1976d2;
+                background: #93c5fd;
             }
         ''')
 
