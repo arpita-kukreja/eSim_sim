@@ -32,6 +32,10 @@ class ProjectExplorer(QtWidgets.QWidget):
         self.treewidget.setHeaderItem(header)
         self.treewidget.setColumnHidden(1, True)
         
+        # Set widget background to be transparent
+        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        self.treewidget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        
         # Initialize with light theme by default
         self.apply_light_theme()
         
@@ -57,6 +61,16 @@ class ProjectExplorer(QtWidgets.QWidget):
 
     def apply_dark_theme(self):
         """Apply dark theme to the project explorer"""
+        # Set the main widget background
+        self.setStyleSheet('''
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+            }
+        ''')
+        
+        # Set the tree widget styles
         self.treewidget.setStyleSheet('''
             QHeaderView::section {
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
@@ -78,9 +92,16 @@ class ProjectExplorer(QtWidgets.QWidget):
                 selection-background-color: #40c4ff;
                 selection-color: #181b24;
                 font-weight: 600;
+                padding: 8px;
+            }
+            QTreeWidget::item {
+                padding: 8px;
+                border-radius: 6px;
+                margin: 2px 0px;
+                background: transparent;
             }
             QTreeWidget::item:hover {
-                background: #23273a;
+                background: #2d3348;
                 color: #40c4ff;
             }
             QTreeWidget::item:selected {
@@ -100,10 +121,39 @@ class ProjectExplorer(QtWidgets.QWidget):
             QTreeView::branch:open:has-children:has-siblings {
                 image: url(images/branch-open.png);
             }
+            QScrollBar:vertical {
+                background: #23273a;
+                width: 12px;
+                margin: 0;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:vertical {
+                background: #40c4ff;
+                min-height: 30px;
+                border-radius: 6px;
+                margin: 2px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #1976d2;
+            }
+            QScrollBar::add-line, QScrollBar::sub-line {
+                background: none;
+                border: none;
+            }
         ''')
 
     def apply_light_theme(self):
         """Apply light theme to the project explorer"""
+        # Set the main widget background
+        self.setStyleSheet('''
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #ffffff, stop:1 #f8f9fa);
+                color: #2c3e50;
+            }
+        ''')
+        
+        # Set the tree widget styles
         self.treewidget.setStyleSheet('''
             QHeaderView::section {
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
@@ -125,6 +175,13 @@ class ProjectExplorer(QtWidgets.QWidget):
                 selection-background-color: #1976d2;
                 selection-color: #ffffff;
                 font-weight: 600;
+                padding: 8px;
+            }
+            QTreeWidget::item {
+                padding: 8px;
+                border-radius: 6px;
+                margin: 2px 0px;
+                background: transparent;
             }
             QTreeWidget::item:hover {
                 background: #f1f4f9;
@@ -146,6 +203,25 @@ class ProjectExplorer(QtWidgets.QWidget):
             QTreeView::branch:open:has-children:!has-siblings,
             QTreeView::branch:open:has-children:has-siblings {
                 image: url(images/branch-open.png);
+            }
+            QScrollBar:vertical {
+                background: #f1f4f9;
+                width: 12px;
+                margin: 0;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:vertical {
+                background: #1976d2;
+                min-height: 30px;
+                border-radius: 6px;
+                margin: 2px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #1565c0;
+            }
+            QScrollBar::add-line, QScrollBar::sub-line {
+                background: none;
+                border: none;
             }
         ''')
 
@@ -251,10 +327,6 @@ class ProjectExplorer(QtWidgets.QWidget):
             }
             QScrollBar::handle:vertical:hover, QScrollBar::handle:horizontal:hover {
                 background: #1976d2;
-            }
-            QScrollBar::add-line, QScrollBar::sub-line {
-                background: none;
-                border: none;
             }
             QPushButton {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,

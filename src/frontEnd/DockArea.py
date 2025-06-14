@@ -41,8 +41,87 @@ class DockArea(QtWidgets.QMainWindow):
         QtWidgets.QMainWindow.__init__(self)
         self.obj_appconfig = Appconfig()
 
+        # Set the dock options for better tab appearance
+        self.setDockOptions(QtWidgets.QMainWindow.AllowTabbedDocks | 
+                          QtWidgets.QMainWindow.AnimatedDocks)
+        
+        # Set tab position to top
+        self.setTabPosition(QtCore.Qt.AllDockWidgetAreas, QtWidgets.QTabWidget.North)
+        
+        # Set document mode for modern look
+        self.setDocumentMode(True)
+
+        # Set custom style for dock widgets and tabs
+        self.setStyleSheet("""
+            QDockWidget {
+                border: 1px solid #23273a;
+                border-radius: 4px;
+                margin-top: 4px;
+            }
+            
+            QDockWidget::title {
+                text-align: center;
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                padding: 6px;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+                font-weight: bold;
+                font-size: 9pt;
+            }
+            
+            QTabBar::tab {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                padding: 6px 15px;
+                margin-right: 2px;
+                border-top-left-radius: 4px;
+                border-top-right-radius: 4px;
+                min-width: 120px;
+                max-width: 180px;
+                font-weight: 500;
+                font-size: 9pt;
+            }
+            
+            QTabBar::tab:selected {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #40c4ff, stop:1 #2d8cff);
+                color: #181b24;
+                border-bottom: 2px solid #40c4ff;
+            }
+            
+            QTabBar::tab:hover:!selected {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #2d3a4b, stop:1 #1e2530);
+            }
+            
+            QTabWidget::pane {
+                border: 1px solid #23273a;
+                border-radius: 4px;
+                background: #181b24;
+            }
+            
+            QTabWidget::tab-bar {
+                alignment: center;
+            }
+
+            QTabBar::close-button {
+                image: url(close.png);
+                subcontrol-position: right;
+            }
+            
+            QTabBar::close-button:hover {
+                background: #ff4444;
+                border-radius: 2px;
+            }
+        """)
+
         for dockName in dockList:
             dock[dockName] = QtWidgets.QDockWidget(dockName)
+            dock[dockName].setFeatures(QtWidgets.QDockWidget.DockWidgetMovable | 
+                                     QtWidgets.QDockWidget.DockWidgetFloatable)
             self.welcomeWidget = QtWidgets.QWidget()
             self.welcomeLayout = QtWidgets.QVBoxLayout()
             # Set smaller margins for the layout
@@ -138,13 +217,45 @@ class DockArea(QtWidgets.QMainWindow):
         lib_path_layout = QHBoxLayout()
 
         file_path_text_box = QLineEdit()
-        file_path_text_box.setFixedHeight(30)
+        file_path_text_box.setFixedHeight(35)
         file_path_text_box.setFixedWidth(800)
+        file_path_text_box.setStyleSheet("""
+            QLineEdit {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                border: 2px solid #40c4ff;
+                border-radius: 6px;
+                padding: 5px 15px;
+                font-weight: 500;
+                font-size: 10pt;
+            }
+            QLineEdit:focus {
+                border: 2px solid #40c4ff;
+            }
+        """)
         file_path_layout.setAlignment(Qt.AlignCenter)
         file_path_layout.addWidget(file_path_text_box)
 
         browse_button = QPushButton("Browse")
-        browse_button.setFixedSize(100, 30)
+        browse_button.setFixedSize(120, 35)
+        browse_button.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                border: 1px solid #23273a;
+                border-radius: 6px;
+                padding: 5px 15px;
+                font-weight: 600;
+                font-size: 10pt;
+            }
+            QPushButton:hover {
+                background: #40c4ff;
+                color: #181b24;
+                border: 1px solid #40c4ff;
+            }
+        """)
         browse_button.clicked.connect(lambda: browse_path(self,file_path_text_box))
         file_path_layout.addWidget(browse_button)
 
@@ -157,23 +268,91 @@ class DockArea(QtWidgets.QMainWindow):
         self.pspiceLib_converter = PspiceLibConverter(self)
         self.ltspiceLib_converter = LTspiceLibConverter(self)
 
-        upload_button2 = QPushButton("Convert PSpice library")
-        upload_button2.setFixedSize(180, 30)
+        upload_button2 = QPushButton("Convert PSpice Library")
+        upload_button2.setFixedSize(260, 35)
+        upload_button2.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                border: 1px solid #23273a;
+                border-radius: 6px;
+                padding: 5px 15px;
+                font-weight: 600;
+                font-size: 10pt;
+            }
+            QPushButton:hover {
+                background: #40c4ff;
+                color: #181b24;
+                border: 1px solid #40c4ff;
+            }
+        """)
         upload_button2.clicked.connect(lambda: self.pspiceLib_converter.upload_file_Pspice(file_path_text_box.text()))
         button_layout.addWidget(upload_button2)
 
-        upload_button1 = QPushButton("Convert Pspice schematics")
-        upload_button1.setFixedSize(180, 30)
+        upload_button1 = QPushButton("Convert PSpice Schematics")
+        upload_button1.setFixedSize(260, 35)
+        upload_button1.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                border: 1px solid #23273a;
+                border-radius: 6px;
+                padding: 5px 15px;
+                font-weight: 600;
+                font-size: 10pt;
+            }
+            QPushButton:hover {
+                background: #40c4ff;
+                color: #181b24;
+                border: 1px solid #40c4ff;
+            }
+        """)
         upload_button1.clicked.connect(lambda: self.pspice_converter.upload_file_Pspice(file_path_text_box.text()))
         button_layout.addWidget(upload_button1)
 
-        upload_button3 = QPushButton("Convert LTspice library")
-        upload_button3.setFixedSize(184, 30)
+        upload_button3 = QPushButton("Convert LTspice Library")
+        upload_button3.setFixedSize(260, 35)
+        upload_button3.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                border: 1px solid #23273a;
+                border-radius: 6px;
+                padding: 5px 15px;
+                font-weight: 600;
+                font-size: 10pt;
+            }
+            QPushButton:hover {
+                background: #40c4ff;
+                color: #181b24;
+                border: 1px solid #40c4ff;
+            }
+        """)
         upload_button3.clicked.connect(lambda: self.ltspiceLib_converter.upload_file_LTspice(file_path_text_box.text()))
         button_layout.addWidget(upload_button3)
 
-        upload_button = QPushButton("Convert LTspice schematics")
-        upload_button.setFixedSize(184, 30)
+        upload_button = QPushButton("Convert LTspice Schematics")
+        upload_button.setFixedSize(260, 35)
+        upload_button.setStyleSheet("""
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                border: 1px solid #23273a;
+                border-radius: 6px;
+                padding: 5px 15px;
+                font-weight: 600;
+                font-size: 10pt;
+            }
+            QPushButton:hover {
+                background: #40c4ff;
+                color: #181b24;
+                border: 1px solid #40c4ff;
+            }
+        """)
         upload_button.clicked.connect(lambda: self.ltspice_converter.upload_file_LTspice(file_path_text_box.text()))
         button_layout.addWidget(upload_button)
 
