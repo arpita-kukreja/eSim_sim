@@ -71,6 +71,7 @@
 
             .light-theme p {
                 color: var(--light-text-primary);
+                font-size: 20px;
             }
 
             a {
@@ -181,20 +182,19 @@
     <body>
         <div class="about-container">
             <h1>About eSim</h1>
-            <div class="logo">
-                <img src="../../images/logo.png" alt="eSim logo">
-            </div>
+            <center class="logo"><img src="../../images/logo.png" alt="eSim logo" height="100" width="100"></center>
             <p>
-                <span class="highlight">eSim</span> is an open source EDA tool for circuit design, simulation, analysis and PCB design. It is an integrated tool built using open source software such as 
+                <b style="color: #40c4ff; font-weight: 700;">eSim</b> is an open source EDA tool for circuit design, simulation, analysis and PCB design. It is an integrated tool built using open source softwares such as 
                 <a href="https://www.kicad.org/">KiCad</a>,
                 <a href="https://ngspice.sourceforge.io/">Ngspice</a>,
                 <a href="http://ghdl.free.fr">GHDL</a>,
                 <a href="https://www.veripool.org/verilator/">Verilator</a>,
                 <a href="https://www.makerchip.com/">Makerchip IDE</a>, and
                 <a href="https://skywater-pdk.rtfd.io/">SkyWater SKY130 PDK</a>.
+                eSim source is released under <b style="color: #40c4ff; font-weight: 700;">GNU General Public License.</b>
             </p>
             <p>
-                This tool is developed by the <span class="highlight">eSim Team at FOSSEE, IIT Bombay</span>.<br>
+                This tool is developed by the <b style="color: #40c4ff; font-weight: 700;">eSim Team at FOSSEE, IIT Bombay</b>.<br>
                 To know more about eSim, please visit:
                 <a href="https://esim.fossee.in/">https://esim.fossee.in/</a>.
             </p>
@@ -202,23 +202,6 @@
                 To discuss more about eSim, please visit:
                 <a href="https://forums.fossee.in/">https://forums.fossee.in/</a>
             </p>
-            <div id="license">
-                eSim source is released under <span class="highlight">GNU General Public License</span>
-            </div>
         </div>
-
-        <script>
-            // Function to toggle theme
-            function toggleTheme(isLight) {
-                document.body.classList.toggle('light-theme', isLight);
-            }
-
-            // Listen for theme changes from the parent application
-            window.addEventListener('message', function(event) {
-                if (event.data.type === 'themeChange') {
-                    toggleTheme(event.data.isLight);
-                }
-            });
-        </script>
     </body>
 </html>
