@@ -62,8 +62,8 @@ class Application(QtWidgets.QMainWindow):
         self.is_dark_theme = False
 
         # Initialize font sizes
-        self.toolbar_font_size = 11
-        self.text_font_size = 11
+        self.toolbar_font_size = 10
+        self.text_font_size = 10
 
         # Set slot for simulation end signal to plot simulation data
         self.simulationEndSignal.connect(self.plotSimulationData)
@@ -131,25 +131,26 @@ class Application(QtWidgets.QMainWindow):
         # Update console (noteArea)
         self.obj_Mainview.noteArea.setFont(text_font)
         
-        # Update project explorer and its contents
-        self.obj_Mainview.obj_projectExplorer.setFont(text_font)
+        # Update project explorer with smaller font size for better visibility
+        project_explorer_font = QtGui.QFont("Fira Code", max(8, self.text_font_size - 3))
+        self.obj_Mainview.obj_projectExplorer.setFont(project_explorer_font)
         
-        # Update project tree items
+        # Update project tree items with smaller font
         project_tree = self.obj_Mainview.obj_projectExplorer.findChild(QtWidgets.QTreeWidget)
         if project_tree:
-            project_tree.setFont(text_font)
-            # Update all items in the tree
+            project_tree.setFont(project_explorer_font)
+            # Update all items in the tree with smaller font
             for i in range(project_tree.topLevelItemCount()):
                 item = project_tree.topLevelItem(i)
-                item.setFont(0, text_font)
+                item.setFont(0, project_explorer_font)
                 # Update child items
                 for j in range(item.childCount()):
                     child = item.child(j)
-                    child.setFont(0, text_font)
+                    child.setFont(0, project_explorer_font)
                     # Update grandchild items
                     for k in range(child.childCount()):
                         grandchild = child.child(k)
-                        grandchild.setFont(0, text_font)
+                        grandchild.setFont(0, project_explorer_font)
 
         # Update dock area contents
         dock_area = self.obj_Mainview.obj_dockarea
@@ -191,8 +192,8 @@ class Application(QtWidgets.QMainWindow):
 
     def reset_font_size(self):
         """Reset font sizes to default"""
-        self.toolbar_font_size = 11
-        self.text_font_size = 11
+        self.toolbar_font_size = 10
+        self.text_font_size = 10
         self.update_font_sizes()
         self.obj_appconfig.print_info("Font size reset to default")
 
@@ -1477,14 +1478,22 @@ class Application(QtWidgets.QMainWindow):
             self.apply_dark_theme()
             self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/light_mode.png'))
             self.theme_toggle.setToolTip('Switch to Light Mode')
-            # Update simulation tab and graph colors for dark theme
-            self.update_simulation_theme(is_dark=True)
+            # Update schematic converter theme
+            self.update_schematic_converter_theme(is_dark=True)
+            # Update model editor theme
+            self.update_model_editor_theme(is_dark=True)
+            # Update makerchip-ngveri theme
+            self.update_makerchip_ngveri_theme(is_dark=True)
         else:
             self.apply_light_theme()
             self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/dark_mode.png'))
             self.theme_toggle.setToolTip('Switch to Dark Mode')
-            # Update simulation tab and graph colors for light theme
-            self.update_simulation_theme(is_dark=False)
+            # Update schematic converter theme
+            self.update_schematic_converter_theme(is_dark=False)
+            # Update model editor theme
+            self.update_model_editor_theme(is_dark=False)
+            # Update makerchip-ngveri theme
+            self.update_makerchip_ngveri_theme(is_dark=False)
 
         # Update all dock widgets and their children
         for dock_widget in self.findChildren(QtWidgets.QDockWidget):
@@ -1502,124 +1511,658 @@ class Application(QtWidgets.QMainWindow):
         # Force update of the UI
         self.repaint()
 
-    def update_simulation_theme(self, is_dark):
-        """Update simulation tab and graph colors based on theme."""
+    def update_schematic_converter_theme(self, is_dark):
+        """Update schematic converter theme based on current theme."""
         if is_dark:
-            # Dark theme colors for simulation
-            simulation_style = """
-                QTextEdit, QPlainTextEdit {
-                    background: #23273a;
+            # Dark theme for schematic converter
+            converter_style = """
+                QGroupBox {
+                    border: 2px solid #40c4ff;
+                    border-radius: 14px;
+                    margin-top: 1em;
+                    padding: 15px;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #23273a, stop:1 #181b24);
                     color: #e8eaed;
-                    border: 1px solid #181b24;
-                    border-radius: 8px;
-                    selection-background-color: #40c4ff;
-                    selection-color: #181b24;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 15px;
+                    padding: 0 5px;
+                    color: #40c4ff;
+                    font-weight: bold;
+                    font-size: 14px;
                 }
                 QLineEdit {
-                    background: #23273a;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #23273a, stop:1 #181b24);
                     color: #e8eaed;
-                    border: 1px solid #181b24;
-                    border-radius: 8px;
-                    selection-background-color: #40c4ff;
-                    selection-color: #181b24;
+                    border: 2px solid #40c4ff;
+                    border-radius: 10px;
+                    padding: 8px 15px;
+                    font-weight: 500;
+                    font-size: 12px;
                 }
-                QLabel {
-                    color: #e8eaed;
+                QLineEdit:focus {
+                    border: 2px solid #1976d2;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #2a2f3a, stop:1 #1e2128);
+                    box-shadow: 0 0 10px rgba(64, 196, 255, 0.3);
                 }
-                QProgressBar {
-                    background: #181b24;
-                    border: 1px solid #23273a;
-                    border-radius: 8px;
-                    text-align: center;
-                    color: #e8eaed;
+                QLineEdit::placeholder {
+                    color: #b0b3b8;
+                    font-style: italic;
                 }
-                QProgressBar::chunk {
-                    background: #40c4ff;
-                    border-radius: 8px;
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #40c4ff, stop:1 #1976d2);
+                    color: #181b24;
+                    border: 1px solid #40c4ff;
+                    border-radius: 10px;
+                    padding: 10px 20px;
+                    font-weight: 700;
+                    font-size: 12px;
                 }
-            """
-            # Dark theme colors for graphs
-            graph_style = {
-                'background': '#23273a',
-                'text_color': '#e8eaed',
-                'grid_color': '#181b24',
-                'line_colors': ['#40c4ff', '#ff4081', '#00e676', '#ffd600', '#ff6d00']
-            }
-        else:
-            # Light theme colors for simulation
-            simulation_style = """
-                QTextEdit, QPlainTextEdit {
-                    background: #ffffff;
-                    color: #2c3e50;
-                    border: 1px solid #e1e4e8;
-                    border-radius: 8px;
-                    selection-background-color: #1976d2;
-                    selection-color: #ffffff;
-                }
-                QLineEdit {
-                    background: #ffffff;
-                    color: #2c3e50;
-                    border: 1px solid #e1e4e8;
-                    border-radius: 8px;
-                    selection-background-color: #1976d2;
-                    selection-color: #ffffff;
-                }
-                QLabel {
-                    color: #2c3e50;
-                }
-                QProgressBar {
-                    background: #f8f9fa;
-                    border: 1px solid #e1e4e8;
-                    border-radius: 8px;
-                    text-align: center;
-                    color: #2c3e50;
-                }
-                QProgressBar::chunk {
+                QPushButton:hover {
                     background: #1976d2;
-                    border-radius: 8px;
+                    color: #fff;
+                    border: 1.5px solid #1976d2;
+                }
+                QPushButton:pressed {
+                    background: #23273a;
+                    color: #40c4ff;
+                    border: 1.5px solid #40c4ff;
+                }
+                QLabel {
+                    color: #e8eaed;
                 }
             """
-            # Light theme colors for graphs
-            graph_style = {
-                'background': '#ffffff',
-                'text_color': '#2c3e50',
-                'grid_color': '#e1e4e8',
-                'line_colors': ['#1976d2', '#d81b60', '#00897b', '#fbc02d', '#e64a19']
-            }
+            # Dark theme description styling
+            description_style = """
+                body {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #23273a, stop:1 #181b24);
+                    color: #e8eaed;
+                    border: 2px solid #40c4ff;
+                }
+                h1 {
+                    color: #40c4ff;
+                    border-bottom: 2px solid #40c4ff;
+                }
+                b {
+                    color: #40c4ff;
+                }
+            """
+        else:
+            # Light theme for schematic converter
+            converter_style = """
+                QGroupBox {
+                    border: 2px solid #1976d2;
+                    border-radius: 14px;
+                    margin-top: 1em;
+                    padding: 15px;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #ffffff, stop:1 #f8f9fa);
+                    color: #2c3e50;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 15px;
+                    padding: 0 5px;
+                    color: #1976d2;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                QLineEdit {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #ffffff, stop:1 #f8f9fa);
+                    color: #2c3e50;
+                    border: 2px solid #1976d2;
+                    border-radius: 10px;
+                    padding: 8px 15px;
+                    font-weight: 500;
+                    font-size: 12px;
+                }
+                QLineEdit:focus {
+                    border: 2px solid #1565c0;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #f8f9fa, stop:1 #ffffff);
+                    box-shadow: 0 0 10px rgba(25, 118, 210, 0.3);
+                }
+                QLineEdit::placeholder {
+                    color: #7f8c8d;
+                    font-style: italic;
+                }
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #1976d2, stop:1 #1565c0);
+                    color: #ffffff;
+                    border: 1px solid #1976d2;
+                    border-radius: 10px;
+                    padding: 10px 20px;
+                    font-weight: 700;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background: #1565c0;
+                    color: #fff;
+                    border: 1.5px solid #1565c0;
+                }
+                QPushButton:pressed {
+                    background: #0d47a1;
+                    color: #ffffff;
+                    border: 1.5px solid #0d47a1;
+                }
+                QLabel {
+                    color: #2c3e50;
+                }
+            """
+            # Light theme description styling
+            description_style = """
+                body {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #ffffff, stop:1 #f8f9fa);
+                    color: #2c3e50;
+                    border: 2px solid #1976d2;
+                }
+                h1 {
+                    color: #1976d2;
+                    border-bottom: 2px solid #1976d2;
+                }
+                b {
+                    color: #1976d2;
+                }
+            """
 
-        # Apply simulation styles
-        for widget in self.findChildren((QtWidgets.QTextEdit, QtWidgets.QPlainTextEdit, QtWidgets.QLineEdit, QtWidgets.QLabel, QtWidgets.QProgressBar)):
-            if widget.parent() and isinstance(widget.parent(), QtWidgets.QDockWidget):
-                if "Simulation" in widget.parent().windowTitle():
-                    widget.setStyleSheet(simulation_style)
-
-        # Update graph colors if matplotlib is being used
+        # Apply styles to schematic converter widgets
         try:
-            import matplotlib.pyplot as plt
-            plt.style.use('dark_background' if is_dark else 'default')
-            # Update any existing plots
-            for figure in plt.get_fignums():
-                fig = plt.figure(figure)
-                ax = fig.gca()
-                ax.set_facecolor(graph_style['background'])
-                ax.tick_params(colors=graph_style['text_color'])
-                ax.xaxis.label.set_color(graph_style['text_color'])
-                ax.yaxis.label.set_color(graph_style['text_color'])
-                ax.title.set_color(graph_style['text_color'])
-                ax.grid(True, color=graph_style['grid_color'])
-                fig.set_facecolor(graph_style['background'])
-                plt.draw()
-        except ImportError:
-            pass  # matplotlib not available
+            # Find schematic converter widgets and apply theme
+            for widget in self.findChildren(QtWidgets.QWidget):
+                if hasattr(widget, 'objectName') and widget.objectName() == 'schematic_converter':
+                    widget.setStyleSheet(converter_style)
+                # Also apply to any QTextBrowser widgets that might contain descriptions
+                if isinstance(widget, QtWidgets.QTextBrowser):
+                    widget.document().setDefaultStyleSheet(description_style)
+        except Exception as e:
+            print(f"Error updating schematic converter theme: {e}")
 
-        # Update plot window theme if it exists
+    def update_model_editor_theme(self, is_dark):
+        """Update model editor theme based on current theme."""
+        if is_dark:
+            # Dark theme for model editor
+            model_editor_style = """
+                QGroupBox {
+                    border: 2px solid #40c4ff;
+                    border-radius: 14px;
+                    margin-top: 1em;
+                    padding: 15px;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #23273a, stop:1 #181b24);
+                    color: #e8eaed;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 15px;
+                    padding: 0 5px;
+                    color: #40c4ff;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #40c4ff, stop:1 #1976d2);
+                    color: #181b24;
+                    border: 1px solid #40c4ff;
+                    min-height: 35px;
+                    min-width: 120px;
+                    padding: 8px 15px;
+                    border-radius: 10px;
+                    font-weight: 700;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background: #1976d2;
+                    color: #fff;
+                    border: 1.5px solid #1976d2;
+                }
+                QPushButton:pressed {
+                    background: #23273a;
+                    color: #40c4ff;
+                    border: 1.5px solid #40c4ff;
+                }
+                QPushButton:disabled {
+                    background: #23273a;
+                    color: #888;
+                    border: 1px solid #23273a;
+                }
+                QRadioButton {
+                    color: #e8eaed;
+                    font-weight: 600;
+                    font-size: 13px;
+                }
+                QRadioButton::indicator {
+                    width: 16px;
+                    height: 16px;
+                    border: 2px solid #40c4ff;
+                    border-radius: 8px;
+                    background: #23273a;
+                }
+                QRadioButton::indicator:checked {
+                    background: #40c4ff;
+                    border: 2px solid #40c4ff;
+                }
+                QComboBox {
+                    background: #23273a;
+                    color: #e8eaed;
+                    border: 1px solid #40c4ff;
+                    border-radius: 8px;
+                    padding: 5px 10px;
+                    min-height: 30px;
+                    font-size: 12px;
+                }
+                QComboBox:hover {
+                    border: 1.5px solid #1976d2;
+                }
+                QComboBox::drop-down {
+                    border: none;
+                    width: 20px;
+                }
+                QComboBox::down-arrow {
+                    width: 12px;
+                    height: 12px;
+                }
+                QTableWidget {
+                    background: #23273a;
+                    color: #e8eaed;
+                    border: 1px solid #40c4ff;
+                    border-radius: 8px;
+                    gridline-color: #40c4ff;
+                    font-size: 12px;
+                }
+                QTableWidget::item {
+                    padding: 8px;
+                    border-bottom: 1px solid #181b24;
+                }
+                QTableWidget::item:selected {
+                    background: #40c4ff;
+                    color: #181b24;
+                }
+                QHeaderView::section {
+                    background: #181b24;
+                    color: #40c4ff;
+                    border: 1px solid #40c4ff;
+                    padding: 8px;
+                    font-weight: 700;
+                }
+                QLabel {
+                    color: #e8eaed;
+                }
+            """
+        else:
+            # Light theme for model editor
+            model_editor_style = """
+                QGroupBox {
+                    border: 2px solid #1976d2;
+                    border-radius: 14px;
+                    margin-top: 1em;
+                    padding: 15px;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #ffffff, stop:1 #f8f9fa);
+                    color: #2c3e50;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 15px;
+                    padding: 0 5px;
+                    color: #1976d2;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #1976d2, stop:1 #1565c0);
+                    color: #ffffff;
+                    border: 1px solid #1976d2;
+                    min-height: 35px;
+                    min-width: 120px;
+                    padding: 8px 15px;
+                    border-radius: 10px;
+                    font-weight: 700;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background: #1565c0;
+                    color: #fff;
+                    border: 1.5px solid #1565c0;
+                }
+                QPushButton:pressed {
+                    background: #0d47a1;
+                    color: #ffffff;
+                    border: 1.5px solid #0d47a1;
+                }
+                QPushButton:disabled {
+                    background: #e1e4e8;
+                    color: #7f8c8d;
+                    border: 1px solid #e1e4e8;
+                }
+                QRadioButton {
+                    color: #2c3e50;
+                    font-weight: 600;
+                    font-size: 13px;
+                }
+                QRadioButton::indicator {
+                    width: 16px;
+                    height: 16px;
+                    border: 2px solid #1976d2;
+                    border-radius: 8px;
+                    background: #ffffff;
+                }
+                QRadioButton::indicator:checked {
+                    background: #1976d2;
+                    border: 2px solid #1976d2;
+                }
+                QComboBox {
+                    background: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #1976d2;
+                    border-radius: 8px;
+                    padding: 5px 10px;
+                    min-height: 30px;
+                    font-size: 12px;
+                }
+                QComboBox:hover {
+                    border: 1.5px solid #1565c0;
+                }
+                QComboBox::drop-down {
+                    border: none;
+                    width: 20px;
+                }
+                QComboBox::down-arrow {
+                    width: 12px;
+                    height: 12px;
+                }
+                QTableWidget {
+                    background: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #1976d2;
+                    border-radius: 8px;
+                    gridline-color: #1976d2;
+                    font-size: 12px;
+                }
+                QTableWidget::item {
+                    padding: 8px;
+                    border-bottom: 1px solid #f8f9fa;
+                }
+                QTableWidget::item:selected {
+                    background: #1976d2;
+                    color: #ffffff;
+                }
+                QHeaderView::section {
+                    background: #f8f9fa;
+                    color: #1976d2;
+                    border: 1px solid #1976d2;
+                    padding: 8px;
+                    font-weight: 700;
+                }
+                QLabel {
+                    color: #2c3e50;
+                }
+            """
+
+        # Apply styles to model editor widgets
         try:
-            from ngspiceSimulation.pythonPlotting import plotWindow
-            if plotWindow.instance is not None:
-                if plotWindow.instance.is_dark_theme != is_dark:
-                    plotWindow.instance.toggle_theme()
-        except ImportError:
-            pass  # plotWindow not available
+            # Find model editor widgets and apply theme
+            for widget in self.findChildren(QtWidgets.QWidget):
+                if hasattr(widget, 'objectName') and 'model' in widget.objectName().lower():
+                    widget.setStyleSheet(model_editor_style)
+                # Also apply to any ModelEditorclass instances
+                if hasattr(widget, '__class__') and 'ModelEditorclass' in str(widget.__class__):
+                    widget.setStyleSheet(model_editor_style)
+        except Exception as e:
+            print(f"Error updating model editor theme: {e}")
+
+    def update_makerchip_ngveri_theme(self, is_dark):
+        """Update makerchip-ngveri theme based on current theme."""
+        if is_dark:
+            # Dark theme for makerchip-ngveri
+            makerchip_style = """
+                QGroupBox {
+                    border: 2px solid #40c4ff;
+                    border-radius: 14px;
+                    margin-top: 1em;
+                    padding: 15px;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #23273a, stop:1 #181b24);
+                    color: #e8eaed;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 15px;
+                    padding: 0 5px;
+                    color: #40c4ff;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #40c4ff, stop:1 #1976d2);
+                    color: #181b24;
+                    border: 1px solid #40c4ff;
+                    min-height: 35px;
+                    min-width: 120px;
+                    padding: 8px 15px;
+                    border-radius: 10px;
+                    font-weight: 700;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background: #1976d2;
+                    color: #fff;
+                    border: 1.5px solid #1976d2;
+                }
+                QPushButton:pressed {
+                    background: #23273a;
+                    color: #40c4ff;
+                    border: 1.5px solid #40c4ff;
+                }
+                QPushButton:disabled {
+                    background: #23273a;
+                    color: #888;
+                    border: 1px solid #23273a;
+                }
+                QTextEdit {
+                    background: #23273a;
+                    color: #e8eaed;
+                    border: 1px solid #40c4ff;
+                    border-radius: 8px;
+                    padding: 10px;
+                    font-size: 12px;
+                    font-family: 'Consolas', 'Monaco', monospace;
+                }
+                QComboBox {
+                    background: #23273a;
+                    color: #e8eaed;
+                    border: 1px solid #40c4ff;
+                    border-radius: 8px;
+                    padding: 5px 10px;
+                    min-height: 30px;
+                    font-size: 12px;
+                }
+                QComboBox:hover {
+                    border: 1.5px solid #1976d2;
+                }
+                QComboBox::drop-down {
+                    border: none;
+                    width: 20px;
+                }
+                QComboBox::down-arrow {
+                    width: 12px;
+                    height: 12px;
+                }
+                QLineEdit {
+                    background: #23273a;
+                    color: #e8eaed;
+                    border: 1px solid #40c4ff;
+                    border-radius: 8px;
+                    padding: 8px 12px;
+                    min-height: 30px;
+                    font-size: 12px;
+                }
+                QLineEdit:focus {
+                    border: 1.5px solid #1976d2;
+                }
+                QLabel {
+                    color: #e8eaed;
+                }
+                QTabWidget::pane {
+                    border: 1px solid #40c4ff;
+                    border-radius: 8px;
+                    background: #23273a;
+                }
+                QTabBar::tab {
+                    background: #181b24;
+                    color: #e8eaed;
+                    padding: 8px 16px;
+                    border: 1px solid #40c4ff;
+                    border-bottom: none;
+                    border-radius: 8px 8px 0 0;
+                    font-weight: 600;
+                }
+                QTabBar::tab:selected {
+                    background: #40c4ff;
+                    color: #181b24;
+                }
+                QTabBar::tab:hover {
+                    background: #1976d2;
+                    color: #ffffff;
+                }
+            """
+        else:
+            # Light theme for makerchip-ngveri
+            makerchip_style = """
+                QGroupBox {
+                    border: 2px solid #1976d2;
+                    border-radius: 14px;
+                    margin-top: 1em;
+                    padding: 15px;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #ffffff, stop:1 #f8f9fa);
+                    color: #2c3e50;
+                }
+                QGroupBox::title {
+                    subcontrol-origin: margin;
+                    left: 15px;
+                    padding: 0 5px;
+                    color: #1976d2;
+                    font-weight: bold;
+                    font-size: 14px;
+                }
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #1976d2, stop:1 #1565c0);
+                    color: #ffffff;
+                    border: 1px solid #1976d2;
+                    min-height: 35px;
+                    min-width: 120px;
+                    padding: 8px 15px;
+                    border-radius: 10px;
+                    font-weight: 700;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background: #1565c0;
+                    color: #fff;
+                    border: 1.5px solid #1565c0;
+                }
+                QPushButton:pressed {
+                    background: #0d47a1;
+                    color: #ffffff;
+                    border: 1.5px solid #0d47a1;
+                }
+                QPushButton:disabled {
+                    background: #e1e4e8;
+                    color: #7f8c8d;
+                    border: 1px solid #e1e4e8;
+                }
+                QTextEdit {
+                    background: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #1976d2;
+                    border-radius: 8px;
+                    padding: 10px;
+                    font-size: 12px;
+                    font-family: 'Consolas', 'Monaco', monospace;
+                }
+                QComboBox {
+                    background: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #1976d2;
+                    border-radius: 8px;
+                    padding: 5px 10px;
+                    min-height: 30px;
+                    font-size: 12px;
+                }
+                QComboBox:hover {
+                    border: 1.5px solid #1565c0;
+                }
+                QComboBox::drop-down {
+                    border: none;
+                    width: 20px;
+                }
+                QComboBox::down-arrow {
+                    width: 12px;
+                    height: 12px;
+                }
+                QLineEdit {
+                    background: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #1976d2;
+                    border-radius: 8px;
+                    padding: 8px 12px;
+                    min-height: 30px;
+                    font-size: 12px;
+                }
+                QLineEdit:focus {
+                    border: 1.5px solid #1565c0;
+                }
+                QLabel {
+                    color: #2c3e50;
+                }
+                QTabWidget::pane {
+                    border: 1px solid #1976d2;
+                    border-radius: 8px;
+                    background: #ffffff;
+                }
+                QTabBar::tab {
+                    background: #f8f9fa;
+                    color: #2c3e50;
+                    padding: 8px 16px;
+                    border: 1px solid #1976d2;
+                    border-bottom: none;
+                    border-radius: 8px 8px 0 0;
+                    font-weight: 600;
+                }
+                QTabBar::tab:selected {
+                    background: #1976d2;
+                    color: #ffffff;
+                }
+                QTabBar::tab:hover {
+                    background: #1565c0;
+                    color: #ffffff;
+                }
+            """
+
+        # Apply styles to makerchip-ngveri widgets
+        try:
+            # Find makerchip-ngveri widgets and apply theme
+            for widget in self.findChildren(QtWidgets.QWidget):
+                if hasattr(widget, 'objectName') and ('makerchip' in widget.objectName().lower() or 'ngveri' in widget.objectName().lower()):
+                    widget.setStyleSheet(makerchip_style)
+                # Also apply to any Maker or NgVeri class instances
+                if hasattr(widget, '__class__') and ('Maker' in str(widget.__class__) or 'NgVeri' in str(widget.__class__)):
+                    widget.setStyleSheet(makerchip_style)
+        except Exception as e:
+            print(f"Error updating makerchip-ngveri theme: {e}")
 
     def plotFlagPopBox(self):
         """This function displays a pop-up box with message- Do you want Ngspice plots? and oprions Yes and NO.

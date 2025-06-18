@@ -77,10 +77,10 @@ class ProjectExplorer(QtWidgets.QWidget):
                     stop:0 #23273a, stop:1 #181b24);
                 color: #40c4ff;
                 font-weight: 700;
-                font-size: 17px;
+                font-size: 12px;
                 border: none;
                 border-radius: 0;
-                padding: 12px 0px 12px 18px;
+                padding: 8px 0px 8px 12px;
                 letter-spacing: 0.5px;
             }
             QTreeWidget {
@@ -91,14 +91,16 @@ class ProjectExplorer(QtWidgets.QWidget):
                 border-radius: 12px;
                 selection-background-color: #40c4ff;
                 selection-color: #181b24;
-                font-weight: 600;
-                padding: 8px;
+                font-weight: 500;
+                font-size: 10px;
+                padding: 6px;
             }
             QTreeWidget::item {
-                padding: 8px;
-                border-radius: 6px;
-                margin: 2px 0px;
+                padding: 4px;
+                border-radius: 4px;
+                margin: 1px 0px;
                 background: transparent;
+                font-size: 10px;
             }
             QTreeWidget::item:hover {
                 background: #2d3348;
@@ -107,11 +109,11 @@ class ProjectExplorer(QtWidgets.QWidget):
             QTreeWidget::item:selected {
                 background: #40c4ff;
                 color: #181b24;
-                font-weight: 700;
+                font-weight: 600;
             }
             QTreeView::branch {
                 background: transparent;
-                width: 16px;
+                width: 12px;
             }
             QTreeView::branch:has-children:!has-siblings:closed,
             QTreeView::branch:closed:has-children:has-siblings {
@@ -123,15 +125,15 @@ class ProjectExplorer(QtWidgets.QWidget):
             }
             QScrollBar:vertical {
                 background: #23273a;
-                width: 12px;
+                width: 10px;
                 margin: 0;
-                border-radius: 6px;
+                border-radius: 5px;
             }
             QScrollBar::handle:vertical {
                 background: #40c4ff;
-                min-height: 30px;
-                border-radius: 6px;
-                margin: 2px;
+                min-height: 20px;
+                border-radius: 5px;
+                margin: 1px;
             }
             QScrollBar::handle:vertical:hover {
                 background: #1976d2;
@@ -160,10 +162,10 @@ class ProjectExplorer(QtWidgets.QWidget):
                     stop:0 #ffffff, stop:1 #f8f9fa);
                 color: #1976d2;
                 font-weight: 700;
-                font-size: 17px;
+                font-size: 12px;
                 border: none;
                 border-radius: 0;
-                padding: 12px 0px 12px 18px;
+                padding: 8px 0px 8px 12px;
                 letter-spacing: 0.5px;
             }
             QTreeWidget {
@@ -174,14 +176,16 @@ class ProjectExplorer(QtWidgets.QWidget):
                 border-radius: 12px;
                 selection-background-color: #1976d2;
                 selection-color: #ffffff;
-                font-weight: 600;
-                padding: 8px;
+                font-weight: 500;
+                font-size: 10px;
+                padding: 6px;
             }
             QTreeWidget::item {
-                padding: 8px;
-                border-radius: 6px;
-                margin: 2px 0px;
+                padding: 4px;
+                border-radius: 4px;
+                margin: 1px 0px;
                 background: transparent;
+                font-size: 10px;
             }
             QTreeWidget::item:hover {
                 background: #f1f4f9;
@@ -190,11 +194,11 @@ class ProjectExplorer(QtWidgets.QWidget):
             QTreeWidget::item:selected {
                 background: #1976d2;
                 color: #ffffff;
-                font-weight: 700;
+                font-weight: 600;
             }
             QTreeView::branch {
                 background: transparent;
-                width: 16px;
+                width: 12px;
             }
             QTreeView::branch:has-children:!has-siblings:closed,
             QTreeView::branch:closed:has-children:has-siblings {
@@ -206,15 +210,15 @@ class ProjectExplorer(QtWidgets.QWidget):
             }
             QScrollBar:vertical {
                 background: #f1f4f9;
-                width: 12px;
+                width: 10px;
                 margin: 0;
-                border-radius: 6px;
+                border-radius: 5px;
             }
             QScrollBar::handle:vertical {
                 background: #1976d2;
-                min-height: 30px;
-                border-radius: 6px;
-                margin: 2px;
+                min-height: 20px;
+                border-radius: 5px;
+                margin: 1px;
             }
             QScrollBar::handle:vertical:hover {
                 background: #1565c0;

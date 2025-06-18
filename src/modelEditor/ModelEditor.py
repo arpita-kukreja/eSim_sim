@@ -34,8 +34,10 @@ class ModelEditorclass(QtWidgets.QWidget):
         - Magnetic Core   magnetic_click
     '''
 
-    def __init__(self):
+    def __init__(self, is_dark_theme=False):
         QtWidgets.QWidget.__init__(self)
+
+        self.is_dark_theme = is_dark_theme
 
         self.init_path = '../../'
         if os.name == 'nt':
@@ -118,7 +120,77 @@ class ModelEditorclass(QtWidgets.QWidget):
         self.grid.addWidget(self.igbt, 7, 1)
         self.grid.addWidget(self.magnetic, 8, 1)
         self.setLayout(self.grid)
+        
+        # Apply initial theme styling
+        self.apply_theme_styling()
+        
         self.show()
+
+    def apply_theme_styling(self):
+        """Apply theme styling to the model editor widgets."""
+        self.setObjectName("model_editor")
+        if self.is_dark_theme:
+            self.setStyleSheet("""
+                QWidget { background: transparent; }
+                QPushButton { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #40c4ff, stop:1 #1976d2); color: #181b24; border: 1px solid #40c4ff; min-height: 35px; min-width: 120px; padding: 8px 15px; border-radius: 10px; font-weight: 700; font-size: 12px; }
+                QPushButton:hover { background: #1976d2; color: #fff; border: 1.5px solid #1976d2; }
+                QPushButton:pressed { background: #23273a; color: #40c4ff; border: 1.5px solid #40c4ff; }
+                QPushButton:disabled { background: #23273a; color: #888; border: 1px solid #23273a; }
+                QRadioButton { color: #e8eaed; font-weight: 600; font-size: 13px; }
+                QRadioButton::indicator { width: 16px; height: 16px; border: 2px solid #40c4ff; border-radius: 8px; background: #23273a; }
+                QRadioButton::indicator:checked { background: #40c4ff; border: 2px solid #40c4ff; }
+                QComboBox { background: #23273a; color: #e8eaed; border: 1px solid #40c4ff; border-radius: 8px; padding: 5px 10px; min-height: 30px; font-size: 12px; }
+                QComboBox:hover { border: 1.5px solid #1976d2; }
+                QComboBox::drop-down { border: none; width: 20px; }
+                QComboBox::down-arrow { width: 12px; height: 12px; }
+                QTableWidget { background: #23273a; color: #e8eaed; border: 1px solid #40c4ff; border-radius: 8px; gridline-color: #40c4ff; font-size: 12px; }
+                QTableWidget::item { padding: 8px; border-bottom: 1px solid #181b24; }
+                QTableWidget::item:selected { background: #40c4ff; color: #181b24; }
+                QHeaderView::section { background: #181b24; color: #40c4ff; border: 1px solid #40c4ff; padding: 8px; font-weight: 700; }
+                QLabel { color: #e8eaed; }
+            """)
+        else:
+            self.setStyleSheet("""
+                QWidget { background: transparent; }
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f5f7fa, stop:1 #e3e8ee);
+                    color: #1976d2;
+                    border: 1px solid #b0bec5;
+                    min-height: 35px;
+                    min-width: 120px;
+                    padding: 8px 15px;
+                    border-radius: 10px;
+                    font-weight: 700;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background: #e3e8ee;
+                    color: #1565c0;
+                    border: 1.5px solid #1976d2;
+                }
+                QPushButton:pressed {
+                    background: #cfd8dc;
+                    color: #1976d2;
+                    border: 1.5px solid #1976d2;
+                }
+                QPushButton:disabled {
+                    background: #e1e4e8;
+                    color: #7f8c8d;
+                    border: 1px solid #e1e4e8;
+                }
+                QRadioButton { color: #2c3e50; font-weight: 600; font-size: 13px; }
+                QRadioButton::indicator { width: 16px; height: 16px; border: 2px solid #1976d2; border-radius: 8px; background: #ffffff; }
+                QRadioButton::indicator:checked { background: #1976d2; border: 2px solid #1976d2; }
+                QComboBox { background: #ffffff; color: #2c3e50; border: 1px solid #1976d2; border-radius: 8px; padding: 5px 10px; min-height: 30px; font-size: 12px; }
+                QComboBox:hover { border: 1.5px solid #1565c0; }
+                QComboBox::drop-down { border: none; width: 20px; }
+                QComboBox::down-arrow { width: 12px; height: 12px; }
+                QTableWidget { background: #ffffff; color: #2c3e50; border: 1px solid #1976d2; border-radius: 8px; gridline-color: #1976d2; font-size: 12px; }
+                QTableWidget::item { padding: 8px; border-bottom: 1px solid #f8f9fa; }
+                QTableWidget::item:selected { background: #1976d2; color: #ffffff; }
+                QHeaderView::section { background: #f8f9fa; color: #1976d2; border: 1px solid #1976d2; padding: 8px; font-weight: 700; }
+                QLabel { color: #2c3e50; }
+            """)
 
     def opennew(self):
         '''

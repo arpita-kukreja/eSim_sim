@@ -41,10 +41,11 @@ class NgVeri(QtWidgets.QWidget):
     '''
         This class create the NgVeri Tab
     '''
-    def __init__(self, filecount):
+    def __init__(self, filecount, is_dark_theme=False):
         QtWidgets.QWidget.__init__(self)
         # Maker.addverilog(self)
         self.obj_Appconfig = Appconfig()
+        self.is_dark_theme = is_dark_theme
 
         if os.name == 'nt':
             self.home = os.path.join('library', 'config')
@@ -77,7 +78,73 @@ class NgVeri(QtWidgets.QWidget):
         self.grid.addWidget(self.createoptionsBox(), 0, 0, QtCore.Qt.AlignTop)
         self.grid.addWidget(self.creategroup(), 1, 0, 5, 0)
 
+        # Apply initial theme styling
+        self.apply_theme_styling()
+
         self.show()
+
+    def apply_theme_styling(self):
+        """Apply theme styling to the NgVeri widget."""
+        self.setObjectName("ngveri_widget")
+        
+        if self.is_dark_theme:
+            self.setStyleSheet("""
+                QWidget { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #23273a, stop:1 #181b24); color: #e8eaed; }
+                QGroupBox { border: 2px solid #40c4ff; border-radius: 14px; margin-top: 1em; padding: 15px; background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #23273a, stop:1 #181b24); color: #e8eaed; }
+                QGroupBox::title { subcontrol-origin: margin; left: 15px; padding: 0 5px; color: #40c4ff; font-weight: bold; font-size: 14px; }
+                QPushButton { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #40c4ff, stop:1 #1976d2); color: #181b24; border: 1px solid #40c4ff; min-height: 35px; min-width: 120px; padding: 8px 15px; border-radius: 10px; font-weight: 700; font-size: 12px; }
+                QPushButton:hover { background: #1976d2; color: #fff; border: 1.5px solid #1976d2; }
+                QPushButton:pressed { background: #23273a; color: #40c4ff; border: 1.5px solid #40c4ff; }
+                QPushButton:disabled { background: #23273a; color: #888; border: 1px solid #23273a; }
+                QTextEdit { background: #23273a; color: #e8eaed; border: 1px solid #40c4ff; border-radius: 8px; padding: 10px; font-size: 12px; font-family: 'Consolas', 'Monaco', monospace; }
+                QComboBox { background: #23273a; color: #e8eaed; border: 1px solid #40c4ff; border-radius: 8px; padding: 5px 10px; min-height: 30px; font-size: 12px; }
+                QComboBox:hover { border: 1.5px solid #1976d2; }
+                QComboBox::drop-down { border: none; width: 20px; }
+                QComboBox::down-arrow { width: 12px; height: 12px; }
+                QLineEdit { background: #23273a; color: #e8eaed; border: 1px solid #40c4ff; border-radius: 8px; padding: 8px 12px; min-height: 30px; font-size: 12px; }
+                QLineEdit:focus { border: 1.5px solid #1976d2; }
+                QLabel { color: #e8eaed; }
+            """)
+        else:
+            self.setStyleSheet("""
+                QWidget { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffffff, stop:1 #f8f9fa); color: #2c3e50; }
+                QGroupBox { border: 2px solid #1976d2; border-radius: 14px; margin-top: 1em; padding: 15px; background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffffff, stop:1 #f8f9fa); color: #2c3e50; }
+                QGroupBox::title { subcontrol-origin: margin; left: 15px; padding: 0 5px; color: #1976d2; font-weight: bold; font-size: 14px; }
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f5f7fa, stop:1 #e3e8ee);
+                    color: #1976d2;
+                    border: 1px solid #b0bec5;
+                    min-height: 35px;
+                    min-width: 120px;
+                    padding: 8px 15px;
+                    border-radius: 10px;
+                    font-weight: 700;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background: #e3e8ee;
+                    color: #1565c0;
+                    border: 1.5px solid #1976d2;
+                }
+                QPushButton:pressed {
+                    background: #cfd8dc;
+                    color: #1976d2;
+                    border: 1.5px solid #1976d2;
+                }
+                QPushButton:disabled {
+                    background: #e1e4e8;
+                    color: #7f8c8d;
+                    border: 1px solid #e1e4e8;
+                }
+                QTextEdit { background: #ffffff; color: #2c3e50; border: 1px solid #1976d2; border-radius: 8px; padding: 10px; font-size: 12px; font-family: 'Consolas', 'Monaco', monospace; }
+                QComboBox { background: #ffffff; color: #2c3e50; border: 1px solid #1976d2; border-radius: 8px; padding: 5px 10px; min-height: 30px; font-size: 12px; }
+                QComboBox:hover { border: 1.5px solid #1565c0; }
+                QComboBox::drop-down { border: none; width: 20px; }
+                QComboBox::down-arrow { width: 12px; height: 12px; }
+                QLineEdit { background: #ffffff; color: #2c3e50; border: 1px solid #1976d2; border-radius: 8px; padding: 8px 12px; min-height: 30px; font-size: 12px; }
+                QLineEdit:focus { border: 1.5px solid #1565c0; }
+                QLabel { color: #2c3e50; }
+            """)
 
     def addverilog(self):
         '''
@@ -262,54 +329,6 @@ class NgVeri(QtWidgets.QWidget):
         self.clearTerminalBtn.clicked.connect(self.clearTerminal)
         self.optionsgrid.addWidget(self.clearTerminalBtn, 0, 4)
 
-        # Apply modern styling
-        self.optionsbox.setStyleSheet("""
-            QGroupBox {
-                border: 2px solid #23273a;
-                border-radius: 14px;
-                margin-top: 1em;
-                padding: 15px;
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 15px;
-                padding: 0 5px;
-                color: #40c4ff;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #40c4ff, stop:1 #1976d2);
-                color: #181b24;
-                border: 1px solid #40c4ff;
-                min-height: 35px;
-                min-width: 120px;
-                padding: 8px 15px;
-                border-radius: 10px;
-                font-weight: 700;
-                font-size: 12px;
-            }
-            QPushButton:hover {
-                background: #1976d2;
-                color: #fff;
-                border: 1.5px solid #1976d2;
-            }
-            QPushButton:pressed {
-                background: #23273a;
-                color: #40c4ff;
-                border: 1.5px solid #40c4ff;
-            }
-            QPushButton:disabled {
-                background: #23273a;
-                color: #888;
-                border: 1px solid #23273a;
-            }
-        """)
-
         self.optionsbox.setLayout(self.optionsgrid)
         return self.optionsbox
 
@@ -473,89 +492,5 @@ class NgVeri(QtWidgets.QWidget):
 
         self.count += 1
 
-        # Apply modern styling
-        self.trbox.setStyleSheet("""
-            QGroupBox {
-                border: 2px solid #23273a;
-                border-radius: 14px;
-                margin-top: 1em;
-                padding: 15px;
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 15px;
-                padding: 0 5px;
-                color: #40c4ff;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #40c4ff, stop:1 #1976d2);
-                color: #181b24;
-                border: 1px solid #40c4ff;
-                min-height: 35px;
-                min-width: 120px;
-                padding: 8px 15px;
-                border-radius: 10px;
-                font-weight: 700;
-                font-size: 12px;
-            }
-            QPushButton:hover {
-                background: #1976d2;
-                color: #fff;
-                border: 1.5px solid #1976d2;
-            }
-            QPushButton:pressed {
-                background: #23273a;
-                color: #40c4ff;
-                border: 1.5px solid #40c4ff;
-            }
-            QComboBox {
-                background: #23273a;
-                color: #e8eaed;
-                border: 1px solid #40c4ff;
-                border-radius: 8px;
-                padding: 5px 10px;
-                min-height: 30px;
-                font-size: 12px;
-            }
-            QComboBox:hover {
-                border: 1.5px solid #1976d2;
-            }
-            QComboBox::drop-down {
-                border: none;
-                width: 20px;
-            }
-            QComboBox::down-arrow {
-                image: url(down_arrow.png);
-                width: 12px;
-                height: 12px;
-            }
-            QLineEdit {
-                background: #23273a;
-                color: #e8eaed;
-                border: 1px solid #40c4ff;
-                border-radius: 8px;
-                padding: 8px 12px;
-                min-height: 30px;
-                font-size: 12px;
-            }
-            QLineEdit:focus {
-                border: 1.5px solid #1976d2;
-            }
-            QTextEdit {
-                background: #23273a;
-                color: #e8eaed;
-                border: 1px solid #40c4ff;
-                border-radius: 8px;
-                padding: 10px;
-                font-size: 12px;
-                font-family: 'Consolas', 'Monaco', monospace;
-            }
-        """)
-
+        self.trbox.setLayout(self.trgrid)
         return self.trbox

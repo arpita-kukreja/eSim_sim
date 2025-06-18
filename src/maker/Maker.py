@@ -77,12 +77,13 @@ class Maker(QtWidgets.QWidget):
     Main class for creating the Makerchip Tab widget
     """
     
-    def __init__(self, filecount):
+    def __init__(self, filecount, is_dark_theme=False):
         """
         Initialize the Maker widget
         
         Args:
             filecount (int): File counter
+            is_dark_theme (bool): Whether to use dark theme
         """
         print(self)
         
@@ -92,6 +93,7 @@ class Maker(QtWidgets.QWidget):
         self.filecount = filecount
         self.entry_var = {}
         self.obj_Appconfig = Appconfig()
+        self.is_dark_theme = is_dark_theme
         
         # Initialize components
         self.createMakerWidget()
@@ -112,16 +114,64 @@ class Maker(QtWidgets.QWidget):
         # Add tlv file group below with proper spacing
         self.grid.addWidget(self.creategroup(), 1, 0)
         
-        # Set background color for the main widget
-        self.setStyleSheet("""
-            QWidget {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed; /* Matching Application.py text color */
-            }
-        """)
+        # Apply initial theme styling
+        self.apply_theme_styling()
         
         self.show()
+    
+    def apply_theme_styling(self):
+        """Apply theme styling to the Maker widget."""
+        self.setObjectName("maker_widget")
+        if self.is_dark_theme:
+            self.setStyleSheet("""
+                QWidget { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #23273a, stop:1 #181b24); color: #e8eaed; }
+                QGroupBox { border: 2px solid #40c4ff; border-radius: 14px; margin-top: 1em; padding: 15px; background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #23273a, stop:1 #181b24); color: #e8eaed; }
+                QGroupBox::title { subcontrol-origin: margin; left: 15px; padding: 0 5px; color: #40c4ff; font-weight: bold; font-size: 14px; }
+                QPushButton { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #40c4ff, stop:1 #1976d2); color: #181b24; border: 1px solid #40c4ff; min-height: 35px; min-width: 120px; padding: 8px 15px; border-radius: 10px; font-weight: 700; font-size: 12px; }
+                QPushButton:hover { background: #1976d2; color: #fff; border: 1.5px solid #1976d2; }
+                QPushButton:pressed { background: #23273a; color: #40c4ff; border: 1.5px solid #40c4ff; }
+                QPushButton:disabled { background: #23273a; color: #888; border: 1px solid #23273a; }
+                QTextEdit { background: #23273a; color: #e8eaed; border: 1px solid #40c4ff; border-radius: 8px; padding: 10px; font-size: 12px; font-family: 'Consolas', 'Monaco', monospace; }
+                QLineEdit { background: #23273a; color: #e8eaed; border: 1px solid #40c4ff; border-radius: 8px; padding: 8px 12px; min-height: 30px; font-size: 12px; }
+                QLineEdit:focus { border: 1.5px solid #1976d2; }
+                QLabel { color: #e8eaed; }
+            """)
+        else:
+            self.setStyleSheet("""
+                QWidget { background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffffff, stop:1 #f8f9fa); color: #2c3e50; }
+                QGroupBox { border: 2px solid #1976d2; border-radius: 14px; margin-top: 1em; padding: 15px; background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #ffffff, stop:1 #f8f9fa); color: #2c3e50; }
+                QGroupBox::title { subcontrol-origin: margin; left: 15px; padding: 0 5px; color: #1976d2; font-weight: bold; font-size: 14px; }
+                QPushButton {
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f5f7fa, stop:1 #e3e8ee);
+                    color: #1976d2;
+                    border: 1px solid #b0bec5;
+                    min-height: 35px;
+                    min-width: 120px;
+                    padding: 8px 15px;
+                    border-radius: 10px;
+                    font-weight: 700;
+                    font-size: 12px;
+                }
+                QPushButton:hover {
+                    background: #e3e8ee;
+                    color: #1565c0;
+                    border: 1.5px solid #1976d2;
+                }
+                QPushButton:pressed {
+                    background: #cfd8dc;
+                    color: #1976d2;
+                    border: 1.5px solid #1976d2;
+                }
+                QPushButton:disabled {
+                    background: #e1e4e8;
+                    color: #7f8c8d;
+                    border: 1px solid #e1e4e8;
+                }
+                QTextEdit { background: #ffffff; color: #2c3e50; border: 1px solid #1976d2; border-radius: 8px; padding: 10px; font-size: 12px; font-family: 'Consolas', 'Monaco', monospace; }
+                QLineEdit { background: #ffffff; color: #2c3e50; border: 1px solid #1976d2; border-radius: 8px; padding: 8px 12px; min-height: 30px; font-size: 12px; }
+                QLineEdit:focus { border: 1.5px solid #1565c0; }
+                QLabel { color: #2c3e50; }
+            """)
     
     def addverilog(self):
         """Add new Verilog file to the widget"""
@@ -422,54 +472,6 @@ class Maker(QtWidgets.QWidget):
             self.acceptTOS.clicked.connect(lambda: makerchipTOSAccepted(True))
             self.optionsgrid.addWidget(self.acceptTOS, 0, 4)
         
-        # Apply styling to the options box
-        self.optionsbox.setStyleSheet("""
-            QGroupBox {
-                border: 2px solid #23273a;
-                border-radius: 14px;
-                margin-top: 1em;
-                padding: 15px;
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 15px;
-                padding: 0 5px;
-                color: #40c4ff;
-                font-weight: bold;
-                font-size: 14px;
-            }
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #40c4ff, stop:1 #1976d2);
-                color: #181b24;
-                border: 1px solid #40c4ff;
-                min-height: 35px;
-                min-width: 120px;
-                padding: 8px 15px;
-                border-radius: 10px;
-                font-weight: 700;
-                font-size: 12px;
-            }
-            QPushButton:hover {
-                background: #1976d2;
-                color: #fff;
-                border: 1.5px solid #1976d2;
-            }
-            QPushButton:pressed {
-                background: #23273a;
-                color: #40c4ff;
-                border: 1.5px solid #40c4ff;
-            }
-            QPushButton:disabled {
-                background: #23273a;
-                color: #888;
-                border: 1px solid #23273a;
-            }
-        """)
-        
         self.optionsbox.setLayout(self.optionsgrid)
         return self.optionsbox
     
@@ -502,46 +504,6 @@ class Maker(QtWidgets.QWidget):
         self.entry_var[self.count].setMaximumWidth(1000)
         self.entry_var[self.count].setMinimumHeight(300)  # Set minimum height
         self.count += 1
-        
-        # Apply CSS styling
-        self.trbox.setStyleSheet("""
-            QGroupBox {
-                border: 2px solid #23273a; /* Matching Application.py border color */
-                border-radius: 14px; /* Matching Application.py border radius */
-                margin-top: 1em;
-                padding-top: 10px;
-                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24); /* Matching Application.py background */
-                 color: #e8eaed; /* Matching Application.py text color */
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 3px 0 3px;
-                color: #40c4ff; /* Matching Application.py title color */
-                font-weight: bold;
-            }
-            QLabel {
-                font-size: 12px;
-                color: #e8eaed; /* Matching Application.py label color */
-                font-weight: bold;
-            }
-            QTextEdit {
-                background: #23273a;
-                color: #e8eaed;
-                border: 2px solid #40c4ff;
-                border-radius: 8px;
-                padding: 10px;
-                font-family: 'Consolas', 'Monaco', monospace;
-                font-size: 12px;
-                selection-background-color: #1976d2;
-                selection-color: #ffffff;
-            }
-            QTextEdit:focus {
-                border: 2px solid #1976d2;
-                background: #1e2132;
-            }
-        """)
         
         self.trbox.setLayout(self.trgrid)
         return self.trbox

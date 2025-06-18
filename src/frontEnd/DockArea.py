@@ -213,55 +213,36 @@ class DockArea(QtWidgets.QMainWindow):
         self.eConWidget = QtWidgets.QWidget()
         self.eConLayout = QVBoxLayout()  # QVBoxLayout for the main layout
 
+        # Set margins and spacing for better layout
+        self.eConLayout.setContentsMargins(15, 20, 15, 15)
+        self.eConLayout.setSpacing(15)
+
+        # Create a group box for the converter section
+        converter_group = QtWidgets.QGroupBox("Schematic Converter")
+        
+        converter_layout = QVBoxLayout()
+        converter_layout.setContentsMargins(15, 20, 15, 15)
+        converter_layout.setSpacing(15)
+
         file_path_layout = QHBoxLayout()  # QHBoxLayout for file path line
         lib_path_layout = QHBoxLayout()
 
         file_path_text_box = QLineEdit()
-        file_path_text_box.setFixedHeight(35)
-        file_path_text_box.setFixedWidth(800)
-        file_path_text_box.setStyleSheet("""
-            QLineEdit {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-                border: 2px solid #40c4ff;
-                border-radius: 6px;
-                padding: 5px 15px;
-                font-weight: 500;
-                font-size: 10pt;
-            }
-            QLineEdit:focus {
-                border: 2px solid #40c4ff;
-            }
-        """)
+        file_path_text_box.setFixedHeight(40)
+        file_path_text_box.setMinimumWidth(600)
+        file_path_text_box.setPlaceholderText("Select a schematic file to convert...")
         file_path_layout.setAlignment(Qt.AlignCenter)
         file_path_layout.addWidget(file_path_text_box)
 
-        browse_button = QPushButton("Browse")
-        browse_button.setFixedSize(120, 35)
-        browse_button.setStyleSheet("""
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-                border: 1px solid #23273a;
-                border-radius: 6px;
-                padding: 5px 15px;
-                font-weight: 600;
-                font-size: 10pt;
-            }
-            QPushButton:hover {
-                background: #40c4ff;
-                color: #181b24;
-                border: 1px solid #40c4ff;
-            }
-        """)
+        browse_button = QPushButton("Browse Files")
+        browse_button.setFixedSize(140, 40)
         browse_button.clicked.connect(lambda: browse_path(self,file_path_text_box))
         file_path_layout.addWidget(browse_button)
 
-        self.eConLayout.addLayout(file_path_layout)  # Add file path layout to main layout
+        converter_layout.addLayout(file_path_layout)  # Add file path layout to converter layout
 
         button_layout = QHBoxLayout()  # QHBoxLayout for the buttons
+        button_layout.setSpacing(15)  # Add spacing between buttons
 
         self.pspice_converter = PspiceConverter(self)
         self.ltspice_converter = LTspiceConverter(self)
@@ -269,131 +250,59 @@ class DockArea(QtWidgets.QMainWindow):
         self.ltspiceLib_converter = LTspiceLibConverter(self)
 
         upload_button2 = QPushButton("Convert PSpice Library")
-        upload_button2.setFixedSize(260, 35)
-        upload_button2.setStyleSheet("""
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-                border: 1px solid #23273a;
-                border-radius: 6px;
-                padding: 5px 15px;
-                font-weight: 600;
-                font-size: 10pt;
-            }
-            QPushButton:hover {
-                background: #40c4ff;
-                color: #181b24;
-                border: 1px solid #40c4ff;
-            }
-        """)
+        upload_button2.setMinimumSize(280, 45)
         upload_button2.clicked.connect(lambda: self.pspiceLib_converter.upload_file_Pspice(file_path_text_box.text()))
         button_layout.addWidget(upload_button2)
 
         upload_button1 = QPushButton("Convert PSpice Schematics")
-        upload_button1.setFixedSize(260, 35)
-        upload_button1.setStyleSheet("""
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-                border: 1px solid #23273a;
-                border-radius: 6px;
-                padding: 5px 15px;
-                font-weight: 600;
-                font-size: 10pt;
-            }
-            QPushButton:hover {
-                background: #40c4ff;
-                color: #181b24;
-                border: 1px solid #40c4ff;
-            }
-        """)
+        upload_button1.setMinimumSize(280, 45)
         upload_button1.clicked.connect(lambda: self.pspice_converter.upload_file_Pspice(file_path_text_box.text()))
         button_layout.addWidget(upload_button1)
 
         upload_button3 = QPushButton("Convert LTspice Library")
-        upload_button3.setFixedSize(260, 35)
-        upload_button3.setStyleSheet("""
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-                border: 1px solid #23273a;
-                border-radius: 6px;
-                padding: 5px 15px;
-                font-weight: 600;
-                font-size: 10pt;
-            }
-            QPushButton:hover {
-                background: #40c4ff;
-                color: #181b24;
-                border: 1px solid #40c4ff;
-            }
-        """)
+        upload_button3.setMinimumSize(280, 45)
         upload_button3.clicked.connect(lambda: self.ltspiceLib_converter.upload_file_LTspice(file_path_text_box.text()))
         button_layout.addWidget(upload_button3)
 
         upload_button = QPushButton("Convert LTspice Schematics")
-        upload_button.setFixedSize(260, 35)
-        upload_button.setStyleSheet("""
-            QPushButton {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-                border: 1px solid #23273a;
-                border-radius: 6px;
-                padding: 5px 15px;
-                font-weight: 600;
-                font-size: 10pt;
-            }
-            QPushButton:hover {
-                background: #40c4ff;
-                color: #181b24;
-                border: 1px solid #40c4ff;
-            }
-        """)
+        upload_button.setMinimumSize(280, 45)
         upload_button.clicked.connect(lambda: self.ltspice_converter.upload_file_LTspice(file_path_text_box.text()))
         button_layout.addWidget(upload_button)
 
-        self.eConLayout.addLayout(button_layout)
+        converter_layout.addLayout(button_layout)
+        converter_group.setLayout(converter_layout)
+        self.eConLayout.addWidget(converter_group)
 
-        self.eConWidget.setLayout(self.eConLayout)
-
-        # lib_path_text_box = QLineEdit()
-        # lib_path_text_box.setFixedHeight(30)
-        # lib_path_text_box.setFixedWidth(800)
-        # lib_path_layout.setAlignment(Qt.AlignCenter)
-        # lib_path_layout.addWidget(lib_path_text_box)
-
-        # browse_button1 = QPushButton("Browse lib")
-        # browse_button1.setFixedSize(110, 30)
-        # browse_button1.clicked.connect(lambda: browse_path(self,lib_path_text_box))
-        # lib_path_layout.addWidget(browse_button1)
-
-        # self.eConLayout.addLayout(lib_path_layout)
-
-        # Add the description HTML content
+        # Add the description HTML content with theme-responsive styling
         description_html = """
             <html>
                 <head>
                     <style>
                         body {
-                            font-family: sans-serif;
+                            font-family: 'Segoe UI', 'Arial', sans-serif;
                             margin: 0px;
-                            padding: 0px;
-                            background-color: white;
-                            border: 4px solid  black;
-                            font-size: 10pt; /* Adjust the font size as needed */
+                            padding: 20px;
+                            border: 2px solid;
+                            border-radius: 14px;
+                            font-size: 12px;
+                            line-height: 1.5;
                         }
 
                         h1{
                             font-weight: bold;
-                            font-size: 9pt;
-                            color: #eeeeee;
-                            padding: 10px;
-                            background-color: #165982;
-                            border: 4px outset  #0E324B;
+                            font-size: 16px;
+                            padding: 10px 0;
+                            margin: 0 0 15px 0;
+                            border-bottom: 2px solid;
+                        }
+                        
+                        p {
+                            margin: 10px 0;
+                            text-align: justify;
+                        }
+                        
+                        b {
+                            font-weight: 600;
                         }
                     </style>
                 </head>
@@ -401,21 +310,22 @@ class DockArea(QtWidgets.QMainWindow):
                 <body>
                     <h1>About eSim Converter</h1>
                     <p>
-                        <b>Pspice to eSim </b> will convert the PSpice Schematic and Library files to KiCad Schematic and
+                        <b>Pspice to eSim</b> will convert the PSpice Schematic and Library files to KiCad Schematic and
                         Library files respectively with proper mapping of the components and the wiring. By this way one 
-                        will be able to simulate their schematics in PSpice and get the PCB layout in KiCad.</b> 
-                        <br/><br/>
-                        <b>LTspice to eSim </b> will convert symbols and schematics from LTspice to Kicad.The goal is to design and
-                        simulate under LTspice and to automatically transfer the circuit under Kicad to draw the PCB.</b>
+                        will be able to simulate their schematics in PSpice and get the PCB layout in KiCad.
+                    </p>
+                    <p>
+                        <b>LTspice to eSim</b> will convert symbols and schematics from LTspice to Kicad. The goal is to design and
+                        simulate under LTspice and to automatically transfer the circuit under Kicad to draw the PCB.
                     </p>
                 </body>
             </html>
         """
 
         self.description_label = QLabel()
-        self.description_label.setFixedHeight(160)
-        self.description_label.setFixedWidth(950)
-        self.description_label.setAlignment(Qt.AlignBottom)
+        self.description_label.setFixedHeight(180)
+        self.description_label.setMinimumWidth(950)
+        self.description_label.setAlignment(Qt.AlignTop)
         self.description_label.setWordWrap(True)
         self.description_label.setText(description_html)
         self.eConLayout.addWidget(self.description_label)  # Add the description label to the layout
@@ -426,12 +336,6 @@ class DockArea(QtWidgets.QMainWindow):
         dock[dockName + str(count)].setWidget(self.eConWidget)
         self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock[dockName + str(count)])
         self.tabifyDockWidget(dock['Welcome'], dock[dockName + str(count)])
-
-        # CSS
-        dock[dockName + str(count)].setStyleSheet(" \
-            .QWidget { border-radius: 15px; border: 1px solid gray;\
-                padding: 5px; width: 200px; height: 150px;  } \
-            ")
 
         dock[dockName + str(count)].setVisible(True)
         dock[dockName + str(count)].setFocus()
@@ -448,7 +352,12 @@ class DockArea(QtWidgets.QMainWindow):
         # Set smaller margins for the layout
         self.modellayout.setContentsMargins(4, 4, 4, 4)
         self.modellayout.setSpacing(4)
-        self.modellayout.addWidget(ModelEditorclass())
+        # Get current theme from parent Application if possible
+        is_dark_theme = False
+        parent = self.parent()
+        if parent and hasattr(parent, 'is_dark_theme'):
+            is_dark_theme = parent.is_dark_theme
+        self.modellayout.addWidget(ModelEditorclass(is_dark_theme=is_dark_theme))
 
         # Adding to main Layout
         self.modelwidget.setLayout(self.modellayout)

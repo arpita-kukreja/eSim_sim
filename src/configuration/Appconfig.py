@@ -43,8 +43,15 @@ class Appconfig(QtWidgets.QWidget):
         file = open(os.path.join(
             user_home, ".esim/workspace.txt"), 'r'
         )
-        workspace_check, home = file.readline().split(' ', 1)
+        line = file.readline().strip()
         file.close()
+        
+        if line and ' ' in line:
+            workspace_check, home = line.split(' ', 1)
+        else:
+            # If file is empty or doesn't have expected format, use defaults
+            home = os.path.join(os.path.expanduser("~"), "eSim-Workspace")
+            workspace_check = 0
     except IOError:
         home = os.path.join(os.path.expanduser("~"), "eSim-Workspace")
         workspace_check = 0
@@ -79,6 +86,7 @@ class Appconfig(QtWidgets.QWidget):
     except BaseException as e:
         print("Cannot access Modelica map file --- .esim folder")
         print(str(e))
+        modelica_map_json = None  # Set a default value if config cannot be read
 
     try:
         project_explorer = json.load(open(dictPath["path"]))
