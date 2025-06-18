@@ -64,6 +64,16 @@ class Application(QtWidgets.QMainWindow):
         # Initialize font sizes
         self.toolbar_font_size = 10
         self.text_font_size = 10
+        self.left_toolbar_font_size = 9  # Specific size for left toolbar buttons
+        self.top_toolbar_font_size = 10  # Specific size for top toolbar buttons
+        # Initialize icon sizes
+        self.top_toolbar_icon_size = 24  # px
+        self.left_toolbar_icon_size = 24  # px
+        self.top_toolbar_icon_min = 16
+        self.top_toolbar_icon_max = 56
+        self.left_toolbar_icon_min = 16
+        self.left_toolbar_icon_max = 56
+        self.toolbar_icon_step = 2
 
         # Set slot for simulation end signal to plot simulation data
         self.simulationEndSignal.connect(self.plotSimulationData)
@@ -115,6 +125,16 @@ class Application(QtWidgets.QMainWindow):
         QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl++"), self, self.increase_font_size)
         QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+-"), self, self.decrease_font_size)
         QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+0"), self, self.reset_font_size)
+        
+        # Add specific keyboard shortcuts for toolbar font control
+        QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Up"), self, self.increase_toolbar_font_size)
+        QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Down"), self, self.decrease_toolbar_font_size)
+        QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+Shift+0"), self, self.reset_toolbar_font_size)
+
+        # Add helpful message about font size controls
+        self.obj_appconfig.print_info("Font size controls:")
+        self.obj_appconfig.print_info("  Ctrl++ / Ctrl+- / Ctrl+0: Adjust all font sizes")
+        self.obj_appconfig.print_info("  Ctrl+Up / Ctrl+Down / Ctrl+Shift+0: Adjust toolbar button sizes")
 
     def update_font_sizes(self):
         """Update font sizes for all relevant widgets"""
@@ -124,6 +144,12 @@ class Application(QtWidgets.QMainWindow):
             toolbar.setFont(toolbar_font)
             for action in toolbar.actions():
                 action.setFont(toolbar_font)
+            # Update icon size for top toolbar
+            toolbar.setIconSize(QSize(self.top_toolbar_icon_size, self.top_toolbar_icon_size))
+        # Update left toolbar tool buttons' icon size
+        if hasattr(self, 'toolButtons'):
+            for button in self.toolButtons:
+                button.setIconSize(QSize(self.left_toolbar_icon_size, self.left_toolbar_icon_size))
 
         # Update text area fonts
         text_font = QtGui.QFont("Fira Code", self.text_font_size)
@@ -169,10 +195,168 @@ class Application(QtWidgets.QMainWindow):
         if hasattr(self, 'statusBar') and isinstance(self.statusBar, QtWidgets.QStatusBar):
             self.statusBar.setFont(text_font)
 
+        # Update toolbar button styling with dynamic font sizes
+        self.update_toolbar_button_styling()
+
         # Force update of all widgets
         self.obj_Mainview.update()
         self.obj_Mainview.obj_projectExplorer.update()
         self.obj_Mainview.obj_dockarea.update()
+
+    def update_toolbar_button_styling(self):
+        """Update the styling of toolbar buttons with current font sizes and icon sizes"""
+        # Update top toolbar button styling
+        if hasattr(self, 'topToolbar'):
+            self.topToolbar.setIconSize(QSize(self.top_toolbar_icon_size, self.top_toolbar_icon_size))
+            if self.is_dark_theme:
+                top_toolbar_style = f"""
+                    QToolBar {{
+                        spacing: 10px;
+                        padding: 4px;
+                    }}
+                    QToolButton {{
+                        min-width: 100px;
+                        max-width: 140px;
+                        min-height: 54px;
+                        padding: 4px 2px;
+                        margin: 1px;
+                        font-size: {self.top_toolbar_font_size}px;
+                        color: #e8eaed;
+                        background: transparent;
+                        border: none;
+                        text-align: center;
+                        white-space: nowrap;
+                    }}
+                    QToolButton:hover {{
+                        color: #40c4ff;
+                    }}
+                """
+            else:
+                top_toolbar_style = f"""
+                    QToolBar {{
+                        spacing: 10px;
+                        padding: 4px;
+                    }}
+                    QToolButton {{
+                        min-width: 100px;
+                        max-width: 140px;
+                        min-height: 54px;
+                        padding: 4px 2px;
+                        margin: 1px;
+                        font-size: {self.top_toolbar_font_size}px;
+                        color: #2c3e50;
+                        background: transparent;
+                        border: none;
+                        text-align: center;
+                        white-space: nowrap;
+                    }}
+                    QToolButton:hover {{
+                        color: #1976d2;
+                    }}
+                """
+            self.topToolbar.setStyleSheet(top_toolbar_style)
+
+        # Update left toolbar button styling
+        if hasattr(self, 'toolbarWidget'):
+            for button in self.toolButtons:
+                button.setIconSize(QSize(self.left_toolbar_icon_size, self.left_toolbar_icon_size))
+            if self.is_dark_theme:
+                left_toolbar_style = f"""
+                    QWidget {{
+                        background: transparent;
+                    }}
+                    QToolButton {{
+                        background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                            stop:0 #23273a, stop:1 #181b24);
+                        border: 1px solid #23273a;
+                        color:rgb(170, 170, 167);
+                        padding: 2px;
+                        margin: 1px;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        font-size: {self.left_toolbar_font_size}px;
+                        min-width: 120px;
+                        max-width: 160px;
+                        min-height: 40px;
+                        text-align: center;
+                        white-space: normal;
+                    }}
+                    QToolButton:hover {{
+                        background: #40c4ff;
+                        color: #181b24;
+                        border: 1.5px solid #40c4ff;
+                    }}
+                    QToolButton:pressed, QToolButton:checked {{
+                        background: #1976d2;
+                        color: #fff;
+                        border: 1.5px solid #1976d2;
+                    }}
+                    /* Style for horizontal orientation */
+                    QDockWidget[orientation="horizontal"] QWidget {{
+                        background: transparent;
+                    }}
+                    QDockWidget[orientation="horizontal"] QVBoxLayout {{
+                        flex-direction: row;
+                        flex-wrap: wrap;
+                        justify-content: flex-start;
+                        align-items: center;
+                    }}
+                    QDockWidget[orientation="horizontal"] QToolButton {{
+                        min-width: 120px;
+                        min-height: 40px;
+                        margin: 1px;
+                        padding: 2px;
+                    }}
+                """
+            else:
+                left_toolbar_style = f"""
+                    QWidget {{
+                        background: transparent;
+                    }}
+                    QToolButton {{
+                        background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                            stop:0 #ffffff, stop:1 #f8f9fa);
+                        border: 1px solid #e1e4e8;
+                        color: #2c3e50;
+                        padding: 2px;
+                        margin: 1px;
+                        border-radius: 6px;
+                        font-weight: 600;
+                        font-size: {self.left_toolbar_font_size}px;
+                        min-width: 120px;
+                        max-width: 160px;
+                        min-height: 40px;
+                        text-align: center;
+                        white-space: normal;
+                    }}
+                    QToolButton:hover {{
+                        background: #1976d2;
+                        color: #ffffff;
+                        border: 1.5px solid #1976d2;
+                    }}
+                    QToolButton:pressed, QToolButton:checked {{
+                        background: #1565c0;
+                        color: #ffffff;
+                        border: 1.5px solid #1565c0;
+                    }}
+                    /* Style for horizontal orientation */
+                    QDockWidget[orientation="horizontal"] QWidget {{
+                        background: transparent;
+                    }}
+                    QDockWidget[orientation="horizontal"] QVBoxLayout {{
+                        flex-direction: row;
+                        flex-wrap: wrap;
+                        justify-content: flex-start;
+                        align-items: center;
+                    }}
+                    QDockWidget[orientation="horizontal"] QToolButton {{
+                        min-width: 120px;
+                        min-height: 40px;
+                        margin: 1px;
+                        padding: 2px;
+                    }}
+                """
+            self.toolbarWidget.setStyleSheet(left_toolbar_style)
 
     def increase_font_size(self):
         """Increase font size for all widgets"""
@@ -508,7 +692,6 @@ class Application(QtWidgets.QMainWindow):
                 margin: 1px;
                 border-radius: 6px;
                 font-weight: 600;
-                font-size: 9px;
                 min-width: 120px;
                 max-width: 160px;
                 min-height: 40px;
@@ -526,22 +709,25 @@ class Application(QtWidgets.QMainWindow):
                 border: 1.5px solid #1976d2;
             }
             /* Style for horizontal orientation */
-            QDockWidget[orientation="horizontal"] QWidget {
+            QDockWidget[orientation="horizontal"] QWidget {{
                 background: transparent;
-            }
-            QDockWidget[orientation="horizontal"] QVBoxLayout {
+            }}
+            QDockWidget[orientation="horizontal"] QVBoxLayout {{
                 flex-direction: row;
                 flex-wrap: wrap;
                 justify-content: flex-start;
                 align-items: center;
-            }
-            QDockWidget[orientation="horizontal"] QToolButton {
+            }}
+            QDockWidget[orientation="horizontal"] QToolButton {{
                 min-width: 120px;
                 min-height: 40px;
                 margin: 1px;
                 padding: 2px;
-            }
+            }}
         """)
+
+        # Apply initial toolbar button styling with current font sizes
+        self.update_toolbar_button_styling()
 
     def apply_dark_theme(self):
         """Applies a premium, modern dark theme everywhere using only supported QSS properties."""
@@ -655,7 +841,6 @@ class Application(QtWidgets.QMainWindow):
             margin: 2px;
             border-radius: 6px;
             font-weight: 600;
-            font-size: 9px;
             letter-spacing: 0.3px;
             min-width: 120px;
             max-width: 160px;
@@ -1508,6 +1693,9 @@ class Application(QtWidgets.QMainWindow):
                 else:
                     self.apply_light_theme_to_widget(child)
 
+        # Update toolbar button styling to maintain font sizes
+        self.update_toolbar_button_styling()
+
         # Force update of the UI
         self.repaint()
 
@@ -1516,7 +1704,7 @@ class Application(QtWidgets.QMainWindow):
         if is_dark:
             # Dark theme for schematic converter
             converter_style = """
-                QGroupBox {
+                QGroupBox {{
                     border: 2px solid #40c4ff;
                     border-radius: 14px;
                     margin-top: 1em;
@@ -1524,16 +1712,16 @@ class Application(QtWidgets.QMainWindow):
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #23273a, stop:1 #181b24);
                     color: #e8eaed;
-                }
-                QGroupBox::title {
+                }}
+                QGroupBox::title {{
                     subcontrol-origin: margin;
                     left: 15px;
                     padding: 0 5px;
                     color: #40c4ff;
                     font-weight: bold;
                     font-size: 14px;
-                }
-                QLineEdit {
+                }}
+                QLineEdit {{
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #23273a, stop:1 #181b24);
                     color: #e8eaed;
@@ -1542,18 +1730,18 @@ class Application(QtWidgets.QMainWindow):
                     padding: 8px 15px;
                     font-weight: 500;
                     font-size: 12px;
-                }
-                QLineEdit:focus {
+                }}
+                QLineEdit:focus {{
                     border: 2px solid #1976d2;
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #2a2f3a, stop:1 #1e2128);
-                    box-shadow: 0 0 10px rgba(64, 196, 255, 0.3);
-                }
-                QLineEdit::placeholder {
+                    /* box-shadow: 0 0 10px rgba(64, 196, 255, 0.3); */
+                }}
+                QLineEdit::placeholder {{
                     color: #b0b3b8;
                     font-style: italic;
-                }
-                QPushButton {
+                }}
+                QPushButton {{
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #40c4ff, stop:1 #1976d2);
                     color: #181b24;
@@ -1562,41 +1750,41 @@ class Application(QtWidgets.QMainWindow):
                     padding: 10px 20px;
                     font-weight: 700;
                     font-size: 12px;
-                }
-                QPushButton:hover {
+                }}
+                QPushButton:hover {{
                     background: #1976d2;
                     color: #fff;
                     border: 1.5px solid #1976d2;
-                }
-                QPushButton:pressed {
+                }}
+                QPushButton:pressed {{
                     background: #23273a;
                     color: #40c4ff;
                     border: 1.5px solid #40c4ff;
-                }
-                QLabel {
+                }}
+                QLabel {{
                     color: #e8eaed;
-                }
+                }}
             """
             # Dark theme description styling
             description_style = """
-                body {
+                body {{
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #23273a, stop:1 #181b24);
                     color: #e8eaed;
                     border: 2px solid #40c4ff;
-                }
-                h1 {
+                }}
+                h1 {{
                     color: #40c4ff;
                     border-bottom: 2px solid #40c4ff;
-                }
-                b {
+                }}
+                b {{
                     color: #40c4ff;
-                }
+                }}
             """
         else:
             # Light theme for schematic converter
             converter_style = """
-                QGroupBox {
+                QGroupBox {{
                     border: 2px solid #1976d2;
                     border-radius: 14px;
                     margin-top: 1em;
@@ -1604,16 +1792,16 @@ class Application(QtWidgets.QMainWindow):
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #ffffff, stop:1 #f8f9fa);
                     color: #2c3e50;
-                }
-                QGroupBox::title {
+                }}
+                QGroupBox::title {{
                     subcontrol-origin: margin;
                     left: 15px;
                     padding: 0 5px;
                     color: #1976d2;
                     font-weight: bold;
                     font-size: 14px;
-                }
-                QLineEdit {
+                }}
+                QLineEdit {{
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #ffffff, stop:1 #f8f9fa);
                     color: #2c3e50;
@@ -1622,18 +1810,18 @@ class Application(QtWidgets.QMainWindow):
                     padding: 8px 15px;
                     font-weight: 500;
                     font-size: 12px;
-                }
-                QLineEdit:focus {
+                }}
+                QLineEdit:focus {{
                     border: 2px solid #1565c0;
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #f8f9fa, stop:1 #ffffff);
-                    box-shadow: 0 0 10px rgba(25, 118, 210, 0.3);
-                }
-                QLineEdit::placeholder {
+                    /* box-shadow: 0 0 10px rgba(25, 118, 210, 0.3); */
+                }}
+                QLineEdit::placeholder {{
                     color: #7f8c8d;
                     font-style: italic;
-                }
-                QPushButton {
+                }}
+                QPushButton {{
                     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                         stop:0 #1976d2, stop:1 #1565c0);
                     color: #ffffff;
@@ -2708,7 +2896,6 @@ class Application(QtWidgets.QMainWindow):
             margin: 2px;
             border-radius: 6px;
             font-weight: 600;
-            font-size: 9px;
             letter-spacing: 0.3px;
             min-width: 120px;
             max-width: 160px;
@@ -3420,6 +3607,37 @@ class Application(QtWidgets.QMainWindow):
         """
         widget.setStyleSheet(premium_light_stylesheet)
 
+    def increase_toolbar_font_size(self):
+        """Increase font size for toolbar buttons and icon size"""
+        if self.top_toolbar_font_size < 14:  # Set maximum size
+            self.top_toolbar_font_size += 1
+            self.left_toolbar_font_size += 1
+            # Increase icon sizes with step, clamp to max
+            self.top_toolbar_icon_size = min(self.top_toolbar_icon_size + self.toolbar_icon_step, self.top_toolbar_icon_max)
+            self.left_toolbar_icon_size = min(self.left_toolbar_icon_size + self.toolbar_icon_step, self.left_toolbar_icon_max)
+            self.update_font_sizes()
+            self.obj_appconfig.print_info("Toolbar font and icon size increased")
+
+    def decrease_toolbar_font_size(self):
+        """Decrease font size for toolbar buttons and icon size"""
+        if self.top_toolbar_font_size > 8:  # Set minimum size
+            self.top_toolbar_font_size -= 1
+            self.left_toolbar_font_size -= 1
+            # Decrease icon sizes with step, clamp to min
+            self.top_toolbar_icon_size = max(self.top_toolbar_icon_size - self.toolbar_icon_step, self.top_toolbar_icon_min)
+            self.left_toolbar_icon_size = max(self.left_toolbar_icon_size - self.toolbar_icon_step, self.left_toolbar_icon_min)
+            self.update_font_sizes()
+            self.obj_appconfig.print_info("Toolbar font and icon size decreased")
+
+    def reset_toolbar_font_size(self):
+        """Reset font size and icon size for toolbar buttons"""
+        self.top_toolbar_font_size = 10
+        self.left_toolbar_font_size = 9
+        self.top_toolbar_icon_size = 24
+        self.left_toolbar_icon_size = 24
+        self.update_font_sizes()
+        self.obj_appconfig.print_info("Toolbar font and icon size reset to default")
+
 # This class initialize the Main View of Application
 class MainView(QtWidgets.QWidget):
     """
@@ -3639,4 +3857,6 @@ if __name__ == '__main__':
     try:
         main(sys.argv)
     except Exception as err:
+        import traceback
+        traceback.print_exc()
         print("Error: ", err)
