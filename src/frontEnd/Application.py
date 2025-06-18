@@ -61,6 +61,10 @@ class Application(QtWidgets.QMainWindow):
         # Theme state - set light theme as default
         self.is_dark_theme = False
 
+        # Initialize font sizes
+        self.toolbar_font_size = 11
+        self.text_font_size = 11
+
         # Set slot for simulation end signal to plot simulation data
         self.simulationEndSignal.connect(self.plotSimulationData)
 
@@ -95,8 +99,8 @@ class Application(QtWidgets.QMainWindow):
         self.systemTrayIcon.setIcon(QtGui.QIcon(init_path + 'images/logo.png'))
         self.systemTrayIcon.setVisible(True)
 
-        font = QtGui.QFont("Fira Sans", 11)
-        self.setFont(font)
+        # Set initial font
+        self.update_font_sizes()
 
         self.statusBar = self.statusBar()
         self.statusBar.showMessage('Welcome to eSim!')
@@ -106,6 +110,91 @@ class Application(QtWidgets.QMainWindow):
         self.simulation_process.readyReadStandardOutput.connect(self.handle_simulation_output)
         self.simulation_process.readyReadStandardError.connect(self.handle_simulation_error)
         self.simulation_process.finished.connect(self.handle_simulation_finished)
+
+        # Add keyboard shortcuts for font size adjustment
+        QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl++"), self, self.increase_font_size)
+        QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+-"), self, self.decrease_font_size)
+        QtWidgets.QShortcut(QtGui.QKeySequence("Ctrl+0"), self, self.reset_font_size)
+
+    def update_font_sizes(self):
+        """Update font sizes for all relevant widgets"""
+        # Update toolbar fonts
+        toolbar_font = QtGui.QFont("Fira Sans", self.toolbar_font_size)
+        for toolbar in self.findChildren(QtWidgets.QToolBar):
+            toolbar.setFont(toolbar_font)
+            for action in toolbar.actions():
+                action.setFont(toolbar_font)
+
+        # Update text area fonts
+        text_font = QtGui.QFont("Fira Code", self.text_font_size)
+        
+        # Update console (noteArea)
+        self.obj_Mainview.noteArea.setFont(text_font)
+        
+        # Update project explorer and its contents
+        self.obj_Mainview.obj_projectExplorer.setFont(text_font)
+        
+        # Update project tree items
+        project_tree = self.obj_Mainview.obj_projectExplorer.findChild(QtWidgets.QTreeWidget)
+        if project_tree:
+            project_tree.setFont(text_font)
+            # Update all items in the tree
+            for i in range(project_tree.topLevelItemCount()):
+                item = project_tree.topLevelItem(i)
+                item.setFont(0, text_font)
+                # Update child items
+                for j in range(item.childCount()):
+                    child = item.child(j)
+                    child.setFont(0, text_font)
+                    # Update grandchild items
+                    for k in range(child.childCount()):
+                        grandchild = child.child(k)
+                        grandchild.setFont(0, text_font)
+
+        # Update dock area contents
+        dock_area = self.obj_Mainview.obj_dockarea
+        for dock in dock_area.findChildren(QtWidgets.QDockWidget):
+            dock.setFont(text_font)
+            # Update dock widget contents
+            dock_widget = dock.widget()
+            if dock_widget:
+                dock_widget.setFont(text_font)
+                # Update all child widgets
+                for child in dock_widget.findChildren(QtWidgets.QWidget):
+                    if hasattr(child, 'setFont'):
+                        child.setFont(text_font)
+
+        # Update status bar
+        if hasattr(self, 'statusBar') and isinstance(self.statusBar, QtWidgets.QStatusBar):
+            self.statusBar.setFont(text_font)
+
+        # Force update of all widgets
+        self.obj_Mainview.update()
+        self.obj_Mainview.obj_projectExplorer.update()
+        self.obj_Mainview.obj_dockarea.update()
+
+    def increase_font_size(self):
+        """Increase font size for all widgets"""
+        if self.toolbar_font_size < 20:  # Set maximum size
+            self.toolbar_font_size += 1
+            self.text_font_size += 1
+            self.update_font_sizes()
+            self.obj_appconfig.print_info("Font size increased")
+
+    def decrease_font_size(self):
+        """Decrease font size for all widgets"""
+        if self.toolbar_font_size > 8:  # Set minimum size
+            self.toolbar_font_size -= 1
+            self.text_font_size -= 1
+            self.update_font_sizes()
+            self.obj_appconfig.print_info("Font size decreased")
+
+    def reset_font_size(self):
+        """Reset font sizes to default"""
+        self.toolbar_font_size = 11
+        self.text_font_size = 11
+        self.update_font_sizes()
+        self.obj_appconfig.print_info("Font size reset to default")
 
     def handle_simulation_output(self):
         """Handle simulation standard output"""
