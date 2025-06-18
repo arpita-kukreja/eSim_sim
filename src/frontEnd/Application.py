@@ -73,6 +73,7 @@ class Application(QtWidgets.QMainWindow):
         self.obj_kicad = Kicad(self.obj_Mainview.obj_dockarea)
         self.obj_appconfig = Appconfig()
         self.obj_validation = Validation()
+        
         # Initialize all widget
         self.setCentralWidget(self.obj_Mainview)
         self.initToolBar()
@@ -99,6 +100,41 @@ class Application(QtWidgets.QMainWindow):
 
         self.statusBar = self.statusBar()
         self.statusBar.showMessage('Welcome to eSim!')
+        
+        # Initialize simulation process
+        self.simulation_process = QtCore.QProcess()
+        self.simulation_process.readyReadStandardOutput.connect(self.handle_simulation_output)
+        self.simulation_process.readyReadStandardError.connect(self.handle_simulation_error)
+        self.simulation_process.finished.connect(self.handle_simulation_finished)
+
+    def handle_simulation_output(self):
+        """Handle simulation standard output"""
+        output = self.simulation_process.readAllStandardOutput().data().decode()
+        self.obj_Mainview.update_console(output)
+
+    def handle_simulation_error(self):
+        """Handle simulation error output"""
+        error = self.simulation_process.readAllStandardError().data().decode()
+        self.obj_Mainview.update_console(error, is_error=True)
+
+    def handle_simulation_finished(self, exit_code, exit_status):
+        """Handle simulation completion"""
+        if exit_code == 0:
+            self.obj_Mainview.update_console("Simulation completed successfully!")
+        else:
+            self.obj_Mainview.update_console("Simulation failed!", is_error=True)
+        self.simulationEndSignal.emit(exit_status, exit_code)
+
+    def start_simulation(self, args):
+        """Start simulation with given arguments"""
+        self.obj_Mainview.update_console("Starting simulation...")
+        self.simulation_process.start('ngspice', args)
+
+    def cancel_simulation(self):
+        """Cancel ongoing simulation"""
+        if self.simulation_process.state() == QtCore.QProcess.Running:
+            self.simulation_process.kill()
+            self.obj_Mainview.update_console("Simulation cancelled!", is_error=True)
 
     def initToolBar(self):
         """
@@ -2771,6 +2807,9 @@ class MainView(QtWidgets.QWidget):
 
         # Initialize theme state
         self.is_dark_theme = False
+        
+        # Initialize appconfig
+        self.obj_appconfig = Appconfig()
 
         # Create main layout
         self.mainLayout = QtWidgets.QHBoxLayout()
@@ -2778,15 +2817,63 @@ class MainView(QtWidgets.QWidget):
         self.middleContainer = QtWidgets.QWidget()
         self.middleContainerLayout = QtWidgets.QVBoxLayout()
         self.middleSplit = QtWidgets.QSplitter()
-        self.noteArea = QtWidgets.QTextBrowser()
+        
+        self.noteArea = QtWidgets.QTextEdit()
+        self.noteArea.setReadOnly(True)
+        # Set explicit scrollbar policy
+        self.noteArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
+        self.noteArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
 
-        # Initialize welcome message with light theme by default
-        self.apply_light_theme_welcome()
+        self.obj_appconfig.noteArea['Note'] = self.noteArea
+        self.obj_appconfig.noteArea['Note'].append(
+            '        eSim Started......')
+        self.obj_appconfig.noteArea['Note'].append('Project Selected : None')
+        self.obj_appconfig.noteArea['Note'].append('\n')
+
+        # Enhanced CSS with proper scrollbar styling
+        self.noteArea.setStyleSheet("""
+            QTextEdit {
+                font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+                line-height: 1.4;
+                padding: 16px;
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                    stop:0 #23273a, stop:1 #181b24);
+                color: #e8eaed;
+                border: 1px solid #23273a;
+                border-radius: 12px;
+            }
+            QScrollBar:vertical {
+                background: #23273a;
+                width: 12px;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:vertical {
+                background: #40c4ff;
+                min-height: 20px;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #1976d2;
+            }
+            QScrollBar:horizontal {
+                background: #23273a;
+                height: 12px;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:horizontal {
+                background: #40c4ff;
+                min-width: 20px;
+                border-radius: 6px;
+            }
+            QScrollBar::handle:horizontal:hover {
+                background: #1976d2;
+            }
+        """)
 
         self.obj_dockarea = DockArea.DockArea()
         self.obj_projectExplorer = ProjectExplorer.ProjectExplorer()
 
-        # Adding content to vertical middle Split.
+        # Adding content to vertical middle Split
         self.middleSplit.setOrientation(QtCore.Qt.Vertical)
         self.middleSplit.addWidget(self.obj_dockarea)
         self.middleSplit.addWidget(self.noteArea)
@@ -2806,118 +2893,53 @@ class MainView(QtWidgets.QWidget):
         self.setLayout(self.mainLayout)
 
     def apply_dark_theme_welcome(self):
-        """Apply dark theme to welcome message"""
+        """Apply dark theme to console"""
         self.is_dark_theme = True
-        welcome_html = '''
-        <div style="color: #e8eaed; background-color: transparent; font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;">
-            <h2 style="color: #e8eaed; margin-bottom: 16px; font-weight: 700; letter-spacing: 0.5px;">
-                Welcome to <span style='color: #40c4ff; font-weight: 700;'>eSim</span>
-            </h2>
-            <p style="color: #e8eaed; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-                <b style="color: #40c4ff; font-weight: 700;">eSim</b> is an open source EDA tool for circuit design, simulation, analysis and PCB design.<br>
-                It is an integrated tool built using open source software such as
-                <a href="https://www.kicad.org/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">KiCad</a>,
-                <a href="https://ngspice.sourceforge.io/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">Ngspice</a>,
-                <a href="http://ghdl.free.fr" style="color: #40c4ff; text-decoration: none; font-weight: 600;">GHDL</a>,
-                <a href="https://www.veripool.org/verilator/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">Verilator</a>,
-                <a href="https://www.makerchip.com/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">Makerchip IDE</a>, and
-                <a href="https://skywater-pdk.rtfd.io/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">SkyWater SKY130 PDK</a>.<br>
-                eSim source is released under <b style="color: #40c4ff; font-weight: 700;">GNU General Public License</b>.
-            </p>
-            <p style="color: #e8eaed; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-                This tool is developed by the <b style="color: #40c4ff; font-weight: 700;">eSim Team at FOSSEE, IIT Bombay</b>.<br>
-                To know more about eSim, please visit:
-                <a href="https://esim.fossee.in/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">https://esim.fossee.in/</a>.
-            </p>
-            <p style="color: #e8eaed; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-                To discuss more about eSim, please visit:
-                <a href="https://forums.fossee.in/" style="color: #40c4ff; text-decoration: none; font-weight: 600;">https://forums.fossee.in/</a>
-            </p>
-        </div>
-        '''
-        self.noteArea.setHtml(welcome_html)
-        self.noteArea.setStyleSheet('''
-            QTextBrowser {
+        self.noteArea.setStyleSheet("""
+            QTextEdit {
+                font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+                line-height: 1.4;
+                padding: 16px;
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
                     stop:0 #23273a, stop:1 #181b24);
                 color: #e8eaed;
                 border: 1px solid #23273a;
                 border-radius: 12px;
-                padding: 16px;
-                selection-background-color: #40c4ff;
-                selection-color: #181b24;
             }
-            QScrollBar:vertical {
-                background: #23273a;
-                width: 12px;
-                border-radius: 6px;
+        """)
+        self.noteArea.setStyleSheet("""
+            QLabel {
+                font-size: 16px;
+                font-weight: 600;
+                color: #b0bec5;
+                padding: 8px 0px;
+                border-bottom: 2px solid rgba(64, 196, 255, 0.3);
             }
-            QScrollBar::handle:vertical {
-                background: #40c4ff;
-                min-height: 20px;
-                border-radius: 6px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #1976d2;
-            }
-        ''')
+        """)
 
     def apply_light_theme_welcome(self):
-        """Apply light theme to welcome message"""
+        """Apply light theme to console"""
         self.is_dark_theme = False
-        welcome_html = '''
-        <div style="color: #2c3e50; background-color: transparent; font-family: 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;">
-            <h2 style="color: #2c3e50; margin-bottom: 16px; font-weight: 700; letter-spacing: 0.5px;">
-                Welcome to <span style='color: #1976d2; font-weight: 700;'>eSim</span>
-            </h2>
-            <p style="color: #2c3e50; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-                <b style="color: #1976d2; font-weight: 700;">eSim</b> is an open source EDA tool for circuit design, simulation, analysis and PCB design.<br>
-                It is an integrated tool built using open source software such as
-                <a href="https://www.kicad.org/" style="color: #1976d2; text-decoration: none; font-weight: 600;">KiCad</a>,
-                <a href="https://ngspice.sourceforge.io/" style="color: #1976d2; text-decoration: none; font-weight: 600;">Ngspice</a>,
-                <a href="http://ghdl.free.fr" style="color: #1976d2; text-decoration: none; font-weight: 600;">GHDL</a>,
-                <a href="https://www.veripool.org/verilator/" style="color: #1976d2; text-decoration: none; font-weight: 600;">Verilator</a>,
-                <a href="https://www.makerchip.com/" style="color: #1976d2; text-decoration: none; font-weight: 600;">Makerchip IDE</a>, and
-                <a href="https://skywater-pdk.rtfd.io/" style="color: #1976d2; text-decoration: none; font-weight: 600;">SkyWater SKY130 PDK</a>.<br>
-                eSim source is released under <b style="color: #1976d2; font-weight: 700;">GNU General Public License</b>.
-            </p>
-            <p style="color: #2c3e50; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-                This tool is developed by the <b style="color: #1976d2; font-weight: 700;">eSim Team at FOSSEE, IIT Bombay</b>.<br>
-                To know more about eSim, please visit:
-                <a href="https://esim.fossee.in/" style="color: #1976d2; text-decoration: none; font-weight: 600;">https://esim.fossee.in/</a>.
-            </p>
-            <p style="color: #2c3e50; margin-bottom: 14px; line-height: 1.6; font-weight: 500;">
-                To discuss more about eSim, please visit:
-                <a href="https://forums.fossee.in/" style="color: #1976d2; text-decoration: none; font-weight: 600;">https://forums.fossee.in/</a>
-            </p>
-        </div>
-        '''
-        self.noteArea.setHtml(welcome_html)
-        self.noteArea.setStyleSheet('''
-            QTextBrowser {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #ffffff, stop:1 #f8f9fa);
+        self.noteArea.setStyleSheet("""
+            QTextEdit {
+                font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+                line-height: 1.4;
+                padding: 16px;
+                background: #ffffff;
                 color: #2c3e50;
                 border: 1px solid #e1e4e8;
                 border-radius: 12px;
-                padding: 16px;
-                selection-background-color: #1976d2;
-                selection-color: #ffffff;
             }
-            QScrollBar:vertical {
-                background: #f8f9fa;
-                width: 12px;
-                border-radius: 6px;
+        """)
+        self.noteArea.setStyleSheet("""
+            QLabel {
+                font-size: 16px;
+                font-weight: 600;
+                color: #2c3e50;
+                padding: 8px 0px;
+                border-bottom: 2px solid rgba(25, 118, 210, 0.3);
             }
-            QScrollBar::handle:vertical {
-                background: #e1e4e8;
-                min-height: 20px;
-                border-radius: 6px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #1976d2;
-            }
-        ''')
+        """)
 
 def ensure_config_directory():
     
