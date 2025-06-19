@@ -70,9 +70,9 @@ class Application(QtWidgets.QMainWindow):
         self.top_toolbar_icon_size = 24  # px
         self.left_toolbar_icon_size = 24  # px
         self.top_toolbar_icon_min = 16
-        self.top_toolbar_icon_max = 56
+        self.top_toolbar_icon_max = 96  # Increased from 56
         self.left_toolbar_icon_min = 16
-        self.left_toolbar_icon_max = 56
+        self.left_toolbar_icon_max = 96  # Increased from 56
         self.toolbar_icon_step = 2
 
         # Set slot for simulation end signal to plot simulation data
@@ -1661,7 +1661,7 @@ class Application(QtWidgets.QMainWindow):
         self.is_dark_theme = not self.is_dark_theme
         if self.is_dark_theme:
             self.apply_dark_theme()
-            self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/light_mode.png'))
+            self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/sun.png'))
             self.theme_toggle.setToolTip('Switch to Light Mode')
             # Update schematic converter theme
             self.update_schematic_converter_theme(is_dark=True)
@@ -3609,10 +3609,9 @@ class Application(QtWidgets.QMainWindow):
 
     def increase_toolbar_font_size(self):
         """Increase font size for toolbar buttons and icon size"""
-        if self.top_toolbar_font_size < 14:  # Set maximum size
+        if self.top_toolbar_font_size < 24:
             self.top_toolbar_font_size += 1
             self.left_toolbar_font_size += 1
-            # Increase icon sizes with step, clamp to max
             self.top_toolbar_icon_size = min(self.top_toolbar_icon_size + self.toolbar_icon_step, self.top_toolbar_icon_max)
             self.left_toolbar_icon_size = min(self.left_toolbar_icon_size + self.toolbar_icon_step, self.left_toolbar_icon_max)
             self.update_font_sizes()
@@ -3620,10 +3619,9 @@ class Application(QtWidgets.QMainWindow):
 
     def decrease_toolbar_font_size(self):
         """Decrease font size for toolbar buttons and icon size"""
-        if self.top_toolbar_font_size > 8:  # Set minimum size
+        if self.top_toolbar_font_size > 8:
             self.top_toolbar_font_size -= 1
             self.left_toolbar_font_size -= 1
-            # Decrease icon sizes with step, clamp to min
             self.top_toolbar_icon_size = max(self.top_toolbar_icon_size - self.toolbar_icon_step, self.top_toolbar_icon_min)
             self.left_toolbar_icon_size = max(self.left_toolbar_icon_size - self.toolbar_icon_step, self.left_toolbar_icon_min)
             self.update_font_sizes()
