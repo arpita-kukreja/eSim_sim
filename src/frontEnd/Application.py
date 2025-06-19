@@ -157,6 +157,45 @@ class Application(QtWidgets.QMainWindow):
         # Update console (noteArea)
         self.obj_Mainview.noteArea.setFont(text_font)
         
+        # Update welcome message font size
+        welcome_font_size = self.text_font_size + 2  # Slightly larger for welcome message
+        if self.is_dark_theme:
+            self.obj_Mainview.noteArea.setStyleSheet(f"""
+                QTextEdit {{
+                    font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+                    line-height: 1.4;
+                    padding: 16px;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #23273a, stop:1 #181b24);
+                    color: #e8eaed;
+                    border: 1px solid #23273a;
+                    border-radius: 12px;
+                    font-size: {welcome_font_size}px;
+                }}
+            """)
+        else:
+            self.obj_Mainview.noteArea.setStyleSheet(f"""
+                QTextEdit {{
+                    font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+                    line-height: 1.4;
+                    padding: 16px;
+                    background: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #e1e4e8;
+                    border-radius: 12px;
+                    font-size: {welcome_font_size}px;
+                }}
+            """)
+        
+        # Update welcome page font size in dock widgets
+        for dock_widget in self.findChildren(QtWidgets.QDockWidget):
+            if dock_widget.windowTitle().startswith('Welcome'):
+                welcome_widget = dock_widget.widget()
+                if welcome_widget:
+                    welcome_browser = welcome_widget.findChild(QtWidgets.QWidget).findChild(QtWidgets.QTextBrowser)
+                    if welcome_browser:
+                        welcome_browser.setFont(text_font)
+        
         # Update project explorer with smaller font size for better visibility
         project_explorer_font = QtGui.QFont("Fira Code", max(8, self.text_font_size - 3))
         self.obj_Mainview.obj_projectExplorer.setFont(project_explorer_font)
@@ -364,6 +403,14 @@ class Application(QtWidgets.QMainWindow):
             self.toolbar_font_size += 1
             self.text_font_size += 1
             self.update_font_sizes()
+            # Update welcome page zoom
+            for dock_widget in self.findChildren(QtWidgets.QDockWidget):
+                if dock_widget.windowTitle().startswith('Welcome'):
+                    welcome_widget = dock_widget.widget()
+                    if welcome_widget:
+                        welcome_layout = welcome_widget.findChild(QtWidgets.QWidget)
+                        if welcome_layout and hasattr(welcome_layout, 'increase_font_size'):
+                            welcome_layout.increase_font_size()
             self.obj_appconfig.print_info("Font size increased")
 
     def decrease_font_size(self):
@@ -372,6 +419,14 @@ class Application(QtWidgets.QMainWindow):
             self.toolbar_font_size -= 1
             self.text_font_size -= 1
             self.update_font_sizes()
+            # Update welcome page zoom
+            for dock_widget in self.findChildren(QtWidgets.QDockWidget):
+                if dock_widget.windowTitle().startswith('Welcome'):
+                    welcome_widget = dock_widget.widget()
+                    if welcome_widget:
+                        welcome_layout = welcome_widget.findChild(QtWidgets.QWidget)
+                        if welcome_layout and hasattr(welcome_layout, 'decrease_font_size'):
+                            welcome_layout.decrease_font_size()
             self.obj_appconfig.print_info("Font size decreased")
 
     def reset_font_size(self):
@@ -379,6 +434,14 @@ class Application(QtWidgets.QMainWindow):
         self.toolbar_font_size = 10
         self.text_font_size = 10
         self.update_font_sizes()
+        # Reset welcome page zoom
+        for dock_widget in self.findChildren(QtWidgets.QDockWidget):
+            if dock_widget.windowTitle().startswith('Welcome'):
+                welcome_widget = dock_widget.widget()
+                if welcome_widget:
+                    welcome_layout = welcome_widget.findChild(QtWidgets.QWidget)
+                    if welcome_layout and hasattr(welcome_layout, 'reset_font_size'):
+                        welcome_layout.reset_font_size()
         self.obj_appconfig.print_info("Font size reset to default")
 
     def handle_simulation_output(self):
@@ -427,6 +490,7 @@ class Application(QtWidgets.QMainWindow):
             'New Project', self
         )
         self.newproj.setShortcut('Ctrl+N')
+        self.newproj.setToolTip('New Project (Ctrl+N)')
         self.newproj.triggered.connect(self.new_project)
 
         self.openproj = QtWidgets.QAction(
@@ -434,6 +498,7 @@ class Application(QtWidgets.QMainWindow):
             'Open Project', self
         )
         self.openproj.setShortcut('Ctrl+O')
+        self.openproj.setToolTip('Open Project (Ctrl+O)')
         self.openproj.triggered.connect(self.open_project)
 
         self.closeproj = QtWidgets.QAction(
@@ -441,6 +506,7 @@ class Application(QtWidgets.QMainWindow):
             'Close Project', self
         )
         self.closeproj.setShortcut('Ctrl+X')
+        self.closeproj.setToolTip('Close Project (Ctrl+X)')
         self.closeproj.triggered.connect(self.close_project)
 
         self.wrkspce = QtWidgets.QAction(
@@ -448,6 +514,7 @@ class Application(QtWidgets.QMainWindow):
             'Change Workspace', self
         )
         self.wrkspce.setShortcut('Ctrl+W')
+        self.wrkspce.setToolTip('Change Workspace (Ctrl+W)')
         self.wrkspce.triggered.connect(self.change_workspace)
 
         self.helpfile = QtWidgets.QAction(
@@ -455,6 +522,7 @@ class Application(QtWidgets.QMainWindow):
             'Help', self
         )
         self.helpfile.setShortcut('Ctrl+H')
+        self.helpfile.setToolTip('Help (Ctrl+H)')
         self.helpfile.triggered.connect(self.help_project)
 
         # Theme toggle button - set initial icon for dark mode since we're in light mode
@@ -463,8 +531,8 @@ class Application(QtWidgets.QMainWindow):
             'Switch Theme', self
         )
         self.theme_toggle.setShortcut('Ctrl+T')
+        self.theme_toggle.setToolTip('Switch Theme (Ctrl+T)')
         self.theme_toggle.triggered.connect(self.toggle_theme)
-        self.theme_toggle.setToolTip('Switch to Dark Mode')
 
         # added devDocs logo and called functions
         self.devdocs = QtWidgets.QAction(
@@ -472,6 +540,7 @@ class Application(QtWidgets.QMainWindow):
             'Dev Docs', self
         )
         self.devdocs.setShortcut('Ctrl+D')
+        self.devdocs.setToolTip('Developer Documentation (Ctrl+D)')
         self.devdocs.triggered.connect(self.dev_docs)
 
         self.topToolbar = self.addToolBar('Top Tool Bar')
@@ -484,38 +553,90 @@ class Application(QtWidgets.QMainWindow):
         self.topToolbar.addAction(self.theme_toggle)
         self.topToolbar.setIconSize(QSize(24, 24))
         self.topToolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        
-        # Add specific styling for top toolbar
-        # self.topToolbar.setStyleSheet("""
-        #     QToolBar {
-        #         spacing: 10px;
-        #         padding: 4px;
-        #     }
-        #     QToolButton {
-        #         min-width: 100px;
-        #         max-width: 140px;
-        #         min-height: 54px;
-        #         padding: 4px 2px;
-        #         margin: 1px;
-        #         font-size: 10.5px;
-        #         color: #000000;
-        #         background: transparent;
-        #         border: none;
-        #         text-align: center;
-        #         white-space: nowrap;
-        #     }
-        #     QToolButton:hover {
-        #         color: #40c4ff;
-        #     }
-        # """)
+
+        # Add specific styling for top toolbar with theme-specific tooltip styles
+        if self.is_dark_theme:
+            self.topToolbar.setStyleSheet("""
+                QToolBar {
+                    spacing: 10px;
+                    padding: 4px;
+                }
+                QToolButton {
+                    min-width: 100px;
+                    max-width: 140px;
+                    min-height: 54px;
+                    padding: 4px 2px;
+                    margin: 1px;
+                    font-size: 10.5px;
+                    color: #e8eaed;
+                    background: transparent;
+                    border: none;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+                QToolButton:hover {
+                    color: #40c4ff;
+                    background: rgba(64, 196, 255, 0.1);
+                    border-radius: 6px;
+                }
+                QToolTip {
+                    background-color: #23273a;
+                    color: #e8eaed;
+                    border: 2px solid #40c4ff;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    opacity: 255;
+                    margin: 2px;
+                    box-shadow: 0 4px 12px rgba(64, 196, 255, 0.4);
+                }
+            """)
+        else:
+            self.topToolbar.setStyleSheet("""
+                QToolBar {
+                    spacing: 10px;
+                    padding: 4px;
+                }
+                QToolButton {
+                    min-width: 100px;
+                    max-width: 140px;
+                    min-height: 54px;
+                    padding: 4px 2px;
+                    margin: 1px;
+                    font-size: 10.5px;
+                    color: #2c3e50;
+                    background: transparent;
+                    border: none;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+                QToolButton:hover {
+                    color: #1976d2;
+                    background: rgba(25, 118, 210, 0.1);
+                    border-radius: 6px;
+                }
+                QToolTip {
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    border: 2px solid #1976d2;
+                    padding: 12px 16px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    opacity: 255;
+                    margin: 2px;
+                    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+                }
+            """)
 
         # This part is setting fossee logo to the right
-        # corner in the application window.
         self.spacer = QtWidgets.QWidget()
         self.spacer.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding,
             QtWidgets.QSizePolicy.Expanding)
         self.topToolbar.addWidget(self.spacer)
+        
         self.logo = QtWidgets.QLabel()
         self.logopic = QtGui.QPixmap(
             os.path.join(
@@ -1661,8 +1782,12 @@ class Application(QtWidgets.QMainWindow):
         self.is_dark_theme = not self.is_dark_theme
         if self.is_dark_theme:
             self.apply_dark_theme()
+
             self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/sun.png'))
             self.theme_toggle.setToolTip('Switch to Light Mode')
+
+            
+
             # Update schematic converter theme
             self.update_schematic_converter_theme(is_dark=True)
             # Update model editor theme
@@ -1672,7 +1797,7 @@ class Application(QtWidgets.QMainWindow):
         else:
             self.apply_light_theme()
             self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/dark_mode.png'))
-            self.theme_toggle.setToolTip('Switch to Dark Mode')
+            self.theme_toggle.setToolTip('Switch to Dark Mode (Ctrl+T)')
             # Update schematic converter theme
             self.update_schematic_converter_theme(is_dark=False)
             # Update model editor theme
@@ -3636,6 +3761,8 @@ class Application(QtWidgets.QMainWindow):
         self.update_font_sizes()
         self.obj_appconfig.print_info("Toolbar font and icon size reset to default")
 
+
+
 # This class initialize the Main View of Application
 class MainView(QtWidgets.QWidget):
     """
@@ -3652,7 +3779,7 @@ class MainView(QtWidgets.QWidget):
     def __init__(self, *args):
         # call init method of superclass
         QtWidgets.QWidget.__init__(self, *args)
-
+        
         # Initialize theme state
         self.is_dark_theme = False
         
@@ -3743,6 +3870,7 @@ class MainView(QtWidgets.QWidget):
     def apply_dark_theme_welcome(self):
         """Apply dark theme to console"""
         self.is_dark_theme = True
+        # Note: Font size is now handled in update_font_sizes()
         self.noteArea.setStyleSheet("""
             QTextEdit {
                 font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
@@ -3757,7 +3885,6 @@ class MainView(QtWidgets.QWidget):
         """)
         self.noteArea.setStyleSheet("""
             QLabel {
-                font-size: 16px;
                 font-weight: 600;
                 color: #b0bec5;
                 padding: 8px 0px;
@@ -3768,6 +3895,7 @@ class MainView(QtWidgets.QWidget):
     def apply_light_theme_welcome(self):
         """Apply light theme to console"""
         self.is_dark_theme = False
+        # Note: Font size is now handled in update_font_sizes()
         self.noteArea.setStyleSheet("""
             QTextEdit {
                 font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
@@ -3781,7 +3909,6 @@ class MainView(QtWidgets.QWidget):
         """)
         self.noteArea.setStyleSheet("""
             QLabel {
-                font-size: 16px;
                 font-weight: 600;
                 color: #2c3e50;
                 padding: 8px 0px;
