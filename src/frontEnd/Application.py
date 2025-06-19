@@ -490,6 +490,7 @@ class Application(QtWidgets.QMainWindow):
             'New Project', self
         )
         self.newproj.setShortcut('Ctrl+N')
+        self.newproj.setToolTip('New Project (Ctrl+N)')
         self.newproj.triggered.connect(self.new_project)
 
         self.openproj = QtWidgets.QAction(
@@ -497,6 +498,7 @@ class Application(QtWidgets.QMainWindow):
             'Open Project', self
         )
         self.openproj.setShortcut('Ctrl+O')
+        self.openproj.setToolTip('Open Project (Ctrl+O)')
         self.openproj.triggered.connect(self.open_project)
 
         self.closeproj = QtWidgets.QAction(
@@ -504,6 +506,7 @@ class Application(QtWidgets.QMainWindow):
             'Close Project', self
         )
         self.closeproj.setShortcut('Ctrl+X')
+        self.closeproj.setToolTip('Close Project (Ctrl+X)')
         self.closeproj.triggered.connect(self.close_project)
 
         self.wrkspce = QtWidgets.QAction(
@@ -511,6 +514,7 @@ class Application(QtWidgets.QMainWindow):
             'Change Workspace', self
         )
         self.wrkspce.setShortcut('Ctrl+W')
+        self.wrkspce.setToolTip('Change Workspace (Ctrl+W)')
         self.wrkspce.triggered.connect(self.change_workspace)
 
         self.helpfile = QtWidgets.QAction(
@@ -518,6 +522,7 @@ class Application(QtWidgets.QMainWindow):
             'Help', self
         )
         self.helpfile.setShortcut('Ctrl+H')
+        self.helpfile.setToolTip('Help (Ctrl+H)')
         self.helpfile.triggered.connect(self.help_project)
 
         # Theme toggle button - set initial icon for dark mode since we're in light mode
@@ -526,8 +531,8 @@ class Application(QtWidgets.QMainWindow):
             'Switch Theme', self
         )
         self.theme_toggle.setShortcut('Ctrl+T')
+        self.theme_toggle.setToolTip('Switch Theme (Ctrl+T)')
         self.theme_toggle.triggered.connect(self.toggle_theme)
-        self.theme_toggle.setToolTip('Switch to Dark Mode')
 
         # added devDocs logo and called functions
         self.devdocs = QtWidgets.QAction(
@@ -535,6 +540,7 @@ class Application(QtWidgets.QMainWindow):
             'Dev Docs', self
         )
         self.devdocs.setShortcut('Ctrl+D')
+        self.devdocs.setToolTip('Developer Documentation (Ctrl+D)')
         self.devdocs.triggered.connect(self.dev_docs)
 
         self.topToolbar = self.addToolBar('Top Tool Bar')
@@ -547,38 +553,90 @@ class Application(QtWidgets.QMainWindow):
         self.topToolbar.addAction(self.theme_toggle)
         self.topToolbar.setIconSize(QSize(24, 24))
         self.topToolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        
-        # Add specific styling for top toolbar
-        # self.topToolbar.setStyleSheet("""
-        #     QToolBar {
-        #         spacing: 10px;
-        #         padding: 4px;
-        #     }
-        #     QToolButton {
-        #         min-width: 100px;
-        #         max-width: 140px;
-        #         min-height: 54px;
-        #         padding: 4px 2px;
-        #         margin: 1px;
-        #         font-size: 10.5px;
-        #         color: #000000;
-        #         background: transparent;
-        #         border: none;
-        #         text-align: center;
-        #         white-space: nowrap;
-        #     }
-        #     QToolButton:hover {
-        #         color: #40c4ff;
-        #     }
-        # """)
+
+        # Add specific styling for top toolbar with theme-specific tooltip styles
+        if self.is_dark_theme:
+            self.topToolbar.setStyleSheet("""
+                QToolBar {
+                    spacing: 10px;
+                    padding: 4px;
+                }
+                QToolButton {
+                    min-width: 100px;
+                    max-width: 140px;
+                    min-height: 54px;
+                    padding: 4px 2px;
+                    margin: 1px;
+                    font-size: 10.5px;
+                    color: #e8eaed;
+                    background: transparent;
+                    border: none;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+                QToolButton:hover {
+                    color: #40c4ff;
+                    background: rgba(64, 196, 255, 0.1);
+                    border-radius: 6px;
+                }
+                QToolTip {
+                    background-color: #23273a;
+                    color: #e8eaed;
+                    border: 2px solid #40c4ff;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-weight: bold;
+                    opacity: 255;
+                    margin: 2px;
+                    box-shadow: 0 2px 10px rgba(64, 196, 255, 0.3);
+                }
+            """)
+        else:
+            self.topToolbar.setStyleSheet("""
+                QToolBar {
+                    spacing: 10px;
+                    padding: 4px;
+                }
+                QToolButton {
+                    min-width: 100px;
+                    max-width: 140px;
+                    min-height: 54px;
+                    padding: 4px 2px;
+                    margin: 1px;
+                    font-size: 10.5px;
+                    color: #2c3e50;
+                    background: transparent;
+                    border: none;
+                    text-align: center;
+                    white-space: nowrap;
+                }
+                QToolButton:hover {
+                    color: #1976d2;
+                    background: rgba(25, 118, 210, 0.1);
+                    border-radius: 6px;
+                }
+                QToolTip {
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    border: 2px solid #1976d2;
+                    padding: 10px 14px;
+                    border-radius: 8px;
+                    font-size: 13px;
+                    font-weight: bold;
+                    opacity: 255;
+                    margin: 2px;
+                    box-shadow: 0 2px 10px rgba(25, 118, 210, 0.3);
+                }
+            """)
 
         # This part is setting fossee logo to the right
-        # corner in the application window.
         self.spacer = QtWidgets.QWidget()
         self.spacer.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding,
             QtWidgets.QSizePolicy.Expanding)
         self.topToolbar.addWidget(self.spacer)
+        
         self.logo = QtWidgets.QLabel()
         self.logopic = QtGui.QPixmap(
             os.path.join(
