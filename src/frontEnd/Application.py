@@ -583,13 +583,13 @@ class Application(QtWidgets.QMainWindow):
                     background-color: #23273a;
                     color: #e8eaed;
                     border: 2px solid #40c4ff;
-                    padding: 10px 14px;
+                    padding: 12px 16px;
                     border-radius: 8px;
-                    font-size: 13px;
+                    font-size: 14px;
                     font-weight: bold;
                     opacity: 255;
                     margin: 2px;
-                    box-shadow: 0 2px 10px rgba(64, 196, 255, 0.3);
+                    box-shadow: 0 4px 12px rgba(64, 196, 255, 0.4);
                 }
             """)
         else:
@@ -620,13 +620,13 @@ class Application(QtWidgets.QMainWindow):
                     background-color: #ffffff;
                     color: #2c3e50;
                     border: 2px solid #1976d2;
-                    padding: 10px 14px;
+                    padding: 12px 16px;
                     border-radius: 8px;
-                    font-size: 13px;
+                    font-size: 14px;
                     font-weight: bold;
                     opacity: 255;
                     margin: 2px;
-                    box-shadow: 0 2px 10px rgba(25, 118, 210, 0.3);
+                    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
                 }
             """)
 
@@ -1783,7 +1783,7 @@ class Application(QtWidgets.QMainWindow):
         if self.is_dark_theme:
             self.apply_dark_theme()
             self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/light_mode.png'))
-            self.theme_toggle.setToolTip('Switch to Light Mode')
+            self.theme_toggle.setToolTip('Switch to Light Mode (Ctrl+T)')
             # Update schematic converter theme
             self.update_schematic_converter_theme(is_dark=True)
             # Update model editor theme
@@ -1793,7 +1793,7 @@ class Application(QtWidgets.QMainWindow):
         else:
             self.apply_light_theme()
             self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/dark_mode.png'))
-            self.theme_toggle.setToolTip('Switch to Dark Mode')
+            self.theme_toggle.setToolTip('Switch to Dark Mode (Ctrl+T)')
             # Update schematic converter theme
             self.update_schematic_converter_theme(is_dark=False)
             # Update model editor theme
