@@ -157,6 +157,45 @@ class Application(QtWidgets.QMainWindow):
         # Update console (noteArea)
         self.obj_Mainview.noteArea.setFont(text_font)
         
+        # Update welcome message font size
+        welcome_font_size = self.text_font_size + 2  # Slightly larger for welcome message
+        if self.is_dark_theme:
+            self.obj_Mainview.noteArea.setStyleSheet(f"""
+                QTextEdit {{
+                    font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+                    line-height: 1.4;
+                    padding: 16px;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #23273a, stop:1 #181b24);
+                    color: #e8eaed;
+                    border: 1px solid #23273a;
+                    border-radius: 12px;
+                    font-size: {welcome_font_size}px;
+                }}
+            """)
+        else:
+            self.obj_Mainview.noteArea.setStyleSheet(f"""
+                QTextEdit {{
+                    font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+                    line-height: 1.4;
+                    padding: 16px;
+                    background: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #e1e4e8;
+                    border-radius: 12px;
+                    font-size: {welcome_font_size}px;
+                }}
+            """)
+        
+        # Update welcome page font size in dock widgets
+        for dock_widget in self.findChildren(QtWidgets.QDockWidget):
+            if dock_widget.windowTitle().startswith('Welcome'):
+                welcome_widget = dock_widget.widget()
+                if welcome_widget:
+                    welcome_browser = welcome_widget.findChild(QtWidgets.QWidget).findChild(QtWidgets.QTextBrowser)
+                    if welcome_browser:
+                        welcome_browser.setFont(text_font)
+        
         # Update project explorer with smaller font size for better visibility
         project_explorer_font = QtGui.QFont("Fira Code", max(8, self.text_font_size - 3))
         self.obj_Mainview.obj_projectExplorer.setFont(project_explorer_font)
@@ -364,6 +403,14 @@ class Application(QtWidgets.QMainWindow):
             self.toolbar_font_size += 1
             self.text_font_size += 1
             self.update_font_sizes()
+            # Update welcome page zoom
+            for dock_widget in self.findChildren(QtWidgets.QDockWidget):
+                if dock_widget.windowTitle().startswith('Welcome'):
+                    welcome_widget = dock_widget.widget()
+                    if welcome_widget:
+                        welcome_layout = welcome_widget.findChild(QtWidgets.QWidget)
+                        if welcome_layout and hasattr(welcome_layout, 'increase_font_size'):
+                            welcome_layout.increase_font_size()
             self.obj_appconfig.print_info("Font size increased")
 
     def decrease_font_size(self):
@@ -372,6 +419,14 @@ class Application(QtWidgets.QMainWindow):
             self.toolbar_font_size -= 1
             self.text_font_size -= 1
             self.update_font_sizes()
+            # Update welcome page zoom
+            for dock_widget in self.findChildren(QtWidgets.QDockWidget):
+                if dock_widget.windowTitle().startswith('Welcome'):
+                    welcome_widget = dock_widget.widget()
+                    if welcome_widget:
+                        welcome_layout = welcome_widget.findChild(QtWidgets.QWidget)
+                        if welcome_layout and hasattr(welcome_layout, 'decrease_font_size'):
+                            welcome_layout.decrease_font_size()
             self.obj_appconfig.print_info("Font size decreased")
 
     def reset_font_size(self):
@@ -379,6 +434,14 @@ class Application(QtWidgets.QMainWindow):
         self.toolbar_font_size = 10
         self.text_font_size = 10
         self.update_font_sizes()
+        # Reset welcome page zoom
+        for dock_widget in self.findChildren(QtWidgets.QDockWidget):
+            if dock_widget.windowTitle().startswith('Welcome'):
+                welcome_widget = dock_widget.widget()
+                if welcome_widget:
+                    welcome_layout = welcome_widget.findChild(QtWidgets.QWidget)
+                    if welcome_layout and hasattr(welcome_layout, 'reset_font_size'):
+                        welcome_layout.reset_font_size()
         self.obj_appconfig.print_info("Font size reset to default")
 
     def handle_simulation_output(self):
@@ -3638,6 +3701,8 @@ class Application(QtWidgets.QMainWindow):
         self.update_font_sizes()
         self.obj_appconfig.print_info("Toolbar font and icon size reset to default")
 
+
+
 # This class initialize the Main View of Application
 class MainView(QtWidgets.QWidget):
     """
@@ -3654,7 +3719,7 @@ class MainView(QtWidgets.QWidget):
     def __init__(self, *args):
         # call init method of superclass
         QtWidgets.QWidget.__init__(self, *args)
-
+        
         # Initialize theme state
         self.is_dark_theme = False
         
@@ -3745,6 +3810,7 @@ class MainView(QtWidgets.QWidget):
     def apply_dark_theme_welcome(self):
         """Apply dark theme to console"""
         self.is_dark_theme = True
+        # Note: Font size is now handled in update_font_sizes()
         self.noteArea.setStyleSheet("""
             QTextEdit {
                 font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
@@ -3759,7 +3825,6 @@ class MainView(QtWidgets.QWidget):
         """)
         self.noteArea.setStyleSheet("""
             QLabel {
-                font-size: 16px;
                 font-weight: 600;
                 color: #b0bec5;
                 padding: 8px 0px;
@@ -3770,6 +3835,7 @@ class MainView(QtWidgets.QWidget):
     def apply_light_theme_welcome(self):
         """Apply light theme to console"""
         self.is_dark_theme = False
+        # Note: Font size is now handled in update_font_sizes()
         self.noteArea.setStyleSheet("""
             QTextEdit {
                 font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
@@ -3783,7 +3849,6 @@ class MainView(QtWidgets.QWidget):
         """)
         self.noteArea.setStyleSheet("""
             QLabel {
-                font-size: 16px;
                 font-weight: 600;
                 color: #2c3e50;
                 padding: 8px 0px;

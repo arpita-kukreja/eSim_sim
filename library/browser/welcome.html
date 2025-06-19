@@ -22,6 +22,11 @@
                 --light-link-hover: #1565c0;
                 --light-border: #e1e4e8;
                 --light-shadow: rgba(0, 0, 0, 0.1);
+
+                /* Base font sizes - will scale with browser zoom */
+                --base-font-size: 1em;
+                --heading-font-size: 1.5em;
+                --text-font-size: 1.1em;
             }
 
             body {
@@ -31,6 +36,7 @@
                 background: linear-gradient(135deg, var(--dark-bg-primary) 0%, var(--dark-bg-secondary) 100%);
                 color: var(--dark-text-primary);
                 transition: all 0.3s ease;
+                font-size: var(--base-font-size);
             }
 
             body.light-theme {
@@ -40,7 +46,7 @@
 
             h1 {
                 font-weight: bold;
-                font-size: 28px;
+                font-size: var(--heading-font-size);
                 color: var(--dark-accent);
                 padding: 18px 24px 12px 24px;
                 background: linear-gradient(90deg, var(--dark-bg-primary) 0%, var(--dark-bg-secondary) 100%);
@@ -60,7 +66,7 @@
 
             p {
                 margin: 0px 24px 18px 24px;
-                font-size: 16px;
+                font-size: var(--text-font-size);
                 line-height: 1.7;
                 color: var(--dark-text-primary);
                 font-weight: 600;
@@ -71,7 +77,6 @@
 
             .light-theme p {
                 color: var(--light-text-primary);
-                font-size: 20px;
             }
 
             a {
@@ -80,6 +85,7 @@
                 font-weight: 600;
                 transition: color 0.2s;
                 position: relative;
+                font-size: inherit;
             }
 
             .light-theme a {
@@ -117,12 +123,12 @@
             }
 
             #license {
-                font-size: 12px;
                 color: var(--dark-text-secondary);
                 transition: all 0.3s ease;
                 width: 100%;
                 text-align: center;
                 margin-top: 8px;
+                font-size: var(--text-font-size);
             }
 
             .light-theme #license {
@@ -171,10 +177,19 @@
                 color: var(--dark-accent);
                 font-weight: 700;
                 transition: all 0.3s ease;
+                font-size: inherit;
             }
 
             .light-theme .highlight {
                 color: var(--light-accent);
+            }
+
+            /* Ensure all text elements scale with zoom */
+            * {
+                -webkit-text-size-adjust: 100%;
+                -moz-text-size-adjust: 100%;
+                -ms-text-size-adjust: 100%;
+                text-size-adjust: 100%;
             }
         </style>
     </head>
@@ -184,17 +199,17 @@
             <h1>About eSim</h1>
             <center class="logo"><img src="../../images/logo.png" alt="eSim logo" height="100" width="100"></center>
             <p>
-                <b style="color: #40c4ff; font-weight: 700;">eSim</b> is an open source EDA tool for circuit design, simulation, analysis and PCB design. It is an integrated tool built using open source softwares such as 
+                <span class="highlight">eSim</span> is an open source EDA tool for circuit design, simulation, analysis and PCB design. It is an integrated tool built using open source softwares such as 
                 <a href="https://www.kicad.org/">KiCad</a>,
                 <a href="https://ngspice.sourceforge.io/">Ngspice</a>,
                 <a href="http://ghdl.free.fr">GHDL</a>,
                 <a href="https://www.veripool.org/verilator/">Verilator</a>,
                 <a href="https://www.makerchip.com/">Makerchip IDE</a>, and
                 <a href="https://skywater-pdk.rtfd.io/">SkyWater SKY130 PDK</a>.
-                eSim source is released under <b style="color: #40c4ff; font-weight: 700;">GNU General Public License.</b>
+                eSim source is released under <span class="highlight">GNU General Public License.</span>
             </p>
             <p>
-                This tool is developed by the <b style="color: #40c4ff; font-weight: 700;">eSim Team at FOSSEE, IIT Bombay</b>.<br>
+                This tool is developed by the <span class="highlight">eSim Team at FOSSEE, IIT Bombay</span>.<br>
                 To know more about eSim, please visit:
                 <a href="https://esim.fossee.in/">https://esim.fossee.in/</a>.
             </p>
