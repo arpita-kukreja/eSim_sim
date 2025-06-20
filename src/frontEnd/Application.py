@@ -136,6 +136,10 @@ class Application(QtWidgets.QMainWindow):
         self.obj_appconfig.print_info("  Ctrl++ / Ctrl+- / Ctrl+0: Adjust all font sizes")
         self.obj_appconfig.print_info("  Ctrl+Up / Ctrl+Down / Ctrl+Shift+0: Adjust toolbar button sizes")
 
+        self.current_makerchip_widget = None  # Reference to open makerchip widget
+        self.current_modeleditor_widget = None  # Reference to open model editor widget
+        self.current_terminalui_widget = None  # Reference to open simulation TerminalUi widget
+
     def update_font_sizes(self):
         """Update font sizes for all relevant widgets"""
         # Update toolbar fonts
@@ -1806,14 +1810,15 @@ class Application(QtWidgets.QMainWindow):
             self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/sun.png'))
             self.theme_toggle.setToolTip('Switch to Light Mode (Ctrl+T)')
 
-            
-
             # Update schematic converter theme
             self.update_schematic_converter_theme(is_dark=True)
             # Update model editor theme
             self.update_model_editor_theme(is_dark=True)
             # Update makerchip-ngveri theme
             self.update_makerchip_ngveri_theme(is_dark=True)
+            # Update simulation TerminalUi theme
+            if hasattr(self, 'current_terminalui_widget') and self.current_terminalui_widget is not None:
+                self.current_terminalui_widget.set_theme(True)
         else:
             self.apply_light_theme()
             self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/dark_mode.png'))
@@ -1824,6 +1829,9 @@ class Application(QtWidgets.QMainWindow):
             self.update_model_editor_theme(is_dark=False)
             # Update makerchip-ngveri theme
             self.update_makerchip_ngveri_theme(is_dark=False)
+            # Update simulation TerminalUi theme
+            if hasattr(self, 'current_terminalui_widget') and self.current_terminalui_widget is not None:
+                self.current_terminalui_widget.set_theme(False)
 
         # Update all dock widgets and their children
         for dock_widget in self.findChildren(QtWidgets.QDockWidget):
@@ -2020,7 +2028,7 @@ class Application(QtWidgets.QMainWindow):
             print(f"Error updating schematic converter theme: {e}")
 
     def update_model_editor_theme(self, is_dark):
-        """Update model editor theme based on current theme."""
+        """Update model editor theme based on current theme and update the widget if open."""
         if is_dark:
             # Dark theme for model editor
             model_editor_style = """
@@ -2251,11 +2259,14 @@ class Application(QtWidgets.QMainWindow):
                 # Also apply to any ModelEditorclass instances
                 if hasattr(widget, '__class__') and 'ModelEditorclass' in str(widget.__class__):
                     widget.setStyleSheet(model_editor_style)
+            # --- NEW: update the actual model editor widget if present ---
+            if hasattr(self, 'current_modeleditor_widget') and self.current_modeleditor_widget is not None:
+                self.current_modeleditor_widget.set_theme(is_dark)
         except Exception as e:
             print(f"Error updating model editor theme: {e}")
 
     def update_makerchip_ngveri_theme(self, is_dark):
-        """Update makerchip-ngveri theme based on current theme."""
+        """Update makerchip-ngveri theme based on current theme and update the widget if open."""
         if is_dark:
             # Dark theme for makerchip-ngveri
             makerchip_style = """
@@ -2494,6 +2505,9 @@ class Application(QtWidgets.QMainWindow):
                 # Also apply to any Maker or NgVeri class instances
                 if hasattr(widget, '__class__') and ('Maker' in str(widget.__class__) or 'NgVeri' in str(widget.__class__)):
                     widget.setStyleSheet(makerchip_style)
+            # --- NEW: update the actual makerchip widget if present ---
+            if hasattr(self, 'current_makerchip_widget') and self.current_makerchip_widget is not None:
+                self.current_makerchip_widget.set_theme(is_dark)
         except Exception as e:
             print(f"Error updating makerchip-ngveri theme: {e}")
 
@@ -2717,8 +2731,16 @@ class Application(QtWidgets.QMainWindow):
                 self.msg.exec_()
                 return
 
+            # --- Store reference to the TerminalUi widget for theme updates ---
             self.obj_Mainview.obj_dockarea.ngspiceEditor(
                 projName, ngspiceNetlist, self.simulationEndSignal, self.plotFlag)
+            # Find the most recently created NgspiceWidget and its TerminalUi
+            try:
+                ngspice_widget = self.obj_Mainview.obj_dockarea.ngspiceLayout.itemAt(0).widget()
+                if hasattr(ngspice_widget, 'terminalUi'):
+                    self.current_terminalui_widget = ngspice_widget.terminalUi
+            except Exception as e:
+                self.current_terminalui_widget = None
 
             self.ngspice.setEnabled(False)
             self.conversion.setEnabled(False)
@@ -2789,6 +2811,11 @@ class Application(QtWidgets.QMainWindow):
         print("Function : Makerchip and Verilator to Ngspice Converter")
         self.obj_appconfig.print_info('Makerchip is called')
         self.obj_Mainview.obj_dockarea.makerchip()
+        # --- Store reference to the currently open makerchip widget ---
+        if hasattr(self.obj_Mainview.obj_dockarea, 'makerchip_instance'):
+            self.current_makerchip_widget = self.obj_Mainview.obj_dockarea.makerchip_instance
+        else:
+            self.current_makerchip_widget = None
 
     def open_modelEditor(self):
         """
@@ -2803,6 +2830,11 @@ class Application(QtWidgets.QMainWindow):
         print("Function : Model editor")
         self.obj_appconfig.print_info('Model editor is called')
         self.obj_Mainview.obj_dockarea.modelEditor()
+        # --- Store reference to the currently open model editor widget ---
+        if hasattr(self.obj_Mainview.obj_dockarea, 'modeleditor_instance'):
+            self.current_modeleditor_widget = self.obj_Mainview.obj_dockarea.modeleditor_instance
+        else:
+            self.current_modeleditor_widget = None
 
     def open_OMedit(self):
         """

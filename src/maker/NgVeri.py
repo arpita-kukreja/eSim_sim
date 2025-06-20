@@ -494,3 +494,8 @@ class NgVeri(QtWidgets.QWidget):
 
         self.trbox.setLayout(self.trgrid)
         return self.trbox
+
+    def set_theme(self, is_dark_theme):
+        """Update the theme and re-apply styling."""
+        self.is_dark_theme = is_dark_theme
+        self.apply_theme_styling()

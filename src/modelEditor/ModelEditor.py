@@ -947,3 +947,8 @@ class ModelEditorclass(QtWidgets.QWidget):
         os.chdir(defaultcwd)
         libopen.close()
         libopen1.close()
+
+    def set_theme(self, is_dark_theme):
+        """Update the theme and re-apply styling."""
+        self.is_dark_theme = is_dark_theme
+        self.apply_theme_styling()

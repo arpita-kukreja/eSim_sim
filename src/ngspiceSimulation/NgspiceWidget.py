@@ -34,6 +34,17 @@ class NgspiceWidget(QtWidgets.QWidget):
         self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.terminalUi)
 
+        # --- Ensure the correct theme is applied immediately ---
+        app_parent = self.parent()
+        is_dark_theme = False
+        while app_parent is not None:
+            if hasattr(app_parent, 'is_dark_theme'):
+                is_dark_theme = app_parent.is_dark_theme
+                break
+            app_parent = app_parent.parent() if hasattr(app_parent, 'parent') else None
+        if hasattr(self, 'terminalUi') and hasattr(self.terminalUi, 'set_theme'):
+            self.terminalUi.set_theme(is_dark_theme)
+
         # Receiving the plotFlag
         self.plotFlag = plotFlag
         print("Value of plotFlag: ", self.plotFlag)

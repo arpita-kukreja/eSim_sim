@@ -344,22 +344,17 @@ class DockArea(QtWidgets.QMainWindow):
         count = count + 1
 
     def modelEditor(self):
-        """This function creates a widget for model editor."""
+        """This function creates a widget for model editor and ensures the correct theme is applied."""
         global count
 
         self.modelwidget = QtWidgets.QWidget()
         self.modellayout = QtWidgets.QVBoxLayout()
-        # Set smaller margins for the layout
         self.modellayout.setContentsMargins(4, 4, 4, 4)
         self.modellayout.setSpacing(4)
-        # Get current theme from parent Application if possible
-        is_dark_theme = False
-        parent = self.parent()
-        if parent and hasattr(parent, 'is_dark_theme'):
-            is_dark_theme = parent.is_dark_theme
-        self.modellayout.addWidget(ModelEditorclass(is_dark_theme=is_dark_theme))
+        # --- Create the actual ModelEditorclass widget and store reference ---
+        self.modeleditor_instance = ModelEditorclass()
+        self.modellayout.addWidget(self.modeleditor_instance)
 
-        # Adding to main Layout
         self.modelwidget.setLayout(self.modellayout)
         dock['Model Editor-' + str(count)] = QtWidgets.QDockWidget('Model Editor-' + str(count))
         dock['Model Editor-' + str(count)].setWidget(self.modelwidget)
@@ -369,6 +364,17 @@ class DockArea(QtWidgets.QMainWindow):
         dock['Model Editor-' + str(count)].setVisible(True)
         dock['Model Editor-' + str(count)].setFocus()
         dock['Model Editor-' + str(count)].raise_()
+
+        # --- Ensure the correct theme is applied immediately ---
+        app_parent = self.parent()
+        is_dark_theme = False
+        while app_parent is not None:
+            if hasattr(app_parent, 'is_dark_theme'):
+                is_dark_theme = app_parent.is_dark_theme
+                break
+            app_parent = app_parent.parent() if hasattr(app_parent, 'parent') else None
+        if hasattr(self, 'modeleditor_instance') and hasattr(self.modeleditor_instance, 'set_theme'):
+            self.modeleditor_instance.set_theme(is_dark_theme)
 
         temp = self.obj_appconfig.current_project['ProjectName']
         if temp:
@@ -470,13 +476,11 @@ class DockArea(QtWidgets.QMainWindow):
             self.msg.exec_()
 
     def makerchip(self):
-        """This function creates a widget for different subcircuit options."""
+        """This function creates a widget for Makerchip/NgVeri and ensures the correct theme is applied."""
         global count
 
         projDir = self.obj_appconfig.current_project["ProjectName"]
         if projDir is None:
-            """ when projDir is None that is clicking on subcircuit icon
-                without any project selection """
             self.msg = QtWidgets.QErrorMessage()
             self.msg.setModal(True)
             self.msg.setWindowTitle("Error Message")
@@ -491,17 +495,14 @@ class DockArea(QtWidgets.QMainWindow):
 
         self.makerWidget = QtWidgets.QWidget()
         self.makerLayout = QtWidgets.QVBoxLayout()
-        self.makerLayout.addWidget(makerchip(self))
-
+        # --- Create the actual makerchip widget and store reference ---
+        self.makerchip_instance = makerchip(self)
+        self.makerLayout.addWidget(self.makerchip_instance)
         self.makerWidget.setLayout(self.makerLayout)
-        dock[dockName +
-             str(count)] = QtWidgets.QDockWidget(dockName
-                                                 + str(count))
+        dock[dockName + str(count)] = QtWidgets.QDockWidget(dockName + str(count))
         dock[dockName + str(count)].setWidget(self.makerWidget)
-        self.addDockWidget(QtCore.Qt.TopDockWidgetArea,
-                           dock[dockName + str(count)])
-        self.tabifyDockWidget(dock['Welcome'],
-                              dock[dockName + str(count)])
+        self.addDockWidget(QtCore.Qt.TopDockWidgetArea, dock[dockName + str(count)])
+        self.tabifyDockWidget(dock['Welcome'], dock[dockName + str(count)])
 
         # CSS
         dock[dockName + str(count)].setStyleSheet(" \
@@ -512,6 +513,18 @@ class DockArea(QtWidgets.QMainWindow):
         dock[dockName + str(count)].setVisible(True)
         dock[dockName + str(count)].setFocus()
         dock[dockName + str(count)].raise_()
+
+        # --- Ensure the correct theme is applied immediately ---
+        # Find the Application parent and get the current theme
+        app_parent = self.parent()
+        is_dark_theme = False
+        while app_parent is not None:
+            if hasattr(app_parent, 'is_dark_theme'):
+                is_dark_theme = app_parent.is_dark_theme
+                break
+            app_parent = app_parent.parent() if hasattr(app_parent, 'parent') else None
+        if hasattr(self, 'makerchip_instance') and hasattr(self.makerchip_instance, 'set_theme'):
+            self.makerchip_instance.set_theme(is_dark_theme)
 
         count = count + 1
 
