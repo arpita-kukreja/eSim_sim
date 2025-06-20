@@ -553,7 +553,7 @@ class Application(QtWidgets.QMainWindow):
         self.topToolbar.addAction(self.theme_toggle)
         self.topToolbar.setIconSize(QSize(24, 24))
         self.topToolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-
+        
         # Add specific styling for top toolbar with theme-specific tooltip styles
         if self.is_dark_theme:
             self.topToolbar.setStyleSheet("""
@@ -3799,7 +3799,7 @@ class MainView(QtWidgets.QWidget):
     def __init__(self, *args):
         # call init method of superclass
         QtWidgets.QWidget.__init__(self, *args)
-        
+
         # Initialize theme state
         self.is_dark_theme = False
         
