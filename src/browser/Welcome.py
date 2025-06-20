@@ -92,8 +92,4 @@ class Welcome(QtWidgets.QWidget):
     def reset_font_size(self):
         """Reset the font size to default"""
         self.current_zoom = 100
-<<<<<<< HEAD
         self.load_and_scale_content()
-=======
-        self.load_and_scale_content()
->>>>>>> 6e7ae07cc9e26c191594d98ff40eaf4af0816015

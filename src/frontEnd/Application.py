@@ -531,7 +531,7 @@ class Application(QtWidgets.QMainWindow):
             'Switch Theme', self
         )
         self.theme_toggle.setShortcut('Ctrl+T')
-        self.theme_toggle.setToolTip('Switch Theme (Ctrl+T)')
+        self.theme_toggle.setToolTip('Switch to Dark Mode (Ctrl+T)')
         self.theme_toggle.triggered.connect(self.toggle_theme)
 
         # added devDocs logo and called functions
@@ -653,59 +653,79 @@ class Application(QtWidgets.QMainWindow):
             QtGui.QIcon(init_path + 'images/kicad.png'),
             'Open Schematic', self
         )
+        self.kicad.setShortcut('Ctrl+K')  # Shortcut for Open Schematic
+        self.kicad.setToolTip('Open Schematic (Ctrl+K)')
         self.kicad.triggered.connect(self.obj_kicad.openSchematic)
 
         self.conversion = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/ki-ng.png'),
             'Convert KiCad to Ngspice', self
         )
+        self.conversion.setShortcut('Ctrl+G')  # Shortcut for Convert KiCad to Ngspice
+        self.conversion.setToolTip('Convert KiCad to Ngspice (Ctrl+G)')
         self.conversion.triggered.connect(self.obj_kicad.openKicadToNgspice)
 
         self.ngspice = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/ngspice.png'),
             'Simulate', self
         )
+        self.ngspice.setShortcut('Ctrl+M')  # Shortcut for Simulate
+        self.ngspice.setToolTip('Simulate (Ctrl+M)')
         self.ngspice.triggered.connect(self.plotFlagPopBox)
 
         self.model = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/model.png'),
             'Model Editor', self
         )
+        self.model.setShortcut('Ctrl+E')  # Shortcut for Model Editor
+        self.model.setToolTip('Model Editor (Ctrl+E)')
         self.model.triggered.connect(self.open_modelEditor)
 
         self.subcircuit = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/subckt.png'),
             'Subcircuit', self
         )
+        self.subcircuit.setShortcut('Ctrl+B')  # Shortcut for Subcircuit
+        self.subcircuit.setToolTip('Subcircuit (Ctrl+B)')
         self.subcircuit.triggered.connect(self.open_subcircuit)
 
         self.nghdl = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/nghdl.png'), 'NGHDL', self
         )
+        self.nghdl.setShortcut('Ctrl+H')  # Shortcut for NGHDL
+        self.nghdl.setToolTip('NGHDL (Ctrl+H)')
         self.nghdl.triggered.connect(self.open_nghdl)
 
         self.makerchip = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/makerchip.png'),
             'Makerchip-NgVeri', self
         )
+        self.makerchip.setShortcut('Ctrl+V')  # Shortcut for Makerchip-NgVeri
+        self.makerchip.setToolTip('Makerchip-NgVeri (Ctrl+V)')
         self.makerchip.triggered.connect(self.open_makerchip)
 
         self.omedit = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/omedit.png'),
             'Modelica Converter', self
         )
+        self.omedit.setShortcut('Ctrl+I')  # Shortcut for Modelica Converter
+        self.omedit.setToolTip('Modelica Converter (Ctrl+I)')
         self.omedit.triggered.connect(self.open_OMedit)
 
         self.omoptim = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/omoptim.png'),
             'OM Optimisation', self
         )
+        self.omoptim.setShortcut('Ctrl+Y')  # Shortcut for OM Optimisation
+        self.omoptim.setToolTip('OM Optimisation (Ctrl+Y)')
         self.omoptim.triggered.connect(self.open_OMoptim)
 
         self.conToeSim = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/icon.png'),
             'Schematics converter', self
         )
+        self.conToeSim.setShortcut('Ctrl+J')  # Shortcut for Schematics converter
+        self.conToeSim.setToolTip('Schematics converter (Ctrl+J)')
         self.conToeSim.triggered.connect(self.open_conToeSim)
 
         # Create a scrollable left toolbar
@@ -1784,7 +1804,7 @@ class Application(QtWidgets.QMainWindow):
             self.apply_dark_theme()
 
             self.theme_toggle.setIcon(QtGui.QIcon(init_path + 'images/sun.png'))
-            self.theme_toggle.setToolTip('Switch to Light Mode')
+            self.theme_toggle.setToolTip('Switch to Light Mode (Ctrl+T)')
 
             
 
