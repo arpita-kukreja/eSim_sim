@@ -2142,112 +2142,47 @@ class Application(QtWidgets.QMainWindow):
         else:
             # Light theme for model editor
             model_editor_style = """
-                QGroupBox {
-                    border: 2px solid #1976d2;
-                    border-radius: 14px;
-                    margin-top: 1em;
-                    padding: 15px;
-                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                        stop:0 #ffffff, stop:1 #f8f9fa);
-                    color: #2c3e50;
-                }
-                QGroupBox::title {
-                    subcontrol-origin: margin;
-                    left: 15px;
-                    padding: 0 5px;
-                    color: #1976d2;
-                    font-weight: bold;
-                    font-size: 14px;
-                }
-                QPushButton {
-                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                        stop:0 #1976d2, stop:1 #1565c0);
-                    color: #ffffff;
-                    border: 1px solid #1976d2;
-                    min-height: 35px;
-                    min-width: 120px;
-                    padding: 8px 15px;
-                    border-radius: 10px;
-                    font-weight: 700;
-                    font-size: 12px;
-                }
-                QPushButton:hover {
-                    background: #1565c0;
-                    color: #fff;
-                    border: 1.5px solid #1565c0;
-                }
-                QPushButton:pressed {
-                    background: #0d47a1;
-                    color: #ffffff;
-                    border: 1.5px solid #0d47a1;
-                }
-                QPushButton:disabled {
-                    background: #e1e4e8;
-                    color: #7f8c8d;
-                    border: 1px solid #e1e4e8;
-                }
-                QRadioButton {
-                    color: #2c3e50;
-                    font-weight: 600;
-                    font-size: 13px;
-                }
-                QRadioButton::indicator {
-                    width: 16px;
-                    height: 16px;
-                    border: 2px solid #1976d2;
-                    border-radius: 8px;
-                    background: #ffffff;
-                }
-                QRadioButton::indicator:checked {
-                    background: #1976d2;
-                    border: 2px solid #1976d2;
-                }
-                QComboBox {
-                    background: #ffffff;
-                    color: #2c3e50;
-                    border: 1px solid #1976d2;
-                    border-radius: 8px;
-                    padding: 5px 10px;
-                    min-height: 30px;
-                    font-size: 12px;
-                }
-                QComboBox:hover {
-                    border: 1.5px solid #1565c0;
-                }
-                QComboBox::drop-down {
-                    border: none;
-                    width: 20px;
-                }
-                QComboBox::down-arrow {
-                    width: 12px;
-                    height: 12px;
-                }
-                QTableWidget {
-                    background: #ffffff;
-                    color: #2c3e50;
-                    border: 1px solid #1976d2;
-                    border-radius: 8px;
-                    gridline-color: #1976d2;
-                    font-size: 12px;
-                }
-                QTableWidget::item {
-                    padding: 8px;
-                    border-bottom: 1px solid #f8f9fa;
-                }
-                QTableWidget::item:selected {
-                    background: #1976d2;
-                    color: #ffffff;
-                }
-                QHeaderView::section {
-                    background: #f8f9fa;
-                    color: #1976d2;
-                    border: 1px solid #1976d2;
-                    padding: 8px;
-                    font-weight: 700;
-                }
-                QLabel {
-                    color: #2c3e50;
-                }
+            
+            #    QWidget { background: transparent; }
+            #    QPushButton {
+            #        background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f8f9fa, stop:1 #e9ecef);
+            #        color: #1976d2;
+            #        border: 1px solid #1976d2;
+            #        min-height: 35px;
+            #        min-width: 120px;
+            #        padding: 8px 15px;
+            #        border-radius: 10px;
+            #        font-weight: 700;
+            #        font-size: 12px;
+            #    }
+            #    QPushButton:hover {
+            #        background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #e3f2fd, stop:1 #bbdefb);
+            #        color: #1565c0;
+            #        border: 1px solid #1565c0;
+            #    }
+            #    QPushButton:pressed {
+            #        background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1976d2, stop:1 #1565c0);
+            #        color: #ffffff;
+            #        border: 1px solid #1565c0;
+            #    }
+            #    QPushButton:disabled {
+            #        background: #f5f5f5;
+            #        color: #9e9e9e;
+            #        border: 1px solid #e0e0e0;
+            #    }
+            #    QRadioButton { color: #2c3e50; font-weight: 600; font-size: 13px; }
+            #    QRadioButton::indicator { width: 16px; height: 16px; border: 2px solid #1976d2; border-radius: 8px; background: #ffffff; }
+            #    QRadioButton::indicator:checked { background: #1976d2; border: 2px solid #1976d2; }
+            #    QComboBox { background: #ffffff; color: #2c3e50; border: 1px solid #1976d2; border-radius: 8px; padding: 5px 10px; min-height: 30px; font-size: 12px; }
+            #    QComboBox:hover { border: 1.5px solid #1565c0; }
+            #    QComboBox::drop-down { border: none; width: 20px; }
+            #    QComboBox::down-arrow { width: 12px; height: 12px; }
+            #    QTableWidget { background: #ffffff; color: #2c3e50; border: 1px solid #1976d2; border-radius: 8px; gridline-color: #1976d2; font-size: 12px; }
+            #    QTableWidget::item { padding: 8px; border-bottom: 1px solid #f8f9fa; }
+            #    QTableWidget::item:selected { background: #1976d2; color: #ffffff; }
+            #    QHeaderView::section { background: #f8f9fa; color: #1976d2; border: 1px solid #1976d2; padding: 8px; font-weight: 700; }
+            #    QLabel { color: #2c3e50; }
+        
             """
 
         # Apply styles to model editor widgets
