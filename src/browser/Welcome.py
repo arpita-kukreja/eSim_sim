@@ -8,12 +8,13 @@ class Welcome(QtWidgets.QWidget):
     It creates Welcome page of eSim.
     """
 
-    def __init__(self):
+    def __init__(self, is_dark_theme=False):
         QtWidgets.QWidget.__init__(self)
         self.vlayout = QtWidgets.QVBoxLayout()
         self.browser = QtWidgets.QTextBrowser()
         self.current_zoom = 100  # Default zoom level
         self.base_font_size = 14  # Base font size in pixels
+        self.is_dark_theme = is_dark_theme
 
         init_path = '../../'
         if os.name == 'nt':
@@ -48,7 +49,34 @@ class Welcome(QtWidgets.QWidget):
         try:
             with open(self.html_path, 'r', encoding='utf-8') as file:
                 content = file.read()
-                
+
+            # Force styles for dark theme to ensure readability
+            if self.is_dark_theme:
+                dark_style = """
+                <style type="text/css">
+                    body {
+                        background-color: #23273a !important;
+                        color: #e8eaed !important;
+                    }
+                    h1 {
+                        color: #40c4ff !important;
+                    }
+                    p, span {
+                        color: #e8eaed !important;
+                    }
+                    a, a:link, a:visited, a:hover, a:active {
+                        color: #40c4ff !important;
+                    }
+                    .highlight {
+                        color: #40c4ff !important;
+                    }
+                </style>
+                """
+                content = content.replace('</head>', dark_style + '</head>')
+            else:
+                # Ensure light theme is properly applied if not dark
+                content = content.replace('<body>', '<body class="light-theme">')
+
             # Calculate the scaled font size
             scaled_size = int(self.base_font_size * (self.current_zoom / 100.0))
             
