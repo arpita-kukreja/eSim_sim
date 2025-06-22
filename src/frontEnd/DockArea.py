@@ -528,12 +528,12 @@ class DockArea(QtWidgets.QMainWindow):
 
         count = count + 1
 
-    def usermanual(self):
+    def usermanual(self, is_dark_theme=False):
         """This function creates a widget for user manual."""
         global count
         self.usermanualWidget = QtWidgets.QWidget()
         self.usermanualLayout = QtWidgets.QVBoxLayout()
-        self.usermanualLayout.addWidget(UserManual())
+        self.usermanualLayout.addWidget(UserManual(is_dark_theme))
 
         self.usermanualWidget.setLayout(self.usermanualLayout)
         dock['User Manual-' +

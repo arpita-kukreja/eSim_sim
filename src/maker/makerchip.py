@@ -82,18 +82,18 @@ class makerchip(QtWidgets.QWidget):
         self.tabWidget = QtWidgets.QTabWidget()
         self.tabWidget.addTab(self.MakerTab, "Makerchip")
         self.tabWidget.addTab(self.NgVeriTab, "NgVeri")
-
+        
         # Re-apply theme on tab change
         self.tabWidget.currentChanged.connect(self._on_tab_changed)
-
+        
         self.mainLayout = QtWidgets.QVBoxLayout()
         self.mainLayout.setContentsMargins(15, 15, 15, 15)  # Add margins
         self.mainLayout.setSpacing(15)  # Add spacing
         self.mainLayout.addWidget(self.tabWidget)
-
+        
         self.convertWindow.setLayout(self.mainLayout)
         self.convertWindow.show()
-
+        
         filecount = filecount + 1
         return self.convertWindow
 

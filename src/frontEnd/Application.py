@@ -2590,26 +2590,15 @@ class Application(QtWidgets.QMainWindow):
             )
 
     def change_workspace(self):
-        """
-        This function call changes Workspace
-        """
-        print("Function : Change Workspace")
-        self.obj_workspace.returnWhetherClickedOrNot(self)
-        self.hide()
-        self.obj_workspace.show()
+        """This function opens a dialog to choose the workspace."""
+        self.obj_workspace.changeWorkspace()
 
     def help_project(self):
-        """
-        This function opens usermanual in dockarea.
-            - It prints the message ""Function : Help""
-            - Uses print_info() method of class Appconfig
-              from Configuration/Appconfig.py file.
-            - Call method usermanual() from ./DockArea.py.
-        """
+        """This function opens help documentation."""
         print("Function : Help")
         self.obj_appconfig.print_info('Help is called')
         print("Current Project is : ", self.obj_appconfig.current_project)
-        self.obj_Mainview.obj_dockarea.usermanual()
+        self.obj_Mainview.obj_dockarea.usermanual(self.is_dark_theme)
 
     def dev_docs(self):
         """
