@@ -22,20 +22,23 @@ class UserManual(QtWidgets.QWidget):
 
             if is_dark_theme:
                 dark_style = """
-                <style>
+                <style type="text/css">
                     body {
-                        background-color: #2e2e2e;
-                        color: #ffffff;
+                        background-color: #23273a;
+                        color: #e8eaed;
                     }
-                    a {
-                        color: #56a8d8;
+                    a, a:link, a:visited, a:hover, a:active {
+                        color: #40c4ff !important;
                     }
-                    .tableofcontents span {
-                        color: #ffffff !important;
+                    .tableofcontents span, h1, h2, h3, h4, h5, h6,
+                    .likechapterHead, .chapterHead, .sectionHead, .subsectionHead,
+                    .cmbx-12x-x-207, .cmbx-12x-x-144, .cmr-10, .cmbx-10, .cmti-10x-x-109, .cmtt-10x-x-109 {
+                         color: #e8eaed !important;
                     }
                 </style>
                 """
-                html_content = dark_style + html_content
+                # Inject styles into the head of the document
+                html_content = html_content.replace('</head>', dark_style + '</head>')
 
             self.browser.setHtml(html_content)
                 

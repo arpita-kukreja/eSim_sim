@@ -36,7 +36,7 @@ class DockArea(QtWidgets.QMainWindow):
         - Modelica editor.
     """
 
-    def __init__(self):
+    def __init__(self, is_dark_theme=False):
         """This act as constructor for class DockArea."""
         QtWidgets.QMainWindow.__init__(self)
         self.obj_appconfig = Appconfig()
@@ -127,7 +127,7 @@ class DockArea(QtWidgets.QMainWindow):
             # Set smaller margins for the layout
             self.welcomeLayout.setContentsMargins(4, 4, 4, 4)
             self.welcomeLayout.setSpacing(4)
-            self.welcomeLayout.addWidget(Welcome())  # Call browser
+            self.welcomeLayout.addWidget(Welcome(is_dark_theme))  # Call browser
 
             # Adding to main Layout
             self.welcomeWidget.setLayout(self.welcomeLayout)

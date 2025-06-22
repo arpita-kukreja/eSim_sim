@@ -83,7 +83,7 @@ class Application(QtWidgets.QMainWindow):
 
         # Creating require Object
         self.obj_workspace = Workspace.Workspace()
-        self.obj_Mainview = MainView()
+        self.obj_Mainview = MainView(self.is_dark_theme)
         self.obj_kicad = Kicad(self.obj_Mainview.obj_dockarea)
         self.obj_appconfig = Appconfig()
         self.obj_validation = Validation()
@@ -1833,6 +1833,9 @@ class Application(QtWidgets.QMainWindow):
             if hasattr(self, 'current_terminalui_widget') and self.current_terminalui_widget is not None:
                 self.current_terminalui_widget.set_theme(False)
 
+        # Update Project Explorer theme
+        self.obj_Mainview.obj_projectExplorer.set_theme(self.is_dark_theme)
+        
         # Update all dock widgets and their children
         for dock_widget in self.findChildren(QtWidgets.QDockWidget):
             if self.is_dark_theme:
@@ -3752,12 +3755,12 @@ class MainView(QtWidgets.QWidget):
         - Console area.
     """
 
-    def __init__(self, *args):
+    def __init__(self, is_dark_theme=False, *args):
         # call init method of superclass
         QtWidgets.QWidget.__init__(self, *args)
 
         # Initialize theme state
-        self.is_dark_theme = False
+        self.is_dark_theme = is_dark_theme
         
         # Initialize appconfig
         self.obj_appconfig = Appconfig()
@@ -3821,27 +3824,56 @@ class MainView(QtWidgets.QWidget):
             }
         """)
 
-        self.obj_dockarea = DockArea.DockArea()
-        self.obj_projectExplorer = ProjectExplorer.ProjectExplorer()
+        self.obj_dockarea = DockArea.DockArea(self.is_dark_theme)
+        self.obj_projectExplorer = ProjectExplorer.ProjectExplorer(self.is_dark_theme)
+
+        # Main horizontal layout to hold Project Explorer and DockArea
+        self.layout = QtWidgets.QHBoxLayout()
+        # Adding Project Explorer to the layout
+        self.layout.addWidget(self.obj_projectExplorer)
+        self.layout.setStretchFactor(self.obj_projectExplorer, 1)
 
         # Adding content to vertical middle Split
+        self.middleSplit = QtWidgets.QSplitter()
         self.middleSplit.setOrientation(QtCore.Qt.Vertical)
         self.middleSplit.addWidget(self.obj_dockarea)
         self.middleSplit.addWidget(self.noteArea)
 
-        # Adding middle split to Middle Container Widget
-        self.middleContainerLayout.addWidget(self.middleSplit)
-        self.middleContainer.setLayout(self.middleContainerLayout)
+        self.layout.addWidget(self.middleSplit)
+        self.layout.setStretchFactor(self.middleSplit, 3)
 
-        # Adding content of left split
-        self.leftSplit.addWidget(self.obj_projectExplorer)
-        self.leftSplit.addWidget(self.middleContainer)
+        self.setLayout(self.layout)
+        self.show()
 
-        # Adding to main Layout
-        self.mainLayout.addWidget(self.leftSplit)
-        self.leftSplit.setSizes([int(self.width() / 4.5), self.height()])
-        self.middleSplit.setSizes([self.width(), int(self.height() / 2)])
-        self.setLayout(self.mainLayout)
+    def update_console(self, text, is_error=False):
+        """Update the console area with the given text and error flag."""
+        if is_error:
+            self.noteArea.setStyleSheet("""
+                QTextEdit {
+                    font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+                    line-height: 1.4;
+                    padding: 16px;
+                    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                        stop:0 #23273a, stop:1 #181b24);
+                    color: #e8eaed;
+                    border: 1px solid #23273a;
+                    border-radius: 12px;
+                }
+            """)
+            self.noteArea.append(text)
+        else:
+            self.noteArea.setStyleSheet("""
+                QTextEdit {
+                    font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+                    line-height: 1.4;
+                    padding: 16px;
+                    background: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #e1e4e8;
+                    border-radius: 12px;
+                }
+            """)
+            self.noteArea.append(text)
 
     def apply_dark_theme_welcome(self):
         """Apply dark theme to console"""

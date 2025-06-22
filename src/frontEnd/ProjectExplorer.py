@@ -17,7 +17,7 @@ class ProjectExplorer(QtWidgets.QWidget):
         - for removing project.
     """
 
-    def __init__(self):
+    def __init__(self, is_dark_theme=False):
         """
         This method is doing following tasks:
             - Working as a constructor for class ProjectExplorer.
@@ -36,8 +36,8 @@ class ProjectExplorer(QtWidgets.QWidget):
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         self.treewidget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
         
-        # Initialize with light theme by default
-        self.apply_light_theme()
+        # Initialize with the correct theme
+        self.set_theme(is_dark_theme)
         
         for parents, children in list(
                 self.obj_appconfig.project_explorer.items()):
@@ -58,6 +58,13 @@ class ProjectExplorer(QtWidgets.QWidget):
         self.treewidget.customContextMenuRequested.connect(self.openMenu)
         self.setLayout(self.window)
         self.show()
+
+    def set_theme(self, is_dark):
+        """Sets the theme for the widget."""
+        if is_dark:
+            self.apply_dark_theme()
+        else:
+            self.apply_light_theme()
 
     def apply_dark_theme(self):
         """Apply dark theme to the project explorer"""
