@@ -3845,6 +3845,8 @@ class MainView(QtWidgets.QWidget):
         self.setLayout(self.layout)
         self.show()
 
+        self.obj_projectExplorer.projectOpened.connect(self.openProjectInTabs)
+
     def update_console(self, text, is_error=False):
         """Update the console area with the given text and error flag."""
         if is_error:
@@ -3923,6 +3925,79 @@ class MainView(QtWidgets.QWidget):
                 border-bottom: 2px solid rgba(25, 118, 210, 0.3);
             }
         """)
+
+    def openProjectInTabs(self, projectName, projectPath, fileList):
+        self.obj_appconfig.print_info(f"Opening project '{projectName}'. Found {len(fileList)} total files.")
+        projectDock = QtWidgets.QDockWidget(projectName, self)
+        projectDock.setAllowedAreas(QtCore.Qt.TopDockWidgetArea)
+
+        tabWidget = QtWidgets.QTabWidget()
+        tabWidget.setTabsClosable(True)
+        tabWidget.tabCloseRequested.connect(lambda index: tabWidget.removeTab(index))
+
+        # Make tab file names more visible and readable
+        tabWidget.setStyleSheet("""
+        QTabBar::tab {
+            font-size: 8pt;
+        }
+        QTabBar::tab:selected {
+            font-weight: bold;
+        }
+        """)
+        tabWidget.setElideMode(QtCore.Qt.ElideMiddle)
+
+        files_added = 0
+        for f_name in fileList:
+            filePath = os.path.join(projectPath, f_name)
+            # Filter out kicad cache/rescue files
+            if f_name.endswith(('.lib', '.sch-bak', '.kicad_pcb-bak', '.net', '.xml', '.cir', '.log')):
+                self.obj_appconfig.print_info(f"Skipping file: {f_name}")
+                continue
+
+            try:
+                with open(filePath, 'r', errors='ignore') as f:
+                    content = f.read()
+
+                editor = QtWidgets.QTextEdit()
+                editor.setText(content)
+                # Set a monospace font
+                font = QtGui.QFont()
+                font.setFamily("monospace")
+                font.setStyleHint(QtGui.QFont.Monospace)
+                editor.setFont(font)
+
+                tabWidget.addTab(editor, f_name)
+                tabWidget.setTabToolTip(tabWidget.count() - 1, f_name)
+                files_added += 1
+            except Exception as e:
+                self.obj_appconfig.print_info(f"Error reading file {filePath}: {e}")
+
+        self.obj_appconfig.print_info(f"Added {files_added} files to the new tab.")
+
+        if tabWidget.count() > 0:
+            projectDock.setWidget(tabWidget)
+            self.obj_dockarea.addDockWidget(QtCore.Qt.TopDockWidgetArea, projectDock)
+            self.obj_appconfig.print_info("Project dock added to dock area.")
+
+            # Tabify with the welcome widget if it exists
+            self.obj_appconfig.print_info("Attempting to tabify with 'Welcome' dock...")
+            welcome_dock = None
+            for d in self.obj_dockarea.findChildren(QtWidgets.QDockWidget):
+                if d.windowTitle() == 'Welcome':
+                    welcome_dock = d
+                    break
+
+            if welcome_dock:
+                self.obj_appconfig.print_info("'Welcome' dock found. Tabifying...")
+                self.obj_dockarea.tabifyDockWidget(welcome_dock, projectDock)
+                self.obj_appconfig.print_info("Tabify complete.")
+            else:
+                self.obj_appconfig.print_info("'Welcome' dock NOT found. New dock will appear as a separate window.")
+
+            projectDock.raise_()
+            self.obj_appconfig.print_info("Called raise_() on the new project dock.")
+        else:
+            self.obj_appconfig.print_info(f"No viewable files found in project '{projectName}'. Nothing to display.")
 
 def ensure_config_directory():
     

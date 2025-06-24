@@ -17,6 +17,8 @@ class ProjectExplorer(QtWidgets.QWidget):
         - for removing project.
     """
 
+    projectOpened = QtCore.pyqtSignal(str, str, list)
+
     def __init__(self, is_dark_theme=False):
         """
         This method is doing following tasks:
@@ -44,16 +46,13 @@ class ProjectExplorer(QtWidgets.QWidget):
             os.path.join(parents)
             if os.path.exists(parents):
                 pathlist = parents.split(os.sep)
-                parentnode = QtWidgets.QTreeWidgetItem(
+                QtWidgets.QTreeWidgetItem(
                     self.treewidget, [pathlist[-1], parents]
                 )
-                for files in children:
-                    QtWidgets.QTreeWidgetItem(
-                        parentnode, [files, os.path.join(parents, files)]
-                    )
+
         self.window.addWidget(self.treewidget)
         self.treewidget.expanded.connect(self.refreshInstant)
-        self.treewidget.doubleClicked.connect(self.openProject)
+        self.treewidget.itemClicked.connect(self.handleItemClicked)
         self.treewidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treewidget.customContextMenuRequested.connect(self.openMenu)
         self.setLayout(self.window)
@@ -237,31 +236,16 @@ class ProjectExplorer(QtWidgets.QWidget):
         ''')
 
     def refreshInstant(self):
-        for i in range(self.treewidget.topLevelItemCount()):
-            if self.treewidget.topLevelItem(i).isExpanded():
-                index = self.treewidget.indexFromItem(
-                    self.treewidget.topLevelItem(i))
-                self.refreshProject(indexItem=index)
+        # Disabled: Do not repopulate file nodes under projects
+        pass
 
     def addTreeNode(self, parents, children):
         os.path.join(parents)
         pathlist = parents.split(os.sep)
-        parentnode = QtWidgets.QTreeWidgetItem(
+        QtWidgets.QTreeWidgetItem(
             self.treewidget, [pathlist[-1], parents]
         )
-        for files in children:
-            QtWidgets.QTreeWidgetItem(
-                parentnode, [files, os.path.join(parents, files)]
-            )
-
-        (
-            self.obj_appconfig.
-            proc_dict[self.obj_appconfig.current_project['ProjectName']]
-        ) = []
-        (
-            self.obj_appconfig.
-            dock_dict[self.obj_appconfig.current_project['ProjectName']]
-        ) = []
+        # Do NOT add file children
 
     def openMenu(self, position):
         indexes = self.treewidget.selectedIndexes()
@@ -378,7 +362,9 @@ class ProjectExplorer(QtWidgets.QWidget):
             self.textwindow.show()
         else:
             self.refreshProject(self.filePath)
-
+            projectName = os.path.basename(self.filePath)
+            files = [f for f in os.listdir(self.filePath) if os.path.isfile(os.path.join(self.filePath, f))]
+            self.projectOpened.emit(projectName, self.filePath, files)
             self.obj_appconfig.print_info(
                 'The current project is: ' + self.filePath
             )
@@ -450,22 +436,7 @@ class ProjectExplorer(QtWidgets.QWidget):
             )
 
         if os.path.exists(filePath):
-            filelistnew = os.listdir(os.path.join(filePath))
-            if indexItem is None:
-                parentnode = self.treewidget.currentItem()
-            else:
-                parentnode = self.treewidget.itemFromIndex(self.indexItem)
-            count = parentnode.childCount()
-            for i in range(count):
-                parentnode.removeChild(parentnode.child(0))
-            for files in filelistnew:
-                QtWidgets.QTreeWidgetItem(
-                    parentnode, [files, os.path.join(filePath, files)]
-                )
-
-            self.obj_appconfig.project_explorer[filePath] = filelistnew
-            json.dump(self.obj_appconfig.project_explorer,
-                      open(self.obj_appconfig.dictPath["path"], 'w'))
+            # Disabled: Do not add file nodes under project
             return True
 
         else:
@@ -651,3 +622,14 @@ class ProjectExplorer(QtWidgets.QWidget):
                         'contain space between them'
                     )
                     msg.exec_()
+
+    def handleItemClicked(self, item, column):
+        # If the clicked item is a project (has children), open in tabs
+        if item.childCount() > 0:
+            projectName = item.text(0)
+            projectPath = item.text(1)
+            files = [item.child(i).text(0) for i in range(item.childCount())]
+            self.projectOpened.emit(projectName, projectPath, files)
+        else:
+            # If it's a file, use the old behavior
+            self.openProject()
