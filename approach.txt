@@ -1,0 +1,12 @@
+Maintaining Font and Icon Size State:
+You have variables such as top_toolbar_font_size, left_toolbar_font_size, top_toolbar_icon_size, and left_toolbar_icon_size in the Application class to keep track of the current sizes.
+Keyboard Shortcuts:
+You have set up keyboard shortcuts (e.g., Ctrl+Up, Ctrl+Down, Ctrl+Shift+0) to trigger the increase, decrease, and reset of toolbar sizes.
+Dedicated Methods:
+Methods like increase_toolbar_font_size, decrease_toolbar_font_size, and reset_toolbar_font_size are defined to adjust these size variables and then call update_font_sizes() to apply the changes.
+Dynamic Styling and Updates:
+The update_font_sizes() and update_toolbar_button_styling() methods update the font and icon sizes for all toolbar buttons and apply the new styles using Qt's stylesheet system.
+The toolbars and their buttons are updated in real-time as the user triggers the resizing actions.
+Widget and Layout Management:
+The left toolbar is implemented as a scrollable QDockWidget with a vertical layout for tool buttons.
+The top toolbar is a standard QToolBar with actions and widgets.

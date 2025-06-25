@@ -521,14 +521,7 @@ class Application(QtWidgets.QMainWindow):
         self.wrkspce.setToolTip('Change Workspace (Ctrl+W)')
         self.wrkspce.triggered.connect(self.change_workspace)
 
-        self.helpfile = QtWidgets.QAction(
-            QtGui.QIcon(init_path + 'images/helpProject.png'),
-            'Help', self
-        )
-        self.helpfile.setShortcut('Ctrl+H')
-        self.helpfile.setToolTip('Help (Ctrl+H)')
-        self.helpfile.triggered.connect(self.help_project)
-
+        
         # Theme toggle button - set initial icon for dark mode since we're in light mode
         self.theme_toggle = QtWidgets.QAction(
             QtGui.QIcon(init_path + 'images/dark_mode.png'),
@@ -537,6 +530,13 @@ class Application(QtWidgets.QMainWindow):
         self.theme_toggle.setShortcut('Ctrl+T')
         self.theme_toggle.setToolTip('Switch to Dark Mode (Ctrl+T)')
         self.theme_toggle.triggered.connect(self.toggle_theme)
+        self.helpfile = QtWidgets.QAction(
+            QtGui.QIcon(init_path + 'images/helpProject.png'),
+            'Help', self
+        )
+        self.helpfile.setShortcut('Ctrl+H')
+        self.helpfile.setToolTip('Help (Ctrl+H)')
+        self.helpfile.triggered.connect(self.help_project)
 
         # added devDocs logo and called functions
         self.devdocs = QtWidgets.QAction(
@@ -552,9 +552,10 @@ class Application(QtWidgets.QMainWindow):
         self.topToolbar.addAction(self.openproj)
         self.topToolbar.addAction(self.closeproj)
         self.topToolbar.addAction(self.wrkspce)
-        self.topToolbar.addAction(self.helpfile)
+        
         self.topToolbar.addAction(self.devdocs)
         self.topToolbar.addAction(self.theme_toggle)
+        self.topToolbar.addAction(self.helpfile)
         self.topToolbar.setIconSize(QSize(24, 24))
         self.topToolbar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         
