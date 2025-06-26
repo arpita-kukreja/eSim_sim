@@ -107,15 +107,15 @@ class DockArea(QtWidgets.QMainWindow):
                 alignment: center;
             }
 
-            QTabBar::close-button {
-                image: url(close.png);
-                subcontrol-position: right;
-            }
+            # QTabBar::close-button {
+            #     image: url(close.png);
+            #     subcontrol-position: right;
+            # }
             
-            QTabBar::close-button:hover {
-                background: #ff4444;
-                border-radius: 2px;
-            }
+            # QTabBar::close-button:hover {
+            #     background: #ff4444;
+            #     border-radius: 2px;
+            # }
         """)
 
         for dockName in dockList:

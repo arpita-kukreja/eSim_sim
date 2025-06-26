@@ -3945,20 +3945,38 @@ class MainView(QtWidgets.QWidget):
         tabWidget = QtWidgets.QTabWidget()
         tabWidget.setTabsClosable(True)
         tabWidget.setElideMode(QtCore.Qt.ElideMiddle)
+        tabWidget.tabCloseRequested.connect(lambda index: tabWidget.removeTab(index))
         tabWidget.setStyleSheet("""
         QTabBar::tab {
-            font-size: 8pt;
+            background: #ffffff;
+            color: #222222;
+            font-size: 9pt;
+            border-radius: 6px;
+            padding: 6px 18px;
+            margin-right: 2px;
         }
         QTabBar::tab:selected {
-            font-weight: bold;
+            background: #e0e0e0;
+            color: #111111;
         }
-        QTabBar::close-button {
-            image: url(images/close.png);
-            subcontrol-position: right;
+        QTabBar::tab:hover:!selected {
+            background: #f5f5f5;
+            color: #111111;
         }
-        QTabBar::close-button:hover {
-            background: #ff4444;
-            border-radius: 2px;
+        # QTabBar::close-button {
+        #     image: url(images/close.png);
+        #     subcontrol-position: right;
+        #     width: 16px;
+        #     height: 16px;
+        # }
+        # QTabBar::close-button:hover {
+        #     background: #cccccc;
+        #     border-radius: 8px;
+        # }
+        QTabWidget::pane {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: #ffffff;
         }
         """)
 
