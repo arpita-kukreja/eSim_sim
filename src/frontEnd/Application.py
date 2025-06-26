@@ -3962,6 +3962,43 @@ class MainView(QtWidgets.QWidget):
         }
         """)
 
+        def handle_tab_double_click(index):
+            if index == -1:
+                return
+            file_name = tabWidget.tabText(index)
+            file_path = os.path.join(projectPath, file_name)
+            if not os.path.isfile(file_path):
+                return
+            try:
+                with open(file_path, 'r', errors='ignore') as f:
+                    content = f.read()
+            except Exception as e:
+                QtWidgets.QMessageBox.warning(tabWidget, "Error", f"Could not open file: {e}")
+                return
+
+            editorWindow = QtWidgets.QWidget()
+            editorWindow.setWindowTitle(file_name)
+            editorWindow.setMinimumSize(600, 500)
+            layout = QtWidgets.QVBoxLayout(editorWindow)
+            textEdit = QtWidgets.QTextEdit()
+            textEdit.setText(content)
+            saveButton = QtWidgets.QPushButton('Save and Exit')
+            layout.addWidget(textEdit)
+            layout.addWidget(saveButton)
+
+            def save_and_exit():
+                try:
+                    with open(file_path, 'w') as f:
+                        f.write(textEdit.toPlainText())
+                    editorWindow.close()
+                except Exception as e:
+                    QtWidgets.QMessageBox.warning(editorWindow, "Error", f"Could not save file: {e}")
+
+            saveButton.clicked.connect(save_and_exit)
+            editorWindow.show()
+
+        tabWidget.tabBar().tabBarDoubleClicked.connect(handle_tab_double_click)
+
         files_added = 0
         for f_name in fileList:
             filePath = os.path.join(projectPath, f_name)

@@ -53,6 +53,7 @@ class ProjectExplorer(QtWidgets.QWidget):
         self.window.addWidget(self.treewidget)
         self.treewidget.expanded.connect(self.refreshInstant)
         self.treewidget.itemClicked.connect(self.handleItemClicked)
+        self.treewidget.itemDoubleClicked.connect(self.handleItemDoubleClicked)
         self.treewidget.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.treewidget.customContextMenuRequested.connect(self.openMenu)
         self.setLayout(self.window)
@@ -633,6 +634,39 @@ class ProjectExplorer(QtWidgets.QWidget):
         else:
             # If it's a file, use the old behavior
             self.openProject()
+
+    def handleItemDoubleClicked(self, item, column):
+        # Only open a new window for editing if it's a file (no children)
+        if item.childCount() == 0:
+            filePath = item.text(1)
+            if os.path.isfile(filePath):
+                try:
+                    with open(filePath, 'r', errors='ignore') as f:
+                        content = f.read()
+                except Exception as e:
+                    QtWidgets.QMessageBox.warning(self, "Error", f"Could not open file: {e}")
+                    return
+
+                editorWindow = QtWidgets.QWidget()
+                editorWindow.setWindowTitle(os.path.basename(filePath))
+                editorWindow.setMinimumSize(600, 500)
+                layout = QtWidgets.QVBoxLayout(editorWindow)
+                textEdit = QtWidgets.QTextEdit()
+                textEdit.setText(content)
+                saveButton = QtWidgets.QPushButton('Save and Exit')
+                layout.addWidget(textEdit)
+                layout.addWidget(saveButton)
+
+                def save_and_exit():
+                    try:
+                        with open(filePath, 'w') as f:
+                            f.write(textEdit.toPlainText())
+                        editorWindow.close()
+                    except Exception as e:
+                        QtWidgets.QMessageBox.warning(editorWindow, "Error", f"Could not save file: {e}")
+
+                saveButton.clicked.connect(save_and_exit)
+                editorWindow.show()
 
     def selectProjectNode(self, projectName):
         for i in range(self.treewidget.topLevelItemCount()):
