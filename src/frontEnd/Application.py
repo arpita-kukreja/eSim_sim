@@ -2539,6 +2539,11 @@ class Application(QtWidgets.QMainWindow):
                 self.obj_Mainview.obj_projectExplorer.addTreeNode(
                     directory, filelist
                 )
+                # Also open the new project's files in tabs and select the node
+                import os
+                projectName = os.path.basename(directory)
+                fileList = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+                self.obj_Mainview.openProjectInTabs(projectName, directory, fileList)
                 updated = True
 
         if not updated:
@@ -2560,6 +2565,11 @@ class Application(QtWidgets.QMainWindow):
             directory, filelist = self.project.body()
             self.obj_Mainview.obj_projectExplorer.addTreeNode(
                 directory, filelist)
+            # Also open the project files in tabs
+            import os
+            projectName = os.path.basename(directory)
+            fileList = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+            self.obj_Mainview.openProjectInTabs(projectName, directory, fileList)
         except BaseException:
             pass
 
@@ -3934,9 +3944,7 @@ class MainView(QtWidgets.QWidget):
 
         tabWidget = QtWidgets.QTabWidget()
         tabWidget.setTabsClosable(True)
-        tabWidget.tabCloseRequested.connect(lambda index: tabWidget.removeTab(index))
-
-        # Make tab file names more visible and readable
+        tabWidget.setElideMode(QtCore.Qt.ElideMiddle)
         tabWidget.setStyleSheet("""
         QTabBar::tab {
             font-size: 8pt;
@@ -3944,8 +3952,15 @@ class MainView(QtWidgets.QWidget):
         QTabBar::tab:selected {
             font-weight: bold;
         }
+        QTabBar::close-button {
+            image: url(images/close.png);
+            subcontrol-position: right;
+        }
+        QTabBar::close-button:hover {
+            background: #ff4444;
+            border-radius: 2px;
+        }
         """)
-        tabWidget.setElideMode(QtCore.Qt.ElideMiddle)
 
         files_added = 0
         for f_name in fileList:
@@ -3999,6 +4014,9 @@ class MainView(QtWidgets.QWidget):
             self.obj_appconfig.print_info("Called raise_() on the new project dock.")
         else:
             self.obj_appconfig.print_info(f"No viewable files found in project '{projectName}'. Nothing to display.")
+
+        # Select the project node in the Project Explorer
+        self.obj_projectExplorer.selectProjectNode(projectName)
 
 def ensure_config_directory():
     

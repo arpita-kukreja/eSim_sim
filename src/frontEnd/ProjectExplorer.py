@@ -633,3 +633,11 @@ class ProjectExplorer(QtWidgets.QWidget):
         else:
             # If it's a file, use the old behavior
             self.openProject()
+
+    def selectProjectNode(self, projectName):
+        for i in range(self.treewidget.topLevelItemCount()):
+            item = self.treewidget.topLevelItem(i)
+            if item.text(0) == projectName:
+                self.treewidget.setCurrentItem(item)
+                self.treewidget.scrollToItem(item)
+                break
