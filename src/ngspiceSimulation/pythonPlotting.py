@@ -423,6 +423,14 @@ class plotWindow(QtWidgets.QMainWindow):
         for text in self.axes.texts:
             text.set_color(function_color)
         
+        # Update legend colors if it exists
+        if self.axes.get_legend():
+            legend = self.axes.get_legend()
+            legend.get_frame().set_facecolor(bg_color)
+            legend.get_frame().set_edgecolor(accent_color)
+            for text in legend.get_texts():
+                text.set_color(text_color)
+        
         # Redraw the canvas
         self.canvas.draw()
 
@@ -507,8 +515,8 @@ class plotWindow(QtWidgets.QMainWindow):
 
         self.chkbox = []
 
-        # Modern color palette for dark theme
-        self.full_colors = ['#ff7e76', '#36d399', '#51b4ff', '#ffd666', '#bd93f9', '#ff79c6', '#8be9fd']  # Bright, modern colors
+        # Modern color palette for dark theme - brighter colors for better visibility
+        self.full_colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a55eea', '#fd79a8', '#00d2d3']  # Bright, high-contrast colors
         self.color = []
         for i in range(0, self.a[0] - 1):
             if i % 7 == 0:
@@ -664,6 +672,8 @@ class plotWindow(QtWidgets.QMainWindow):
     def pushedClear(self):
         self.text.clear()
         self.axes.cla()
+        # Reapply theme after clearing
+        self.update_plot_theme()
         self.canvas.draw()
 
     def pushedPlotFunc(self):
@@ -743,11 +753,11 @@ class plotWindow(QtWidgets.QMainWindow):
                     label=str(2))  # _rev
 
                 if max(a) < self.volts_length:
-                    self.axes.set_ylabel('Voltage(V)-->')
-                    self.axes.set_xlabel('Voltage(V)-->')
+                    self.axes.set_ylabel('Voltage(V)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
+                    self.axes.set_xlabel('Voltage(V)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
                 else:
-                    self.axes.set_ylabel('Current(I)-->')
-                    self.axes.set_ylabel('Current(I)-->')
+                    self.axes.set_ylabel('Current(I)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
+                    self.axes.set_xlabel('Current(I)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
 
         elif max(a) >= self.volts_length and min(a) < self.volts_length:
             QtWidgets.QMessageBox.about(
@@ -784,12 +794,12 @@ class plotWindow(QtWidgets.QMainWindow):
                         c=self.color[0],
                         label=str(1))
 
-                self.axes.set_xlabel('freq-->')
+                self.axes.set_xlabel('freq-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
 
                 if max(a) < self.volts_length:
-                    self.axes.set_ylabel('Voltage(V)-->')
+                    self.axes.set_ylabel('Voltage(V)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
                 else:
-                    self.axes.set_ylabel('Current(I)-->')
+                    self.axes.set_ylabel('Current(I)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
 
             elif self.plotType2[0] == 1:
                 # self.setWindowTitle('Transient Analysis')
@@ -798,11 +808,11 @@ class plotWindow(QtWidgets.QMainWindow):
                     finalResult,
                     c=self.color[0],
                     label=str(1))
-                self.axes.set_xlabel('time-->')
+                self.axes.set_xlabel('time-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
                 if max(a) < self.volts_length:
-                    self.axes.set_ylabel('Voltage(V)-->')
+                    self.axes.set_ylabel('Voltage(V)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
                 else:
-                    self.axes.set_ylabel('Current(I)-->')
+                    self.axes.set_ylabel('Current(I)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
 
             else:
                 # self.setWindowTitle('DC Analysis')
@@ -811,13 +821,17 @@ class plotWindow(QtWidgets.QMainWindow):
                     finalResult,
                     c=self.color[0],
                     label=str(1))
-                self.axes.set_xlabel('I/P Voltage-->')
+                self.axes.set_xlabel('I/P Voltage-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
                 if max(a) < self.volts_length:
-                    self.axes.set_ylabel('Voltage(V)-->')
+                    self.axes.set_ylabel('Voltage(V)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
                 else:
-                    self.axes.set_ylabel('Current(I)-->')
+                    self.axes.set_ylabel('Current(I)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
 
         self.axes.grid(True)
+        # Add legend
+        self.axes.legend()
+        # Reapply theme after plotting
+        self.update_plot_theme()
         self.canvas.draw()
         self.combo = []
         self.combo1 = []
@@ -851,6 +865,12 @@ class plotWindow(QtWidgets.QMainWindow):
             )
             return
 
+        # Add legend
+        if boxCheck > 0:
+            self.axes.legend()
+        
+        # Reapply theme after plotting
+        self.update_plot_theme()
         self.canvas.draw()
 
     def onPush_ac(self):
@@ -877,6 +897,12 @@ class plotWindow(QtWidgets.QMainWindow):
             )
             return
 
+        # Add legend
+        if boxCheck > 0:
+            self.axes.legend()
+
+        # Reapply theme after plotting
+        self.update_plot_theme()
         self.canvas.draw()
 
     def onPush_trans(self):
@@ -902,6 +928,13 @@ class plotWindow(QtWidgets.QMainWindow):
                 self, "Warning!!", "Please select at least one Node OR Branch"
             )
             return
+        
+        # Add legend
+        if boxCheck > 0:
+            self.axes.legend()
+        
+        # Reapply theme after plotting
+        self.update_plot_theme()
         self.canvas.draw()
 
     def onPush_dc(self):
@@ -928,6 +961,12 @@ class plotWindow(QtWidgets.QMainWindow):
             )
             return
 
+        # Add legend
+        if boxCheck > 0:
+            self.axes.legend()
+
+        # Reapply theme after plotting
+        self.update_plot_theme()
         self.canvas.draw()
 
     def colorName(self, color):
@@ -1053,6 +1092,14 @@ class MultimeterWidgetClass(QtWidgets.QWidget):
         # Update function text colors
         for text in self.axes.texts:
             text.set_color(function_color)
+        
+        # Update legend colors if it exists
+        if self.axes.get_legend():
+            legend = self.axes.get_legend()
+            legend.get_frame().set_facecolor(bg_color)
+            legend.get_frame().set_edgecolor(accent_color)
+            for text in legend.get_texts():
+                text.set_color(text_color)
         
         # Redraw the canvas
         self.canvas.draw()
