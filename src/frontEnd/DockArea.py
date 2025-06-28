@@ -64,40 +64,41 @@ class DockArea(QtWidgets.QMainWindow):
             
             QDockWidget::title {
                 text-align: center;
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
+                background: #ffffff;
+                color: #2c3e50;
                 padding: 6px;
                 border-top-left-radius: 4px;
                 border-top-right-radius: 4px;
                 font-weight: bold;
                 font-size: 9pt;
+                border: none;
             }
             
             QTabBar::tab {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #23273a, stop:1 #181b24);
-                color: #e8eaed;
-                padding: 6px 15px;
-                margin-right: 2px;
+                background: #808080;
+                color: #2c3e50;
+                border: 1px solid #e1e4e8;
+                border-bottom: none;
                 border-top-left-radius: 4px;
                 border-top-right-radius: 4px;
                 min-width: 120px;
                 max-width: 180px;
                 font-weight: 500;
                 font-size: 9pt;
+                padding: 6px 15px;
+                margin-right: 2px;
             }
             
             QTabBar::tab:selected {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #40c4ff, stop:1 #2d8cff);
-                color: #181b24;
-                border-bottom: 2px solid #40c4ff;
+                background: #8c8c8c;
+                color: #1976d2;
+                border: 1.5px solid #1976d2;
+                border-bottom: 2px solid #1976d2;
             }
             
             QTabBar::tab:hover:!selected {
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 #2d3a4b, stop:1 #1e2530);
+                background:#e3f0fc;
+                color: #1976d2;
             }
             
             QTabWidget::pane {

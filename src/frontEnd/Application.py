@@ -1096,9 +1096,9 @@ class Application(QtWidgets.QMainWindow):
         }
         QTabBar::tab {
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                stop:0 #23273a, stop:1 #181b24);
-            color: #b0b3b8;
-            border: 1px solid #23273a;
+                stop:0 #2d3748, stop:1 #1a202c);  /* Changed from #23273a, #181b24 */
+            color: #e2e8f0;  /* Changed from #b0b3b8 - brighter text */
+            border: 1px solid #4a5568;  /* Changed from #23273a - lighter border */
             border-bottom: none;
             border-top-left-radius: 12px;
             border-top-right-radius: 12px;
@@ -1109,15 +1109,15 @@ class Application(QtWidgets.QMainWindow):
             letter-spacing: 0.3px;
         }
         QTabBar::tab:selected {
-            background: #40c4ff;
-            color: #181b24;
-            border: 1px solid #40c4ff;
-            border-bottom: 3px solid #40c4ff;
+            background: #667eea;  /* Changed from #40c4ff - purple accent */
+            color: #1a202c;  /* Changed from #181b24 - darker text */
+            border: 1px solid #667eea;
+            border-bottom: 3px solid #667eea;
             font-weight: 700;
         }
         QTabBar::tab:hover:!selected {
-            background: #23273a;
-            color: #e8eaed;
+            background: #4a5568;  /* Changed from #23273a - lighter hover */
+            color: #f7fafc;  /* Changed from #e8eaed - brighter hover text */
         }
         QTabWidget::pane {
             border: 1px solid #23273a;
@@ -1530,8 +1530,7 @@ class Application(QtWidgets.QMainWindow):
                 stop:0 #ffffff, stop:1 #f8f9fa);
         }
         QTabBar::tab {
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                stop:0 #ffffff, stop:1 #f8f9fa);
+            background: #ffffff;  /* Changed from gradient to solid white */
             color: #2c3e50;
             border: 1px solid #e1e4e8;
             border-bottom: none;
@@ -1547,8 +1546,8 @@ class Application(QtWidgets.QMainWindow):
             border: 1px solid #1976d2;
         }
         QTabBar::tab:hover:!selected {
-            background: #f1f4f9;
-            color: #1976d2;
+            background: #e8eaed;  /* Changed from #f1f4f9 to greyish color */
+            color: #2c3e50;  /* Changed from #1976d2 to keep text dark */
         }
         QTextEdit, QLineEdit, QPlainTextEdit {
             background: #ffffff;
@@ -3130,9 +3129,9 @@ class Application(QtWidgets.QMainWindow):
         }
         QTabBar::tab {
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                stop:0 #23273a, stop:1 #181b24);
-            color: #b0b3b8;
-            border: 1px solid #23273a;
+                stop:0 #2d3748, stop:1 #1a202c);  /* Changed from #23273a, #181b24 */
+            color: #e2e8f0;  /* Changed from #b0b3b8 - brighter text */
+            border: 1px solid #4a5568;  /* Changed from #23273a - lighter border */
             border-bottom: none;
             border-top-left-radius: 12px;
             border-top-right-radius: 12px;
@@ -3143,15 +3142,15 @@ class Application(QtWidgets.QMainWindow):
             letter-spacing: 0.3px;
         }
         QTabBar::tab:selected {
-            background: #40c4ff;
-            color: #181b24;
-            border: 1px solid #40c4ff;
-            border-bottom: 3px solid #40c4ff;
+            background: #667eea;  /* Changed from #40c4ff - purple accent */
+            color: #1a202c;  /* Changed from #181b24 - darker text */
+            border: 1px solid #667eea;
+            border-bottom: 3px solid #667eea;
             font-weight: 700;
         }
         QTabBar::tab:hover:!selected {
-            background: #23273a;
-            color: #e8eaed;
+            background: #4a5568;  /* Changed from #23273a - lighter hover */
+            color: #f7fafc;  /* Changed from #e8eaed - brighter hover text */
         }
         QTabWidget::pane {
             border: 1px solid #23273a;
@@ -3528,8 +3527,7 @@ class Application(QtWidgets.QMainWindow):
                 stop:0 #ffffff, stop:1 #f8f9fa);
         }
         QTabBar::tab {
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                stop:0 #ffffff, stop:1 #f8f9fa);
+            background: #ffffff;  /* Changed from gradient to solid white */
             color: #2c3e50;
             border: 1px solid #e1e4e8;
             border-bottom: none;
@@ -3545,8 +3543,8 @@ class Application(QtWidgets.QMainWindow):
             border: 1px solid #1976d2;
         }
         QTabBar::tab:hover:!selected {
-            background: #f1f4f9;
-            color: #1976d2;
+            background: #e8eaed;  /* Changed from #f1f4f9 to greyish color */
+            color: #2c3e50;  /* Changed from #1976d2 to keep text dark */
         }
         QTextEdit, QLineEdit, QPlainTextEdit {
             background: #ffffff;
