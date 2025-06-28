@@ -332,29 +332,26 @@ class plotWindow(QtWidgets.QMainWindow):
     instance = None
     
     @classmethod
-    def add_output(cls, fpath, projectName):
-        """Static method to manage plot window instances.
-        
-        Args:
-            fpath (str): Path to the project directory
-            projectName (str): Name of the project
-        """
+    def add_output(cls, fpath, projectName, is_dark_theme=True):
+        """Static method to manage plot window instances, now with theme support."""
         if cls.instance is None:
-            cls.instance = cls(fpath, projectName)
+            cls.instance = cls(fpath, projectName, is_dark_theme)
         else:
-            # Update existing instance with new data
+            # Update existing instance with new data and theme
             cls.instance.fpath = fpath
             cls.instance.projectName = projectName
+            cls.instance.is_dark_theme = is_dark_theme
+            cls.instance.setStyleSheet(DARK_STYLESHEET if is_dark_theme else LIGHT_STYLESHEET)
+            cls.instance.update_plot_theme()
             cls.instance.obj_dataext = DataExtraction()
             cls.instance.plotType = cls.instance.obj_dataext.openFile(fpath)
             cls.instance.obj_dataext.computeAxes()
             cls.instance.a = cls.instance.obj_dataext.numVals()
             cls.instance.createMainFrame()
-        
         return cls.instance
 
-    def __init__(self, fpath, projectName):
-        """This create constructor for plotWindow class."""
+    def __init__(self, fpath, projectName, is_dark_theme=True):
+        """Constructor for plotWindow class, now accepts theme."""
         QtWidgets.QMainWindow.__init__(self)
         self.fpath = fpath
         self.projectName = projectName
@@ -368,13 +365,17 @@ class plotWindow(QtWidgets.QMainWindow):
         self.combo = []
         self.combo1 = []
         self.combo1_rev = []
-        
-        # Apply dark theme by default
-        self.is_dark_theme = True
-        self.setStyleSheet(DARK_STYLESHEET)
-        
+        # Use theme from argument
+        self.is_dark_theme = is_dark_theme
+        self.setStyleSheet(DARK_STYLESHEET if self.is_dark_theme else LIGHT_STYLESHEET)
         # Creating Frame
         self.createMainFrame()
+
+    def set_theme(self, is_dark_theme):
+        """Set the theme dynamically."""
+        self.is_dark_theme = is_dark_theme
+        self.setStyleSheet(DARK_STYLESHEET if is_dark_theme else LIGHT_STYLESHEET)
+        self.update_plot_theme()
 
     def toggle_theme(self):
         """Toggle between light and dark themes."""
@@ -436,10 +437,8 @@ class plotWindow(QtWidgets.QMainWindow):
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self.mainFrame)
         self.axes = self.fig.add_subplot(111)
-        
         # Configure theme for plot with enhanced visibility
         self.update_plot_theme()
-        
         # Configure navigation toolbar
         self.navToolBar = NavigationToolbar(self.canvas, self.mainFrame)
         self.navToolBar.setIconSize(QtCore.QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE))
@@ -487,7 +486,6 @@ class plotWindow(QtWidgets.QMainWindow):
         self.right_vbox = QtWidgets.QVBoxLayout()
         self.right_grid = QtWidgets.QGridLayout()
         self.top_grid = QtWidgets.QGridLayout()
-        
         # Configure spacing for more compact layout
         self.right_vbox.setSpacing(4)
         self.right_grid.setSpacing(4)
@@ -499,12 +497,9 @@ class plotWindow(QtWidgets.QMainWindow):
         # Get DataExtraction Details
         self.obj_dataext = DataExtraction()
         self.plotType = self.obj_dataext.openFile(self.fpath)
-
         self.obj_dataext.computeAxes()
         self.a = self.obj_dataext.numVals()
-
         self.chkbox = []
-
         # Modern color palette for dark theme
         self.full_colors = ['#ff7e76', '#36d399', '#51b4ff', '#ffd666', '#bd93f9', '#ff79c6', '#8be9fd']  # Bright, modern colors
         self.color = []
@@ -523,9 +518,7 @@ class plotWindow(QtWidgets.QMainWindow):
                 self.color.append(self.full_colors[5])
             elif (i - 6) % 7 == 0:
                 self.color.append(self.full_colors[6])
-
         # Color generation ends here
-
         # Total number of voltage source
         self.volts_length = self.a[1]
         self.analysisType = QtWidgets.QLabel()
@@ -546,7 +539,6 @@ class plotWindow(QtWidgets.QMainWindow):
                     self.color[i]) +
                 '; font-weight = bold;')
             self.top_grid.addWidget(self.colorLab, i + 2, 1)
-
         for i in range(self.a[1], self.a[0] - 1):  # a[0]-1
             self.chkbox.append(QtWidgets.QCheckBox(self.obj_dataext.NBList[i]))
             self.chkbox[i].setToolTip('<b>Check To Plot</b>')
@@ -558,13 +550,11 @@ class plotWindow(QtWidgets.QMainWindow):
                     self.color[i]) +
                 '; font-weight = bold;')
             self.top_grid.addWidget(self.colorLab, i + 3, 1)
-
         # Buttons for Plot, multimeter, plotting function.
         self.clear = QtWidgets.QPushButton("Clear")
         self.warnning = QtWidgets.QLabel()
         self.funcName = QtWidgets.QLabel()
         self.funcExample = QtWidgets.QLabel()
-
         self.plotbtn = QtWidgets.QPushButton("Plot")
         self.plotbtn.setToolTip('<b>Press</b> to Plot')
         self.multimeterbtn = QtWidgets.QPushButton("Multimeter")
@@ -576,7 +566,6 @@ class plotWindow(QtWidgets.QMainWindow):
         self.palette2 = QtGui.QPalette()
         self.plotfuncbtn = QtWidgets.QPushButton("Plot Function")
         self.plotfuncbtn.setToolTip('<b>Press</b> to Plot the function')
-
         self.palette1.setColor(QtGui.QPalette.Foreground, QtCore.Qt.blue)
         self.palette2.setColor(QtGui.QPalette.Foreground, QtCore.Qt.red)
         self.funcName.setPalette(self.palette1)
@@ -585,7 +574,6 @@ class plotWindow(QtWidgets.QMainWindow):
         self.right_vbox.addLayout(self.top_grid)
         self.right_vbox.addWidget(self.plotbtn)
         self.right_vbox.addWidget(self.multimeterbtn)
-
         self.right_grid.addWidget(self.funcLabel, 1, 0)
         self.right_grid.addWidget(self.text, 1, 1)
         self.right_grid.addWidget(self.plotfuncbtn, 2, 1)
@@ -594,11 +582,9 @@ class plotWindow(QtWidgets.QMainWindow):
         self.right_grid.addWidget(self.funcName, 4, 0)
         self.right_grid.addWidget(self.funcExample, 4, 1)
         self.right_vbox.addLayout(self.right_grid)
-
         self.hbox = QtWidgets.QHBoxLayout()
         self.hbox.addLayout(self.left_vbox, stretch=4)  # Give more space to plot
         self.hbox.addLayout(self.right_vbox, stretch=1)  # Make right panel more compact
-
         self.widget = QtWidgets.QWidget()
         self.widget.setLayout(self.hbox)  # finalvbox
         self.scrollArea = QtWidgets.QScrollArea()
@@ -612,7 +598,13 @@ class plotWindow(QtWidgets.QMainWindow):
         self.finalhbox.addWidget(self.scrollArea)
         # Right side window frame showing list of nodes and branches.
         self.mainFrame.setLayout(self.finalhbox)
-        self.showMaximized()
+        # Set a beautiful, reasonable default size and center the window
+        self.resize(950, 700)
+        self.setMinimumSize(700, 500)
+        qr = self.frameGeometry()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
         self.listNode.setText(f"<h3 style='color: {ACCENT_HOVER}; margin: 10px 0;'>List of Nodes:</h3>")
         self.listBranch.setText(
