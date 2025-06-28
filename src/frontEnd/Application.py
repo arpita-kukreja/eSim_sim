@@ -2638,16 +2638,26 @@ class Application(QtWidgets.QMainWindow):
             try:
                 self.obj_Mainview.obj_dockarea.plottingEditor()
             except Exception as e:
+                print(f"Plotting error: {e}")
+                print("Full traceback:")
+                traceback.print_exc()
+                
+                # Show a more specific error message based on the exception type
+                if "No project is currently open" in str(e):
+                    error_msg = "No project is currently open. Please open a project first."
+                elif "Required file not found" in str(e):
+                    error_msg = f"Simulation data files are missing.\n{str(e)}\n\nPlease run a simulation first to generate the required plot data files."
+                elif "Unable to open plot data files" in str(e):
+                    error_msg = f"Failed to read simulation data files.\n{str(e)}\n\nPlease ensure the simulation completed successfully and try again."
+                else:
+                    error_msg = f"Data could not be plotted. Please try again.\n\nError details: {str(e)}"
+                
                 self.msg = QtWidgets.QErrorMessage()
                 self.msg.setModal(True)
-                self.msg.setWindowTitle("Error Message")
-                self.msg.showMessage(
-                    'Data could not be plotted. Please try again.'
-                )
+                self.msg.setWindowTitle("Plotting Error")
+                self.msg.showMessage(error_msg)
                 self.msg.exec_()
-                print("Exception Message:", str(e), traceback.format_exc())
-                self.obj_appconfig.print_error('Exception Message : '
-                                               + str(e))
+                self.obj_appconfig.print_error('Plotting Error: ' + str(e))
 
     def open_ngspice(self):
         """This Function execute ngspice on current project."""
@@ -3832,6 +3842,35 @@ class Application(QtWidgets.QMainWindow):
                 
         except Exception as e:
             self.obj_appconfig.print_error(f"Error loading preferences: {str(e)}")
+
+    def propagate_theme_color_change(self):
+        """Propagate theme color change to all GUI components."""
+        print("Propagating theme color change...")
+        
+        # Update DockArea theme
+        if hasattr(self.obj_Mainview.obj_dockarea, 'update_theme'):
+            self.obj_Mainview.obj_dockarea.update_theme(self.is_dark_theme)
+        
+        # Update plotting window theme if it exists
+        try:
+            from ngspiceSimulation.pythonPlotting import plotWindow
+            if plotWindow.instance:
+                plotWindow.instance.is_dark_theme = self.is_dark_theme
+                plotWindow.instance.toggle_theme()
+        except Exception as e:
+            print(f"Error updating plotting window theme: {e}")
+        
+        # Update other components
+        self.update_plotting_windows_theme()
+        self.update_dialog_themes()
+        self.update_all_widgets()
+        
+        # Update specific component themes
+        self.update_schematic_converter_theme(self.is_dark_theme)
+        self.update_model_editor_theme(self.is_dark_theme)
+        self.update_makerchip_ngveri_theme(self.is_dark_theme)
+        
+        print("Theme propagation complete.")
 
 
 

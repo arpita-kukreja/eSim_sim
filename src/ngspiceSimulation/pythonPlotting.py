@@ -332,19 +332,21 @@ class plotWindow(QtWidgets.QMainWindow):
     instance = None
     
     @classmethod
-    def add_output(cls, fpath, projectName):
+    def add_output(cls, fpath, projectName, is_dark_theme=True):
         """Static method to manage plot window instances.
         
         Args:
             fpath (str): Path to the project directory
             projectName (str): Name of the project
+            is_dark_theme (bool): Whether to use dark theme (default: True)
         """
         if cls.instance is None:
-            cls.instance = cls(fpath, projectName)
+            cls.instance = cls(fpath, projectName, is_dark_theme)
         else:
             # Update existing instance with new data
             cls.instance.fpath = fpath
             cls.instance.projectName = projectName
+            cls.instance.is_dark_theme = is_dark_theme
             cls.instance.obj_dataext = DataExtraction()
             cls.instance.plotType = cls.instance.obj_dataext.openFile(fpath)
             cls.instance.obj_dataext.computeAxes()
@@ -353,7 +355,7 @@ class plotWindow(QtWidgets.QMainWindow):
         
         return cls.instance
 
-    def __init__(self, fpath, projectName):
+    def __init__(self, fpath, projectName, is_dark_theme=True):
         """This create constructor for plotWindow class."""
         QtWidgets.QMainWindow.__init__(self)
         self.fpath = fpath
@@ -369,9 +371,9 @@ class plotWindow(QtWidgets.QMainWindow):
         self.combo1 = []
         self.combo1_rev = []
         
-        # Apply dark theme by default
-        self.is_dark_theme = True
-        self.setStyleSheet(DARK_STYLESHEET)
+        # Apply theme based on parameter
+        self.is_dark_theme = is_dark_theme
+        self.setStyleSheet(DARK_STYLESHEET if self.is_dark_theme else LIGHT_STYLESHEET)
         
         # Creating Frame
         self.createMainFrame()
@@ -1153,23 +1155,39 @@ class DataExtraction:
 
     def openFile(self, fpath):
         try:
+            vfile = os.path.join(fpath, "plot_data_v.txt")
+            if not os.path.exists(vfile):
+                raise FileNotFoundError(f"Missing file: {vfile}")
+            if os.path.getsize(vfile) == 0:
+                raise ValueError(f"File is empty: {vfile}")
+            with open(vfile) as f1:
+                allv = f1.read()
+
+            if not allv.strip():
+                raise ValueError(f"File is empty: {vfile}")
+
+            if len(allv.splitlines()) < 6:
+                raise ValueError(f"File {vfile} does not have enough lines for plotting.")
+
+            if not os.path.exists(os.path.join(fpath, "plot_data_i.txt")):
+                raise FileNotFoundError(f"Missing file: {os.path.join(fpath, 'plot_data_i.txt')}")
             with open(os.path.join(fpath, "plot_data_i.txt")) as f2:
                 alli = f2.read()
 
+            if not alli.strip():
+                raise ValueError(f"File is empty: {os.path.join(fpath, 'plot_data_i.txt')}")
+
             alli = alli.split("\n")
             self.NBIList = []
-
-            with open(os.path.join(fpath, "plot_data_v.txt")) as f1:
-                allv = f1.read()
-
         except Exception as e:
             print("Exception Message : ", str(e))
             self.obj_appconfig.print_error('Exception Message :' + str(e))
             self.msg = QtWidgets.QErrorMessage()
             self.msg.setModal(True)
             self.msg.setWindowTitle("Error Message")
-            self.msg.showMessage('Unable to open plot data files.')
+            self.msg.showMessage(f'Unable to open plot data files.\n{str(e)}')
             self.msg.exec_()
+            raise  # Reraise so caller knows it failed
 
         try:
             for l in alli[3].split(" "):
@@ -1183,8 +1201,9 @@ class DataExtraction:
             self.msg = QtWidgets.QErrorMessage()
             self.msg.setModal(True)
             self.msg.setWindowTitle("Error Message")
-            self.msg.showMessage('Unable to read Analysis File.')
+            self.msg.showMessage(f'Unable to read Analysis File.\n{str(e)}')
             self.msg.exec_()
+            raise
 
         d = self.numberFinder(fpath)
         d1 = int(d[0] + 1)

@@ -40,6 +40,9 @@ class DockArea(QtWidgets.QMainWindow):
         """This act as constructor for class DockArea."""
         QtWidgets.QMainWindow.__init__(self)
         self.obj_appconfig = Appconfig()
+        
+        # Store the theme setting
+        self.is_dark_theme = is_dark_theme
 
         # Set the dock options for better tab appearance
         self.setDockOptions(QtWidgets.QMainWindow.AllowTabbedDocks | 
@@ -136,6 +139,19 @@ class DockArea(QtWidgets.QMainWindow):
 
         self.show()
 
+    def update_theme(self, is_dark_theme):
+        """Update the theme setting and propagate to child widgets."""
+        self.is_dark_theme = is_dark_theme
+        
+        # Update the plotting window theme if it exists
+        try:
+            from ngspiceSimulation.pythonPlotting import plotWindow
+            if plotWindow.instance:
+                plotWindow.instance.is_dark_theme = is_dark_theme
+                plotWindow.instance.toggle_theme()  # This will update the theme
+        except Exception as e:
+            print(f"Error updating plotting window theme: {e}")
+
     def createTestEditor(self):
         """This function create widget for Library Editor"""
         global count
@@ -166,17 +182,43 @@ class DockArea(QtWidgets.QMainWindow):
 
     def plottingEditor(self):
         """This function creates or updates the widget for interactive PythonPlotting, now as a single instance with navigation."""
-        self.projDir = self.obj_appconfig.current_project["ProjectName"]
-        self.projName = os.path.basename(self.projDir)
-        # Use the static add_output method to manage outputs and window
-        from ngspiceSimulation.pythonPlotting import plotWindow
-        # Pass the current theme to the plot window
-        is_dark_theme = getattr(self, 'is_dark_theme', False)
-        plotWindow.add_output(self.projDir, self.projName, is_dark_theme=is_dark_theme)
-        # Bring the window to focus if it exists
-        if plotWindow.instance:
-            plotWindow.instance.show()
-            plotWindow.instance.raise_()
+        try:
+            self.projDir = self.obj_appconfig.current_project["ProjectName"]
+            if not self.projDir:
+                raise ValueError("No project is currently open. Please open a project first.")
+            
+            self.projName = os.path.basename(self.projDir)
+            
+            # Check if required files exist
+            plot_data_v = os.path.join(self.projDir, "plot_data_v.txt")
+            plot_data_i = os.path.join(self.projDir, "plot_data_i.txt")
+            
+            if not os.path.exists(plot_data_v):
+                raise FileNotFoundError(f"Required file not found: {plot_data_v}\nPlease run a simulation first to generate plot data.")
+            
+            if not os.path.exists(plot_data_i):
+                raise FileNotFoundError(f"Required file not found: {plot_data_i}\nPlease run a simulation first to generate plot data.")
+            
+            # Use the static add_output method to manage outputs and window
+            from ngspiceSimulation.pythonPlotting import plotWindow
+            # Pass the current theme to the plot window
+            is_dark_theme = getattr(self, 'is_dark_theme', False)
+            plotWindow.add_output(self.projDir, self.projName, is_dark_theme=is_dark_theme)
+            # Bring the window to focus if it exists
+            if plotWindow.instance:
+                plotWindow.instance.show()
+                plotWindow.instance.raise_()
+        except Exception as e:
+            print(f"Error in plottingEditor: {e}")
+            import traceback
+            traceback.print_exc()
+            # Show a more helpful error message
+            msg = QtWidgets.QErrorMessage()
+            msg.setModal(True)
+            msg.setWindowTitle("Plotting Error")
+            msg.showMessage(f"Failed to open plotting window:\n{str(e)}")
+            msg.exec_()
+            raise  # Re-raise the exception so the caller can handle it
 
     def ngspiceEditor(self, projName, netlist, simEndSignal, plotFlag):
         """ This function creates widget for Ngspice window."""
