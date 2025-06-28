@@ -23,6 +23,7 @@ import os
 import sys
 import traceback
 import webbrowser
+import json
 
 if os.name == 'nt':
     from frontEnd import pathmagic  # noqa:F401
@@ -3750,6 +3751,87 @@ class Application(QtWidgets.QMainWindow):
         self.left_toolbar_icon_size = 24
         self.update_font_sizes()
         self.obj_appconfig.print_info("Toolbar font and icon size reset to default")
+
+    def save_preferences(self):
+        """Save user interface preferences to a JSON file"""
+        preferences = {
+            'is_dark_theme': self.is_dark_theme,
+            'toolbar_font_size': self.toolbar_font_size,
+            'text_font_size': self.text_font_size,
+            'left_toolbar_font_size': self.left_toolbar_font_size,
+            'top_toolbar_font_size': self.top_toolbar_font_size,
+            'top_toolbar_icon_size': self.top_toolbar_icon_size,
+            'left_toolbar_icon_size': self.left_toolbar_icon_size
+        }
+        
+        try:
+            # Get the configuration directory
+            if os.name == 'nt':
+                user_home = os.path.join('library', 'config')
+            else:
+                user_home = os.path.expanduser('~')
+                
+            esim_config_dir = os.path.join(user_home, '.esim')
+            
+            # Create directory if it doesn't exist
+            if not os.path.exists(esim_config_dir):
+                os.makedirs(esim_config_dir, exist_ok=True)
+                
+            # Save preferences to JSON file
+            preferences_file = os.path.join(esim_config_dir, 'preferences.json')
+            with open(preferences_file, 'w') as f:
+                json.dump(preferences, f, indent=4)
+                
+            self.obj_appconfig.print_info("UI preferences saved successfully")
+        except Exception as e:
+            self.obj_appconfig.print_error(f"Error saving preferences: {str(e)}")
+
+    def load_preferences(self):
+        """Load user interface preferences from a JSON file"""
+        try:
+            # Get the configuration directory
+            if os.name == 'nt':
+                user_home = os.path.join('library', 'config')
+            else:
+                user_home = os.path.expanduser('~')
+                
+            preferences_file = os.path.join(user_home, '.esim', 'preferences.json')
+            
+            # Check if preferences file exists
+            if not os.path.isfile(preferences_file):
+                self.obj_appconfig.print_info("No saved preferences found. Using defaults.")
+                return
+                
+            # Load preferences from JSON file
+            with open(preferences_file, 'r') as f:
+                preferences = json.load(f)
+                
+            # Apply loaded preferences
+            if 'is_dark_theme' in preferences:
+                self.is_dark_theme = preferences['is_dark_theme']
+                
+            if 'toolbar_font_size' in preferences:
+                self.toolbar_font_size = preferences['toolbar_font_size']
+                
+            if 'text_font_size' in preferences:
+                self.text_font_size = preferences['text_font_size']
+                
+            if 'left_toolbar_font_size' in preferences:
+                self.left_toolbar_font_size = preferences['left_toolbar_font_size']
+                
+            if 'top_toolbar_font_size' in preferences:
+                self.top_toolbar_font_size = preferences['top_toolbar_font_size']
+                
+            if 'top_toolbar_icon_size' in preferences:
+                self.top_toolbar_icon_size = preferences['top_toolbar_icon_size']
+                
+            if 'left_toolbar_icon_size' in preferences:
+                self.left_toolbar_icon_size = preferences['left_toolbar_icon_size']
+                
+            self.obj_appconfig.print_info("UI preferences loaded successfully")
+                
+        except Exception as e:
+            self.obj_appconfig.print_error(f"Error loading preferences: {str(e)}")
 
 
 

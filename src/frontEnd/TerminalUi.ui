@@ -13,124 +13,6 @@
   <property name="windowTitle">
    <string>Terminal Simulator</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">
-QWidget {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-        stop:0 #0a0e1a, stop:0.3 #1a1d29, stop:0.7 #1e2124, stop:1 #0f1419);
-    color: #e8eaed;
-    font-family: 'Fira Sans', 'Inter', 'Segoe UI', 'Roboto', 'Arial', sans-serif;
-    font-size: 17px;
-    font-weight: 500;
-}
-
-/* Enhanced text areas with subtle shadows and better borders */
-QTextEdit, QLineEdit, QPlainTextEdit {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #23273a, stop:1 #181b24);
-    color: #e8eaed;
-    border: 2px solid #2d3142;
-    border-radius: 12px;
-    padding: 20px 24px;
-    font-weight: 500;
-    font-size: 18px;
-    selection-background-color: #40c4ff;
-    selection-color: #181b24;
-    /* Subtle inner shadow for depth */
-    background-clip: padding-box;
-}
-
-QTextEdit:focus, QLineEdit:focus, QPlainTextEdit:focus {
-    border: 2px solid #40c4ff;
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #2a2e41, stop:1 #1f222b);
-}
-
-/* Enhanced buttons with better visual hierarchy */
-QPushButton {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #40c4ff, stop:1 #1976d2);
-    color: #181b24;
-    border: 2px solid #40c4ff;
-    padding: 16px 32px;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: 0.5px;
-    min-width: 120px;
-}
-
-QPushButton:hover {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #1976d2, stop:1 #0d47a1);
-    color: #fff;
-    border: 2px solid #1976d2;
-    transform: translateY(-2px);
-}
-
-QPushButton:pressed {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #23273a, stop:1 #1a1e27);
-    color: #40c4ff;
-    border: 2px solid #40c4ff;
-    transform: translateY(0px);
-}
-
-/* Special styling for the light/dark mode toggle button */
-QPushButton#lightDarkModeButton {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-        stop:0 #2d3142, stop:1 #23273a);
-    border: 2px solid #40c4ff;
-    border-radius: 18px;
-    padding: 8px;
-    min-width: 35px;
-    max-width: 35px;
-    font-size: 16px;
-}
-
-QPushButton#lightDarkModeButton:hover {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
-        stop:0 #40c4ff, stop:1 #1976d2);
-    color: #181b24;
-}
-
-/* Enhanced labels with better contrast */
-QLabel {
-    color: #e8eaed;
-    font-weight: 600;
-    font-size: 18px;
-    letter-spacing: 0.2px;
-    padding: 4px 0px;
-}
-
-/* Improved progress bar with modern styling */
-QProgressBar {
-    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #23273a, stop:1 #1a1e27);
-    border: 2px solid #2d3142;
-    border-radius: 12px;
-    text-align: center;
-    color: #e8eaed;
-    font-weight: 600;
-    font-size: 18px;
-    padding: 2px;
-}
-
-QProgressBar::chunk {
-    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-        stop:0 #40c4ff, stop:0.5 #1976d2, stop:1 #40c4ff);
-    border-radius: 10px;
-    margin: 1px;
-}
-
-/* Container styling for better organization */
-QWidget#verticalLayoutWidget {
-    background: rgba(45, 49, 66, 0.3);
-    border-radius: 16px;
-    border: 1px solid rgba(64, 196, 255, 0.1);
-}
-   </string>
-  </property>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
@@ -168,17 +50,6 @@ QWidget#verticalLayoutWidget {
       <property name="alignment">
        <set>Qt::AlignCenter</set>
       </property>
-      <property name="styleSheet">
-       <string notr="true">
-        QLabel {
-         font-size: 24px;
-         font-weight: 700;
-         color: #40c4ff;
-         padding: 12px 0px;
-         letter-spacing: 1px;
-        }
-       </string>
-      </property>
      </widget>
     </item>
     <item>
@@ -200,16 +71,6 @@ QWidget#verticalLayoutWidget {
          <widget class="QLabel" name="progressLabel">
           <property name="text">
            <string>Simulation Progress</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">
-            QLabel {
-             font-size: 16px;
-             font-weight: 600;
-             color: #b0bec5;
-             padding: 0px;
-            }
-           </string>
           </property>
          </widget>
         </item>
@@ -289,16 +150,6 @@ QWidget#verticalLayoutWidget {
           <property name="toolTip">
            <string>Start a new simulation</string>
           </property>
-          <property name="styleSheet">
-           <string notr="true">
-            QPushButton {
-             font-size: 24px;
-             font-weight: 800;
-             min-height: 24px;
-             max-height: 24px;
-            }
-           </string>
-          </property>
          </widget>
         </item>
         <item>
@@ -320,25 +171,6 @@ QWidget#verticalLayoutWidget {
           </property>
           <property name="toolTip">
            <string>Stop current simulation</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">
-            QPushButton {
-             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                 stop:0 #ff5722, stop:1 #d32f2f);
-             color: #fff;
-             border: 2px solid #ff5722;
-             font-size: 24px;
-             font-weight: 800;
-             min-height: 24px;
-             max-height: 24px;
-            }
-            QPushButton:hover {
-             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                 stop:0 #d32f2f, stop:1 #b71c1c);
-             border: 2px solid #d32f2f;
-            }
-           </string>
           </property>
          </widget>
         </item>
@@ -385,17 +217,6 @@ QWidget#verticalLayoutWidget {
         <property name="text">
          <string>Console Output</string>
         </property>
-        <property name="styleSheet">
-         <string notr="true">
-          QLabel {
-           font-size: 20px;
-           font-weight: 700;
-           color: #e8eaed;
-           padding: 8px 0px;
-           border-bottom: 2px solid rgba(64, 196, 255, 0.3);
-          }
-         </string>
-        </property>
        </widget>
       </item>
       <item>
@@ -417,15 +238,6 @@ QWidget#verticalLayoutWidget {
         </property>
         <property name="placeholderText">
          <string>Simulation output will appear here...</string>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">
-          QTextEdit {
-           font-family: 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
-           line-height: 1.4;
-           padding: 24px;
-          }
-         </string>
         </property>
        </widget>
       </item>

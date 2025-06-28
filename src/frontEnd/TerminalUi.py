@@ -208,4 +208,14 @@ class TerminalUi(QtWidgets.QMainWindow):
                 QProgressBar::chunk { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #1976d2, stop:0.5 #1565c0, stop:1 #1976d2); border-radius: 10px; margin: 1px; }
                 QWidget#verticalLayoutWidget { background: rgba(25, 118, 210, 0.05); border-radius: 16px; border: 1px solid rgba(25, 118, 210, 0.1); }
             """)
-            self.lightDarkModeButton.setIcon(QtGui.QIcon(os.path.join(self.iconDir, 'dark_mode.png')))
+            self.lightDarkModeButton.setIcon(QtGui.QIcon(os.path.join(self.iconDir, 'light_mode.png')))
+
+        # --- Enforce button sizes and fonts to match CSS ---
+        btn_font = QtGui.QFont("Fira Sans", 18, QtGui.QFont.Bold)
+        for btn in [self.redoSimulationButton, self.cancelSimulationButton]:
+            btn.setMinimumHeight(56)
+            btn.setMinimumWidth(140)
+            btn.setFont(btn_font)
+        self.lightDarkModeButton.setMinimumSize(35, 35)
+        self.lightDarkModeButton.setMaximumSize(35, 35)
+        self.lightDarkModeButton.setFont(QtGui.QFont("Fira Sans", 16, QtGui.QFont.Bold))

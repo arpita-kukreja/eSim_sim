@@ -170,7 +170,9 @@ class DockArea(QtWidgets.QMainWindow):
         self.projName = os.path.basename(self.projDir)
         # Use the static add_output method to manage outputs and window
         from ngspiceSimulation.pythonPlotting import plotWindow
-        plotWindow.add_output(self.projDir, self.projName)
+        # Pass the current theme to the plot window
+        is_dark_theme = getattr(self, 'is_dark_theme', False)
+        plotWindow.add_output(self.projDir, self.projName, is_dark_theme=is_dark_theme)
         # Bring the window to focus if it exists
         if plotWindow.instance:
             plotWindow.instance.show()
