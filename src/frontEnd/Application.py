@@ -4148,6 +4148,9 @@ class MainView(QtWidgets.QWidget):
                 with open(filePath, 'r', errors='ignore') as f:
                     content = f.read()
 
+                # Create a QWidget to hold the editor and save button
+                editor_widget = QtWidgets.QWidget()
+                layout = QtWidgets.QVBoxLayout(editor_widget)
                 editor = QtWidgets.QTextEdit()
                 editor.setText(content)
                 # Set a monospace font
@@ -4155,8 +4158,39 @@ class MainView(QtWidgets.QWidget):
                 font.setFamily("monospace")
                 font.setStyleHint(QtGui.QFont.Monospace)
                 editor.setFont(font)
+                save_button = QtWidgets.QPushButton('Save')
+                save_button.setFixedSize(80, 28)  # Make the button smaller
+                save_button.setEnabled(False)
+                save_button.setStyleSheet("")  # Default style
+                layout.addWidget(editor)
+                layout.addWidget(save_button)
+                editor_widget.setLayout(layout)
 
-                tabWidget.addTab(editor, f_name)
+                # Use a closure to keep state per file
+                def make_save_logic(editor, save_button, filePath, initial_content):
+                    content_holder = {'content': initial_content}
+                    def on_text_changed():
+                        if editor.toPlainText() != content_holder['content']:
+                            save_button.setEnabled(True)
+                            save_button.setStyleSheet("background-color: #e53935; color: white; font-weight: bold;")
+                        else:
+                            save_button.setEnabled(False)
+                            save_button.setStyleSheet("")
+                    def on_save_clicked():
+                        try:
+                            with open(filePath, 'w') as f:
+                                f.write(editor.toPlainText())
+                            content_holder['content'] = editor.toPlainText()
+                            save_button.setEnabled(False)
+                            save_button.setStyleSheet("")
+                            QtWidgets.QMessageBox.information(editor_widget, "Saved", "File is saved")
+                        except Exception as e:
+                            QtWidgets.QMessageBox.warning(editor_widget, "Error", f"Could not save file: {e}")
+                    editor.textChanged.connect(on_text_changed)
+                    save_button.clicked.connect(on_save_clicked)
+                make_save_logic(editor, save_button, filePath, content)
+
+                tabWidget.addTab(editor_widget, f_name)
                 tabWidget.setTabToolTip(tabWidget.count() - 1, f_name)
                 files_added += 1
             except Exception as e:
@@ -4169,8 +4203,7 @@ class MainView(QtWidgets.QWidget):
             self.obj_dockarea.addDockWidget(QtCore.Qt.TopDockWidgetArea, projectDock)
             self.obj_appconfig.print_info("Project dock added to dock area.")
 
-            # Tabify with the welcome widget if it exists
-            self.obj_appconfig.print_info("Attempting to tabify with 'Welcome' dock...")
+            # Always tabify with the welcome widget if it exists
             welcome_dock = None
             for d in self.obj_dockarea.findChildren(QtWidgets.QDockWidget):
                 if d.windowTitle() == 'Welcome':
@@ -4180,12 +4213,11 @@ class MainView(QtWidgets.QWidget):
             if welcome_dock:
                 self.obj_appconfig.print_info("'Welcome' dock found. Tabifying...")
                 self.obj_dockarea.tabifyDockWidget(welcome_dock, projectDock)
-                self.obj_appconfig.print_info("Tabify complete.")
+                projectDock.raise_()
+                self.obj_appconfig.print_info("Tabify complete and project dock raised.")
             else:
                 self.obj_appconfig.print_info("'Welcome' dock NOT found. New dock will appear as a separate window.")
-
-            projectDock.raise_()
-            self.obj_appconfig.print_info("Called raise_() on the new project dock.")
+                projectDock.raise_()
         else:
             self.obj_appconfig.print_info(f"No viewable files found in project '{projectName}'. Nothing to display.")
 
