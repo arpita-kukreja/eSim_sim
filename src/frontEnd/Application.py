@@ -1536,14 +1536,15 @@ class Application(QtWidgets.QMainWindow):
             color: #2c3e50;
             border: 1px solid #e1e4e8;
             border-bottom: none;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            padding: 8px 16px;
-            margin-right: 2px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            padding: 6px 24px;
+            margin-right: 4px;
             font-weight: 600;
             font-size: 8pt;
+            letter-spacing: 0.3px;
             min-width: 180px;
--           max-width: 400px;
+            max-width: 400px;
         }
         QTabBar::tab:selected {
             background: #1976d2;
@@ -3544,11 +3545,15 @@ class Application(QtWidgets.QMainWindow):
             color: #2c3e50;
             border: 1px solid #e1e4e8;
             border-bottom: none;
-            border-top-left-radius: 8px;
-            border-top-right-radius: 8px;
-            padding: 8px 16px;
-            margin-right: 2px;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            padding: 6px 24px;
+            margin-right: 4px;
             font-weight: 600;
+            font-size: 8pt;
+            letter-spacing: 0.3px;
+            min-width: 180px;
+            max-width: 400px;
         }
         QTabBar::tab:selected {
             background: #1976d2;
