@@ -79,14 +79,15 @@ class DockArea(QtWidgets.QMainWindow):
                 color: #2c3e50;
                 border: 1px solid #e1e4e8;
                 border-bottom: none;
-                border-top-left-radius: 4px;
-                border-top-right-radius: 4px;
-                min-width: 120px;
-                max-width: 180px;
-                font-weight: 500;
-                font-size: 9pt;
-                padding: 6px 15px;
-                 margin-right: 2px;
+                border-top-left-radius: 12px;
+                border-top-right-radius: 12px;
+                min-width: 180px;
+                max-width: 400px;
+                font-weight: 600;
+                font-size: 8pt;
+                letter-spacing: 0.3px;
+                padding: 6px 24px;
+                margin-right: 4px;
             }
             
             QTabBar::tab:selected {
