@@ -25,11 +25,13 @@ import traceback
 import webbrowser
 import json
 
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 if os.name == 'nt':
     from frontEnd import pathmagic  # noqa:F401
     init_path = ''
 else:
-    import pathmagic    # noqa:F401
+    from frontEnd import pathmagic    # noqa:F401
     init_path = '../../'
 
 from PyQt5 import QtGui, QtCore, QtWidgets
@@ -62,19 +64,18 @@ class Application(QtWidgets.QMainWindow):
         # Theme state - set light theme as default
         self.is_dark_theme = False
 
-        # Initialize font sizes
+        # Initialize font sizes with defaults (will be overridden by load_preferences if available)
         self.toolbar_font_size = 10
         self.text_font_size = 10
-        self.left_toolbar_font_size = 9  # Specific size for left toolbar buttons
-        self.top_toolbar_font_size = 10  # Specific size for top toolbar buttons
-        # Initialize icon sizes
-        self.top_toolbar_icon_size = 24  # px
-        self.left_toolbar_icon_size = 24  # px
-        self.top_toolbar_icon_min = 16
-        self.top_toolbar_icon_max = 96  # Increased from 56
-        self.left_toolbar_icon_min = 16
-        self.left_toolbar_icon_max = 96  # Increased from 56
+        
+        # Single source of truth for toolbar sizes
+        self.toolbar_icon_size = 24  # px
+        self.toolbar_icon_min = 16
+        self.toolbar_icon_max = 96
         self.toolbar_icon_step = 2
+
+        # Load user preferences BEFORE initializing UI components
+        self._load_preferences_early()
 
         # Set slot for simulation end signal to plot simulation data
         self.simulationEndSignal.connect(self.plotSimulationData)
@@ -103,14 +104,17 @@ class Application(QtWidgets.QMainWindow):
         self.showMaximized()
         self.setWindowIcon(QtGui.QIcon(init_path + 'images/logo.png'))
 
-        # Apply light theme by default
-        self.apply_light_theme()
+        # Apply theme based on loaded preferences
+        if self.is_dark_theme:
+            self.apply_dark_theme()
+        else:
+            self.apply_light_theme()
 
         self.systemTrayIcon = QtWidgets.QSystemTrayIcon(self)
         self.systemTrayIcon.setIcon(QtGui.QIcon(init_path + 'images/logo.png'))
         self.systemTrayIcon.setVisible(True)
 
-        # Set initial font
+        # Set initial font (this will use the loaded preferences)
         self.update_font_sizes()
 
         self.statusBar = self.statusBar()
@@ -141,20 +145,70 @@ class Application(QtWidgets.QMainWindow):
         self.current_modeleditor_widget = None  # Reference to open model editor widget
         self.current_terminalui_widget = None  # Reference to open simulation TerminalUi widget
 
+    def _load_preferences_early(self):
+        """Load user preferences early in initialization (before UI objects are created)"""
+        try:
+            preferences_file = os.path.expanduser('~/.esim/preferences.json')
+            if not os.path.exists(preferences_file):
+                print("No saved preferences found, using defaults")
+                return
+                
+            with open(preferences_file, 'r') as f:
+                prefs = json.load(f)
+            
+            # Load and apply font/icon sizes with defaults
+            self.toolbar_font_size = prefs.get('toolbar_font_size', 10)
+            self.text_font_size = prefs.get('text_font_size', 10)
+            self.toolbar_icon_size = prefs.get('toolbar_icon_size', 24)
+            
+            # Ensure values are within valid ranges
+            self.toolbar_font_size = max(8, min(24, self.toolbar_font_size))  # 8-24px range
+            self.text_font_size = max(8, min(24, self.text_font_size))  # 8-24px range
+            self.toolbar_icon_size = max(16, min(96, self.toolbar_icon_size))  # 16-96px range
+            
+            # Apply theme
+            if prefs.get('theme') == 'dark':
+                self.is_dark_theme = True
+            else:
+                self.is_dark_theme = False
+            
+            print("UI preferences loaded successfully")
+            
+        except json.JSONDecodeError as e:
+            print(f"Error parsing preferences file: {str(e)}")
+        except Exception as e:
+            print(f"Error loading preferences: {str(e)}")
+            # Set default values on error
+            self.toolbar_font_size = 10
+            self.text_font_size = 10
+            self.toolbar_icon_size = 24
+            self.is_dark_theme = False
+
     def update_font_sizes(self):
         """Update font sizes for all relevant widgets"""
-        # Update toolbar fonts
+        # Create a consistent font for all toolbars
         toolbar_font = QtGui.QFont("Fira Sans", self.toolbar_font_size)
+        toolbar_font.setBold(True)
+        
+        # Update all toolbars with consistent settings
         for toolbar in self.findChildren(QtWidgets.QToolBar):
             toolbar.setFont(toolbar_font)
             for action in toolbar.actions():
                 action.setFont(toolbar_font)
-            # Update icon size for top toolbar
-            toolbar.setIconSize(QSize(self.top_toolbar_icon_size, self.top_toolbar_icon_size))
-        # Update left toolbar tool buttons' icon size
+            toolbar.setIconSize(QSize(self.toolbar_icon_size, self.toolbar_icon_size))
+        
+        # Update left toolbar buttons to match
         if hasattr(self, 'toolButtons'):
             for button in self.toolButtons:
-                button.setIconSize(QSize(self.left_toolbar_icon_size, self.left_toolbar_icon_size))
+                button.setFont(toolbar_font)
+                button.setIconSize(QSize(self.toolbar_icon_size, self.toolbar_icon_size))
+                # Force update the button's style
+                button.style().unpolish(button)
+                button.style().polish(button)
+                button.update()
+        
+        # Update the toolbar styling to ensure visual consistency
+        self.update_toolbar_button_styling()
 
         # Update text area fonts
         text_font = QtGui.QFont("Fira Code", self.text_font_size)
@@ -251,7 +305,7 @@ class Application(QtWidgets.QMainWindow):
         """Update the styling of toolbar buttons with current font sizes and icon sizes"""
         # Update top toolbar button styling
         if hasattr(self, 'topToolbar'):
-            self.topToolbar.setIconSize(QSize(self.top_toolbar_icon_size, self.top_toolbar_icon_size))
+            self.topToolbar.setIconSize(QSize(self.toolbar_icon_size, self.toolbar_icon_size))
             if self.is_dark_theme:
                 top_toolbar_style = f"""
                     QToolBar {{
@@ -264,7 +318,7 @@ class Application(QtWidgets.QMainWindow):
                         min-height: 54px;
                         padding: 4px 2px;
                         margin: 1px;
-                        font-size: {self.top_toolbar_font_size}px;
+                        font-size: {self.toolbar_font_size}px;
                         color: #e8eaed;
                         background: transparent;
                         border: none;
@@ -287,7 +341,7 @@ class Application(QtWidgets.QMainWindow):
                         min-height: 54px;
                         padding: 4px 2px;
                         margin: 1px;
-                        font-size: {self.top_toolbar_font_size}px;
+                        font-size: {self.toolbar_font_size}px;
                         color: #2c3e50;
                         background: transparent;
                         border: none;
@@ -301,9 +355,14 @@ class Application(QtWidgets.QMainWindow):
             self.topToolbar.setStyleSheet(top_toolbar_style)
 
         # Update left toolbar button styling
-        if hasattr(self, 'toolbarWidget'):
+        if hasattr(self, 'toolbarWidget') and hasattr(self, 'toolButtons'):
             for button in self.toolButtons:
-                button.setIconSize(QSize(self.left_toolbar_icon_size, self.left_toolbar_icon_size))
+                button.setIconSize(QSize(self.toolbar_icon_size, self.toolbar_icon_size))
+                # Set the button's font size to match the top toolbar
+                font = button.font()
+                font.setPointSize(self.toolbar_font_size)
+                font.setBold(True)
+                button.setFont(font)
             if self.is_dark_theme:
                 left_toolbar_style = f"""
                     QWidget {{
@@ -318,10 +377,10 @@ class Application(QtWidgets.QMainWindow):
                         margin: 1px;
                         border-radius: 6px;
                         font-weight: 600;
-                        font-size: {self.left_toolbar_font_size}px;
+                        font-size: {self.toolbar_font_size}px;
                         min-width: 120px;
                         max-width: 160px;
-                        min-height: 40px;
+                        min-height: {max(40, self.toolbar_icon_size + 16)}px;
                         text-align: center;
                         white-space: normal;
                     }}
@@ -366,10 +425,10 @@ class Application(QtWidgets.QMainWindow):
                         margin: 1px;
                         border-radius: 6px;
                         font-weight: 600;
-                        font-size: {self.left_toolbar_font_size}px;
+                        font-size: {self.toolbar_font_size}px;
                         min-width: 120px;
                         max-width: 160px;
-                        min-height: 40px;
+                        min-height: {max(40, self.toolbar_icon_size + 16)}px;
                         text-align: center;
                         white-space: normal;
                     }}
@@ -407,7 +466,10 @@ class Application(QtWidgets.QMainWindow):
         if self.toolbar_font_size < 20:  # Set maximum size
             self.toolbar_font_size += 1
             self.text_font_size += 1
+            
+            # Update UI with new sizes
             self.update_font_sizes()
+            
             # Update welcome page zoom
             for dock_widget in self.findChildren(QtWidgets.QDockWidget):
                 if dock_widget.windowTitle().startswith('Welcome'):
@@ -416,6 +478,9 @@ class Application(QtWidgets.QMainWindow):
                         welcome_layout = welcome_widget.findChild(QtWidgets.QWidget)
                         if welcome_layout and hasattr(welcome_layout, 'increase_font_size'):
                             welcome_layout.increase_font_size()
+            
+            # Save preferences after updating
+            self.save_preferences()
             self.obj_appconfig.print_info("Font size increased")
 
     def decrease_font_size(self):
@@ -423,7 +488,10 @@ class Application(QtWidgets.QMainWindow):
         if self.toolbar_font_size > 8:  # Set minimum size
             self.toolbar_font_size -= 1
             self.text_font_size -= 1
+            
+            # Update UI with new sizes
             self.update_font_sizes()
+            
             # Update welcome page zoom
             for dock_widget in self.findChildren(QtWidgets.QDockWidget):
                 if dock_widget.windowTitle().startswith('Welcome'):
@@ -432,13 +500,23 @@ class Application(QtWidgets.QMainWindow):
                         welcome_layout = welcome_widget.findChild(QtWidgets.QWidget)
                         if welcome_layout and hasattr(welcome_layout, 'decrease_font_size'):
                             welcome_layout.decrease_font_size()
+            
+            # Save preferences after updating
+            self.save_preferences()
             self.obj_appconfig.print_info("Font size decreased")
 
     def reset_font_size(self):
         """Reset font sizes to default"""
+        # Reset all font sizes to defaults
         self.toolbar_font_size = 10
         self.text_font_size = 10
+        
+        # Reset icon size to default
+        self.toolbar_icon_size = 24
+        
+        # Update UI with default sizes
         self.update_font_sizes()
+        
         # Reset welcome page zoom
         for dock_widget in self.findChildren(QtWidgets.QDockWidget):
             if dock_widget.windowTitle().startswith('Welcome'):
@@ -447,6 +525,9 @@ class Application(QtWidgets.QMainWindow):
                     welcome_layout = welcome_widget.findChild(QtWidgets.QWidget)
                     if welcome_layout and hasattr(welcome_layout, 'reset_font_size'):
                         welcome_layout.reset_font_size()
+        
+        # Save preferences after resetting
+        self.save_preferences()
         self.obj_appconfig.print_info("Font size reset to default")
 
     def handle_simulation_output(self):
@@ -2484,56 +2565,20 @@ class Application(QtWidgets.QMainWindow):
         self.open_ngspice()
 
     def closeEvent(self, event):
-        '''
-        This function closes the ongoing program (process).
-        When exit button is pressed a Message box pops out with \
-        exit message and buttons 'Yes', 'No'.
-
-            1. If 'Yes' is pressed:
-                - check that program (process) in procThread_list \
-                  (a list made in Appconfig.py):
-
-                    - if available it terminates that program.
-                    - if the program (process) is not available, \
-                      then check it in process_obj (a list made in \
-                      Appconfig.py) and if found, it closes the program.
-
-            2. If 'No' is pressed:
-                - the program just continues as it was doing earlier.
-        '''
-        exit_msg = "Are you sure you want to exit the program?"
-        exit_msg += " All unsaved data will be lost."
-        reply = QtWidgets.QMessageBox.question(
-            self, 'Message', exit_msg, QtWidgets.QMessageBox.Yes,
-            QtWidgets.QMessageBox.No
-        )
-
-        if reply == QtWidgets.QMessageBox.Yes:
-            for proc in self.obj_appconfig.procThread_list:
-                try:
-                    proc.terminate()
-                except BaseException:
-                    pass
-            try:
-                for process_object in self.obj_appconfig.process_obj:
-                    try:
-                        process_object.close()
-                    except BaseException:
-                        pass
-            except BaseException:
-                pass
-
-            # Check if "Open project" and "New project" window is open.
-            # If yes, just close it when application is closed.
-            try:
-                self.project.close()
-            except BaseException:
-                pass
-            event.accept()
-            self.systemTrayIcon.showMessage('Exit', 'eSim is Closed.')
-
-        elif reply == QtWidgets.QMessageBox.No:
-            event.ignore()
+        """Handle application close event - save preferences before closing"""
+        try:
+            # Save current preferences before closing
+            self.save_preferences()
+            if hasattr(self, 'obj_appconfig'):
+                self.obj_appconfig.print_info("Preferences saved on application close")
+        except Exception as e:
+            if hasattr(self, 'obj_appconfig'):
+                self.obj_appconfig.print_error(f"Error saving preferences on close: {str(e)}")
+            else:
+                print(f"Error saving preferences on close: {str(e)}")
+        
+        # Continue with normal close event
+        super().closeEvent(event)
 
     def new_project(self):
         """This function call New Project Info class."""
@@ -3755,114 +3800,92 @@ class Application(QtWidgets.QMainWindow):
         widget.setStyleSheet(premium_light_stylesheet)
 
     def increase_toolbar_font_size(self):
-        """Increase font size for toolbar buttons and icon size"""
-        if self.top_toolbar_font_size < 24:
-            self.top_toolbar_font_size += 1
-            self.left_toolbar_font_size += 1
-            self.top_toolbar_icon_size = min(self.top_toolbar_icon_size + self.toolbar_icon_step, self.top_toolbar_icon_max)
-            self.left_toolbar_icon_size = min(self.left_toolbar_icon_size + self.toolbar_icon_step, self.left_toolbar_icon_max)
+        """Increase toolbar button sizes"""
+        if self.toolbar_icon_size < self.toolbar_icon_max:
+            self.toolbar_icon_size += self.toolbar_icon_step
             self.update_font_sizes()
-            self.obj_appconfig.print_info("Toolbar font and icon size increased")
+            self.obj_appconfig.print_info("Toolbar button size increased")
+            self.save_preferences()
 
     def decrease_toolbar_font_size(self):
-        """Decrease font size for toolbar buttons and icon size"""
-        if self.top_toolbar_font_size > 8:
-            self.top_toolbar_font_size -= 1
-            self.left_toolbar_font_size -= 1
-            self.top_toolbar_icon_size = max(self.top_toolbar_icon_size - self.toolbar_icon_step, self.top_toolbar_icon_min)
-            self.left_toolbar_icon_size = max(self.left_toolbar_icon_size - self.toolbar_icon_step, self.left_toolbar_icon_min)
+        """Decrease toolbar button sizes"""
+        if self.toolbar_icon_size > self.toolbar_icon_min:
+            self.toolbar_icon_size -= self.toolbar_icon_step
             self.update_font_sizes()
-            self.obj_appconfig.print_info("Toolbar font and icon size decreased")
+            self.obj_appconfig.print_info("Toolbar button size decreased")
+            self.save_preferences()
 
     def reset_toolbar_font_size(self):
-        """Reset font size and icon size for toolbar buttons"""
-        self.top_toolbar_font_size = 10
-        self.left_toolbar_font_size = 9
-        self.top_toolbar_icon_size = 24
-        self.left_toolbar_icon_size = 24
+        """Reset toolbar button sizes to default"""
+        self.toolbar_icon_size = 24
         self.update_font_sizes()
+        self.save_preferences()  # Save the reset to default preference
         self.obj_appconfig.print_info("Toolbar font and icon size reset to default")
 
     def save_preferences(self):
-        """Save user interface preferences to a JSON file"""
-        preferences = {
-            'is_dark_theme': self.is_dark_theme,
+        """Save user preferences to a file"""
+        prefs = {
+            'theme': 'dark' if self.is_dark_theme else 'light',
             'toolbar_font_size': self.toolbar_font_size,
             'text_font_size': self.text_font_size,
-            'left_toolbar_font_size': self.left_toolbar_font_size,
-            'top_toolbar_font_size': self.top_toolbar_font_size,
-            'top_toolbar_icon_size': self.top_toolbar_icon_size,
-            'left_toolbar_icon_size': self.left_toolbar_icon_size
+            'toolbar_icon_size': self.toolbar_icon_size
         }
         
         try:
-            # Get the configuration directory
-            if os.name == 'nt':
-                user_home = os.path.join('library', 'config')
-            else:
-                user_home = os.path.expanduser('~')
-                
-            esim_config_dir = os.path.join(user_home, '.esim')
+            # Ensure the .esim directory exists in the user's home directory
+            esim_config_dir = os.path.expanduser('~/.esim')
+            os.makedirs(esim_config_dir, exist_ok=True)
             
-            # Create directory if it doesn't exist
-            if not os.path.exists(esim_config_dir):
-                os.makedirs(esim_config_dir, exist_ok=True)
-                
             # Save preferences to JSON file
             preferences_file = os.path.join(esim_config_dir, 'preferences.json')
             with open(preferences_file, 'w') as f:
-                json.dump(preferences, f, indent=4)
-                
+                json.dump(prefs, f, indent=4)
+            
             self.obj_appconfig.print_info("UI preferences saved successfully")
         except Exception as e:
             self.obj_appconfig.print_error(f"Error saving preferences: {str(e)}")
+            raise  # Re-raise the exception to ensure it's not silently ignored
 
     def load_preferences(self):
-        """Load user interface preferences from a JSON file"""
+        """Load user preferences from file"""
         try:
-            # Get the configuration directory
-            if os.name == 'nt':
-                user_home = os.path.join('library', 'config')
-            else:
-                user_home = os.path.expanduser('~')
-                
-            preferences_file = os.path.join(user_home, '.esim', 'preferences.json')
-            
-            # Check if preferences file exists
-            if not os.path.isfile(preferences_file):
-                self.obj_appconfig.print_info("No saved preferences found. Using defaults.")
+            preferences_file = os.path.expanduser('~/.esim/preferences.json')
+            if not os.path.exists(preferences_file):
+                self.obj_appconfig.print_info("No saved preferences found, using defaults")
                 return
                 
-            # Load preferences from JSON file
             with open(preferences_file, 'r') as f:
-                preferences = json.load(f)
-                
-            # Apply loaded preferences
-            if 'is_dark_theme' in preferences:
-                self.is_dark_theme = preferences['is_dark_theme']
-                
-            if 'toolbar_font_size' in preferences:
-                self.toolbar_font_size = preferences['toolbar_font_size']
-                
-            if 'text_font_size' in preferences:
-                self.text_font_size = preferences['text_font_size']
-                
-            if 'left_toolbar_font_size' in preferences:
-                self.left_toolbar_font_size = preferences['left_toolbar_font_size']
-                
-            if 'top_toolbar_font_size' in preferences:
-                self.top_toolbar_font_size = preferences['top_toolbar_font_size']
-                
-            if 'top_toolbar_icon_size' in preferences:
-                self.top_toolbar_icon_size = preferences['top_toolbar_icon_size']
-                
-            if 'left_toolbar_icon_size' in preferences:
-                self.left_toolbar_icon_size = preferences['left_toolbar_icon_size']
-                
+                prefs = json.load(f)
+            
+            # Apply theme
+            if prefs.get('theme') == 'dark':
+                self.apply_dark_theme()
+            else:
+                self.apply_light_theme()
+            
+            # Load and apply font/icon sizes with defaults
+            self.toolbar_font_size = prefs.get('toolbar_font_size', 10)
+            self.text_font_size = prefs.get('text_font_size', 10)
+            self.toolbar_icon_size = prefs.get('toolbar_icon_size', 24)
+            
+            # Ensure values are within valid ranges
+            self.toolbar_font_size = max(8, min(24, self.toolbar_font_size))  # 8-24px range
+            self.text_font_size = max(8, min(24, self.text_font_size))  # 8-24px range
+            self.toolbar_icon_size = max(16, min(96, self.toolbar_icon_size))  # 16-96px range
+            
+            # Update the UI with loaded preferences
+            self.update_font_sizes()
             self.obj_appconfig.print_info("UI preferences loaded successfully")
-                
+            
+        except json.JSONDecodeError as e:
+            self.obj_appconfig.print_error(f"Error parsing preferences file: {str(e)}")
         except Exception as e:
             self.obj_appconfig.print_error(f"Error loading preferences: {str(e)}")
+            # Set default values on error
+            self.toolbar_font_size = 10
+            self.text_font_size = 10
+            self.toolbar_icon_size = 24
+            self.update_font_sizes()
 
     def propagate_theme_color_change(self):
         """Propagate theme color change to all GUI components."""
