@@ -4074,16 +4074,19 @@ class MainView(QtWidgets.QWidget):
 
         tabWidget = QtWidgets.QTabWidget()
         tabWidget.setTabsClosable(True)
-        tabWidget.setElideMode(QtCore.Qt.ElideMiddle)
+        # Do not elide tab text, show full file name
+        tabWidget.setElideMode(QtCore.Qt.ElideNone)
         tabWidget.tabCloseRequested.connect(lambda index: tabWidget.removeTab(index))
         tabWidget.setStyleSheet("""
         QTabBar::tab {
             background: #ffffff;
             color: #222222;
-            font-size: 9pt;
+            font-size: 8pt;
             border-radius: 6px;
-            padding: 6px 18px;
+            padding: 6px 24px;
             margin-right: 2px;
+            min-width: 180px;
+            max-width: 400px;
         }
         QTabBar::tab:selected {
             background: #e0e0e0;
@@ -4104,7 +4107,7 @@ class MainView(QtWidgets.QWidget):
         #     border-radius: 8px;
         # }
         QTabWidget::pane {
-            border: 1px solid #ffffff;
+            border: 1px solid #e1e4e8;
             border-radius: 6px;
             background: #ffffff;
         }

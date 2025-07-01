@@ -86,7 +86,7 @@ class DockArea(QtWidgets.QMainWindow):
                 font-weight: 500;
                 font-size: 9pt;
                 padding: 6px 15px;
-                margin-right: 2px;
+                 margin-right: 2px;
             }
             
             QTabBar::tab:selected {
@@ -101,11 +101,11 @@ class DockArea(QtWidgets.QMainWindow):
                 color: #1976d2;
             }
             
-            QTabWidget::pane {
-                border: 1px solid #23273a;
-                border-radius: 4px;
-                background: #181b24;
-            }
+            # QTabWidget::pane {
+            #     border: 1px solid #23273a;
+            #     border-radius: 4px;
+            #     background: #181b24;
+            # }
             
             QTabWidget::tab-bar {
                 alignment: center;
