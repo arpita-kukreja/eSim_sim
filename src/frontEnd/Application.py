@@ -1105,8 +1105,10 @@ class Application(QtWidgets.QMainWindow):
             padding: 12px 28px;
             margin-right: 4px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 8pt;
             letter-spacing: 0.3px;
+            min-width: 180px;
+            max-width: 400px;
         }
         QTabBar::tab:selected {
             background: #667eea;  /* Changed from #40c4ff - purple accent */
@@ -1539,6 +1541,9 @@ class Application(QtWidgets.QMainWindow):
             padding: 8px 16px;
             margin-right: 2px;
             font-weight: 600;
+            font-size: 8pt;
+            min-width: 180px;
+-           max-width: 400px;
         }
         QTabBar::tab:selected {
             background: #1976d2;
@@ -3144,8 +3149,10 @@ class Application(QtWidgets.QMainWindow):
             padding: 12px 28px;
             margin-right: 4px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 8pt;
             letter-spacing: 0.3px;
+            min-width: 180px;
+            max-width: 400px;
         }
         QTabBar::tab:selected {
             background: #667eea;  /* Changed from #40c4ff - purple accent */
