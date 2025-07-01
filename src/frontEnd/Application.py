@@ -1731,6 +1731,12 @@ class Application(QtWidgets.QMainWindow):
             border-radius: 8px;
             padding: 8px;
         }
+        # /* Force white border for file editor widget in light theme */
+        QWidget#FileEditorWidget, QDockWidget > QWidget#FileEditorWidget {
+            border: 2px solid #ffffff !important;
+            border-radius: 10px;
+            background: #fff !important;
+        }
         """
         
         self.setStyleSheet("""
@@ -3728,6 +3734,11 @@ class Application(QtWidgets.QMainWindow):
             border-radius: 8px;
             padding: 8px;
         }
+        # QWidget#FileEditorWidget, QDockWidget > QWidget#FileEditorWidget {
+        #     border: 2px solid #ffffff !important;
+        #     border-radius: 10px;
+        #     background: #fff !important;
+        # }
         """
         widget.setStyleSheet(premium_light_stylesheet)
 
@@ -4093,7 +4104,7 @@ class MainView(QtWidgets.QWidget):
         #     border-radius: 8px;
         # }
         QTabWidget::pane {
-            border: 1px solid #e0e0e0;
+            border: 1px solid #ffffff;
             border-radius: 6px;
             background: #ffffff;
         }
@@ -4150,6 +4161,8 @@ class MainView(QtWidgets.QWidget):
 
                 # Create a QWidget to hold the editor and save button
                 editor_widget = QtWidgets.QWidget()
+                editor_widget.setObjectName("FileEditorWidget")
+                editor_widget.setStyleSheet("#FileEditorWidget { border: 2px solid #ffffff; border-radius: 10px; background: #fff; }")
                 layout = QtWidgets.QVBoxLayout(editor_widget)
                 editor = QtWidgets.QTextEdit()
                 editor.setText(content)
@@ -4159,11 +4172,16 @@ class MainView(QtWidgets.QWidget):
                 font.setStyleHint(QtGui.QFont.Monospace)
                 editor.setFont(font)
                 save_button = QtWidgets.QPushButton('Save')
-                save_button.setFixedSize(80, 28)  # Make the button smaller
+                save_button.setFixedSize(220, 36)  # Make the button wider and keep the height
                 save_button.setEnabled(False)
                 save_button.setStyleSheet("")  # Default style
                 layout.addWidget(editor)
-                layout.addWidget(save_button)
+                # Center the Save button using a horizontal layout
+                button_layout = QtWidgets.QHBoxLayout()
+                button_layout.addStretch(1)
+                button_layout.addWidget(save_button)
+                button_layout.addStretch(1)
+                layout.addLayout(button_layout)
                 editor_widget.setLayout(layout)
 
                 # Use a closure to keep state per file
