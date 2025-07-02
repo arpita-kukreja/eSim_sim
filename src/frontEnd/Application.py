@@ -2565,20 +2565,65 @@ class Application(QtWidgets.QMainWindow):
         self.open_ngspice()
 
     def closeEvent(self, event):
-        """Handle application close event - save preferences before closing"""
-        try:
-            # Save current preferences before closing
-            self.save_preferences()
-            if hasattr(self, 'obj_appconfig'):
-                self.obj_appconfig.print_info("Preferences saved on application close")
-        except Exception as e:
-            if hasattr(self, 'obj_appconfig'):
-                self.obj_appconfig.print_error(f"Error saving preferences on close: {str(e)}")
-            else:
-                print(f"Error saving preferences on close: {str(e)}")
-        
-        # Continue with normal close event
-        super().closeEvent(event)
+        """Handle application close event - ask for confirmation and save preferences before closing"""
+        # Show confirmation dialog
+        msg_box = QtWidgets.QMessageBox(self)
+        msg_box.setWindowTitle("Exit Application")
+        msg_box.setText("Are you sure you want to exit eSim?")
+        msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+
+        # Apply theme to the dialog
+        if self.is_dark_theme:
+            msg_box.setStyleSheet("""
+                QMessageBox {
+                    background-color: #23273a;
+                    color: #f0f0f0;
+                }
+                QPushButton {
+                    background-color: #444a5a;
+                    color: #f0f0f0;
+                    border-radius: 6px;
+                    padding: 6px 18px;
+                }
+                QPushButton:hover {
+                    background-color: #1976d2;
+                    color: #fff;
+                }
+            """)
+        else:
+            msg_box.setStyleSheet("""
+                QMessageBox {
+                    background-color: #fff;
+                    color: #23273a;
+                }
+                QPushButton {
+                    background-color: #e0e0e0;
+                    color: #23273a;
+                    border-radius: 6px;
+                    padding: 6px 18px;
+                }
+                QPushButton:hover {
+                    background-color: #1976d2;
+                    color: #fff;
+                }
+            """)
+
+        reply = msg_box.exec_()
+        if reply == QtWidgets.QMessageBox.Yes:
+            try:
+                # Save current preferences before closing
+                self.save_preferences()
+                if hasattr(self, 'obj_appconfig'):
+                    self.obj_appconfig.print_info("Preferences saved on application close")
+            except Exception as e:
+                if hasattr(self, 'obj_appconfig'):
+                    self.obj_appconfig.print_error(f"Error saving preferences on close: {str(e)}")
+                else:
+                    print(f"Error saving preferences on close: {str(e)}")
+            event.accept()
+        else:
+            event.ignore()
 
     def new_project(self):
         """This function call New Project Info class."""

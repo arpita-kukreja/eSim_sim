@@ -68,7 +68,7 @@ class ProjectExplorer(QtWidgets.QWidget):
 
     def apply_dark_theme(self):
         """Apply dark theme to the project explorer"""
-        # Set the main widget background
+        # Set the main widget background to match Application.py
         self.setStyleSheet('''
             QWidget {
                 background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
@@ -76,8 +76,7 @@ class ProjectExplorer(QtWidgets.QWidget):
                 color: #e8eaed;
             }
         ''')
-        
-        # Set the tree widget styles
+        # Set the tree widget styles to match Application.py
         self.treewidget.setStyleSheet('''
             QHeaderView::section {
                 background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
@@ -370,8 +369,7 @@ class ProjectExplorer(QtWidgets.QWidget):
                 'The current project is: ' + self.filePath
             )
 
-            self.obj_appconfig.current_project["ProjectName"] = str(
-                self.filePath)
+            self.obj_appconfig.current_project["ProjectName"] = self.filePath
             (
                 self.obj_appconfig.
                 proc_dict[self.obj_appconfig.current_project['ProjectName']]
@@ -412,7 +410,6 @@ class ProjectExplorer(QtWidgets.QWidget):
         )
         self.int = self.indexItem.row()
         self.treewidget.takeTopLevelItem(self.int)
-
         if self.obj_appconfig.current_project["ProjectName"] == filePath:
             self.obj_appconfig.current_project["ProjectName"] = None
 
