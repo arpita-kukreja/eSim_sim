@@ -10,6 +10,7 @@ from matplotlib.backends.backend_qt5agg\
 from matplotlib.figure import Figure
 from configuration.Appconfig import Appconfig
 import numpy as np
+import re
 
 # Dark theme colors - Modern GitHub Dark inspired theme
 DARK_BLUE = "#0d1117"  # Main background
@@ -370,12 +371,12 @@ class plotWindow(QtWidgets.QMainWindow):
         self.combo = []
         self.combo1 = []
         self.combo1_rev = []
-        
-        # Apply theme based on parameter
         self.is_dark_theme = is_dark_theme
-        self.setStyleSheet(DARK_STYLESHEET if self.is_dark_theme else LIGHT_STYLESHEET)
-        
-        # Creating Frame
+        # Only apply stylesheet for dark mode
+        if self.is_dark_theme:
+            self.setStyleSheet(DARK_STYLESHEET)
+        else:
+            self.setStyleSheet(LIGHT_STYLESHEET)  # Use light stylesheet for light mode
         self.createMainFrame()
 
     def toggle_theme(self):
@@ -441,82 +442,105 @@ class plotWindow(QtWidgets.QMainWindow):
     def createMainFrame(self):
         self.mainFrame = QtWidgets.QWidget()
         self.dpi = 100
-        self.fig = Figure((7.0, 7.0), dpi=self.dpi, facecolor=DARK_BLUE if self.is_dark_theme else LIGHT_BG)
-        # Creating Canvas which will figure
+        if self.is_dark_theme:
+            self.fig = Figure((7.0, 7.0), dpi=self.dpi, facecolor=DARK_BLUE)
+        else:
+            self.fig = Figure((7.0, 7.0), dpi=self.dpi)  # Default white bg
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self.mainFrame)
         self.axes = self.fig.add_subplot(111)
-        
-        # Configure theme for plot with enhanced visibility
-        self.update_plot_theme()
-        
-        # Configure navigation toolbar
         self.navToolBar = NavigationToolbar(self.canvas, self.mainFrame)
-        self.navToolBar.setIconSize(QtCore.QSize(TOOLBAR_ICON_SIZE, TOOLBAR_ICON_SIZE))
-        self.navToolBar.setStyleSheet(f"""
-            QToolBar {{
-                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                    stop:0 {GRADIENT_START}, stop:1 {GRADIENT_END});
-                border-bottom: 2px solid {ACCENT_BLUE};
-                padding: 8px;
-                spacing: 8px;
-                min-height: 48px;
-            }}
-            QToolButton {{
-                background-color: {ACCENT_BLUE};
-                border: 2px solid {BORDER_COLOR};
-                border-radius: 8px;
-                padding: 8px;
-                margin: 3px;
-                min-width: 32px;
-                min-height: 32px;
-            }}
-            QToolButton:hover {{
-                background-color: {ACCENT_BLUE};
-                border-color: {ACCENT_HOVER};
-            }}
-            QToolButton:pressed {{
-                background-color: {GRADIENT_START};
-                border-color: {TEXT_COLOR};
-            }}
-            QToolBar QLabel {{
-                color: {TEXT_COLOR};
-                font-size: 15px;
-                font-weight: bold;
-                padding: 0 10px;
-            }}
-        """)
-
-        # LeftVbox hold navigation tool bar and canvas
         self.left_vbox = QtWidgets.QVBoxLayout()
-        self.left_vbox.addWidget(self.navToolBar)
+        # Custom toolbar for both dark and light mode
+        self.navToolBar.hide()
+        custom_toolbar = QtWidgets.QWidget()
+        custom_toolbar_layout = QtWidgets.QHBoxLayout()
+        custom_toolbar_layout.setContentsMargins(0, 0, 0, 0)
+        custom_toolbar_layout.setSpacing(8)  # Reduced spacing
+        for action in self.navToolBar.actions():
+            if action.isSeparator() or action.icon().isNull():
+                continue  # Skip separators and actions without icons
+            btn = QtWidgets.QToolButton()
+            btn.setDefaultAction(action)
+            btn.setIcon(action.icon())
+            btn.setToolTip(action.toolTip())
+            # Modern styling for both modes
+            if self.is_dark_theme:
+                btn.setStyleSheet('''
+                    QToolButton {
+                        background-color: #23272e;
+                        border: 2px solid #30363d;
+                        border-radius: 8px;
+                        padding: 8px;
+                        margin: 2px;
+                        min-width: 36px;
+                        min-height: 36px;
+                        font-size: 14px;
+                        color: #f0f6fc;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                        transition: background 0.2s, border 0.2s;
+                    }
+                    QToolButton:hover {
+                        background-color: #1f6feb;
+                        border-color: #388bfd;
+                        color: #fff;
+                    }
+                    QToolButton:pressed {
+                        background-color: #161b22;
+                        border-color: #f0f6fc;
+                    }
+                ''')
+            else:
+                btn.setStyleSheet('''
+                    QToolButton {
+                        background-color: #fff;
+                        border: 2px solid #d0d7de;
+                        border-radius: 8px;
+                        padding: 8px;
+                        margin: 2px;
+                        min-width: 36px;
+                        min-height: 36px;
+                        font-size: 14px;
+                        color: #24292f;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+                        transition: background 0.2s, border 0.2s;
+                    }
+                    QToolButton:hover {
+                        background-color: #f6f8fa;
+                        border-color: #0969da;
+                        color: #0969da;
+                    }
+                    QToolButton:pressed {
+                        background-color: #eaeef2;
+                        border-color: #24292f;
+                    }
+                ''')
+            vbox = QtWidgets.QVBoxLayout()
+            vbox.setAlignment(QtCore.Qt.AlignHCenter)
+            vbox.addWidget(btn, alignment=QtCore.Qt.AlignHCenter)
+            label = QtWidgets.QLabel()
+            label.setAlignment(QtCore.Qt.AlignHCenter)
+            tooltip_plain = re.sub('<[^<]+?>', '', action.toolTip())
+            label.setText(tooltip_plain)
+            label.setStyleSheet('font-size: 10px; color: gray; margin-top: 2px;')
+            vbox.addWidget(label)
+            custom_toolbar_layout.addLayout(vbox)
+        custom_toolbar.setLayout(custom_toolbar_layout)
+        self.left_vbox.addWidget(custom_toolbar)
         self.left_vbox.addWidget(self.canvas)
-
-        # right VBOX is main Layout which hold right grid(bottom part) and top
-        # grid(top part)
         self.right_vbox = QtWidgets.QVBoxLayout()
         self.right_grid = QtWidgets.QGridLayout()
         self.top_grid = QtWidgets.QGridLayout()
-        
-        # Configure spacing for more compact layout
-        self.right_vbox.setSpacing(4)
-        self.right_grid.setSpacing(4)
-        self.top_grid.setSpacing(4)
-        self.right_vbox.setContentsMargins(4, 4, 4, 4)
-        self.right_grid.setContentsMargins(4, 4, 4, 4)
-        self.top_grid.setContentsMargins(4, 4, 4, 4)
-
-        # Get DataExtraction Details
         self.obj_dataext = DataExtraction()
         self.plotType = self.obj_dataext.openFile(self.fpath)
-
         self.obj_dataext.computeAxes()
         self.a = self.obj_dataext.numVals()
-
         self.chkbox = []
-
-        # Modern color palette for dark theme - brighter colors for better visibility
-        self.full_colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a55eea', '#fd79a8', '#00d2d3']  # Bright, high-contrast colors
+        # Color palette
+        if self.is_dark_theme:
+            self.full_colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a55eea', '#fd79a8', '#00d2d3']
+        else:
+            self.full_colors = ['r', 'b', 'g', 'y', 'c', 'm', 'k']
         self.color = []
         for i in range(0, self.a[0] - 1):
             if i % 7 == 0:
@@ -533,10 +557,6 @@ class plotWindow(QtWidgets.QMainWindow):
                 self.color.append(self.full_colors[5])
             elif (i - 6) % 7 == 0:
                 self.color.append(self.full_colors[6])
-
-        # Color generation ends here
-
-        # Total number of voltage source
         self.volts_length = self.a[1]
         self.analysisType = QtWidgets.QLabel()
         self.top_grid.addWidget(self.analysisType, 0, 0)
@@ -828,8 +848,6 @@ class plotWindow(QtWidgets.QMainWindow):
                     self.axes.set_ylabel('Current(I)-->', fontsize=14, fontweight='bold', color=ACCENT_HOVER)
 
         self.axes.grid(True)
-        # Add legend
-        self.axes.legend()
         # Reapply theme after plotting
         self.update_plot_theme()
         self.canvas.draw()
@@ -865,10 +883,6 @@ class plotWindow(QtWidgets.QMainWindow):
             )
             return
 
-        # Add legend
-        if boxCheck > 0:
-            self.axes.legend()
-        
         # Reapply theme after plotting
         self.update_plot_theme()
         self.canvas.draw()
@@ -896,10 +910,6 @@ class plotWindow(QtWidgets.QMainWindow):
                 self, "Warning!!", "Please select at least one Node OR Branch"
             )
             return
-
-        # Add legend
-        if boxCheck > 0:
-            self.axes.legend()
 
         # Reapply theme after plotting
         self.update_plot_theme()
@@ -929,10 +939,6 @@ class plotWindow(QtWidgets.QMainWindow):
             )
             return
         
-        # Add legend
-        if boxCheck > 0:
-            self.axes.legend()
-        
         # Reapply theme after plotting
         self.update_plot_theme()
         self.canvas.draw()
@@ -960,10 +966,6 @@ class plotWindow(QtWidgets.QMainWindow):
                 self, "Warning!!", "Please select atleast one Node OR Branch"
             )
             return
-
-        # Add legend
-        if boxCheck > 0:
-            self.axes.legend()
 
         # Reapply theme after plotting
         self.update_plot_theme()
