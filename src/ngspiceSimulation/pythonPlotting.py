@@ -11,6 +11,7 @@ from matplotlib.figure import Figure
 from configuration.Appconfig import Appconfig
 import numpy as np
 import re
+from cycler import cycler
 
 # Dark theme colors - Modern GitHub Dark inspired theme
 DARK_BLUE = "#0d1117"  # Main background
@@ -177,7 +178,7 @@ LIGHT_STYLESHEET = f"""
     
     QPushButton {{
         background-color: {LIGHT_ACCENT};
-        color: {LIGHT_BG};
+        color: #24292f;
         border: 2px solid {LIGHT_ACCENT_HOVER};
         padding: 6px 12px;
         border-radius: 4px;
@@ -188,10 +189,12 @@ LIGHT_STYLESHEET = f"""
     }}
     QPushButton:hover {{
         background-color: {LIGHT_ACCENT_HOVER};
+        color: #fff;
         border-color: {LIGHT_TEXT};
     }}
     QPushButton:pressed {{
         background-color: {LIGHT_GRADIENT_START};
+        color: #24292f;
         border-color: {LIGHT_ACCENT_HOVER};
     }}
     
@@ -375,6 +378,16 @@ class plotWindow(QtWidgets.QMainWindow):
         # Only apply stylesheet for dark mode
         if self.is_dark_theme:
             self.setStyleSheet(DARK_STYLESHEET)
+            QtWidgets.QToolTip.setStyleSheet('''
+                QToolTip {
+                    background-color: #23272e;
+                    color: #fff;
+                    border: 1px solid #388bfd;
+                    border-radius: 6px;
+                    font-size: 13px;
+                    padding: 6px;
+                }
+            ''')
         else:
             self.setStyleSheet(LIGHT_STYLESHEET)  # Use light stylesheet for light mode
         self.createMainFrame()
@@ -394,6 +407,8 @@ class plotWindow(QtWidgets.QMainWindow):
             accent_color = ACCENT_BLUE
             grid_color = BORDER_COLOR
             function_color = TEXT_COLOR  # White for dark theme
+            # Set a bright color cycle for plot lines in dark mode
+            self.axes.set_prop_cycle(cycler('color', ['#00eaff', '#ff6b6b', '#ffe156', '#6bffb4', '#a55eea', '#fd79a8', '#ffb347', '#f9ca24', '#4ecdc4', '#45b7d1']))
         else:
             # Light theme colors
             bg_color = LIGHT_BG
@@ -443,12 +458,22 @@ class plotWindow(QtWidgets.QMainWindow):
         self.mainFrame = QtWidgets.QWidget()
         self.dpi = 100
         if self.is_dark_theme:
-            self.fig = Figure((7.0, 7.0), dpi=self.dpi, facecolor=DARK_BLUE)
+            self.fig = Figure((7.0, 7.0), dpi=self.dpi, facecolor="#000000")  # Black canvas
         else:
             self.fig = Figure((7.0, 7.0), dpi=self.dpi)  # Default white bg
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self.mainFrame)
         self.axes = self.fig.add_subplot(111)
+        # Set axes and tick colors for dark mode
+        if self.is_dark_theme:
+            self.axes.set_facecolor("#000000")
+            self.axes.tick_params(colors="#f0f6fc", labelsize=12)
+            self.axes.xaxis.label.set_color("#f0f6fc")
+            self.axes.yaxis.label.set_color("#f0f6fc")
+            self.axes.title.set_color("#f0f6fc")
+            for spine in self.axes.spines.values():
+                spine.set_color("#1f6feb")
+                spine.set_linewidth(2)
         self.navToolBar = NavigationToolbar(self.canvas, self.mainFrame)
         self.left_vbox = QtWidgets.QVBoxLayout()
         # Custom toolbar for both dark and light mode
@@ -456,7 +481,7 @@ class plotWindow(QtWidgets.QMainWindow):
         custom_toolbar = QtWidgets.QWidget()
         custom_toolbar_layout = QtWidgets.QHBoxLayout()
         custom_toolbar_layout.setContentsMargins(0, 0, 0, 0)
-        custom_toolbar_layout.setSpacing(8)  # Reduced spacing
+        custom_toolbar_layout.setSpacing(0)  # Minimum horizontal spacing
         for action in self.navToolBar.actions():
             if action.isSeparator() or action.icon().isNull():
                 continue  # Skip separators and actions without icons
@@ -471,22 +496,28 @@ class plotWindow(QtWidgets.QMainWindow):
                         background-color: #23272e;
                         border: 2px solid #30363d;
                         border-radius: 8px;
-                        padding: 8px;
-                        margin: 2px;
-                        min-width: 36px;
-                        min-height: 36px;
-                        font-size: 14px;
+                        padding: 4px;
+                        margin: 0px;
+                        min-width: 28px;
+                        min-height: 28px;
+                        font-size: 13px;
                         color: #f0f6fc;
                         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
                         transition: background 0.2s, border 0.2s;
                     }
                     QToolButton:hover {
                         background-color: #1f6feb;
+                        color: #ffffff;
                         border-color: #388bfd;
-                        color: #fff;
                     }
                     QToolButton:pressed {
                         background-color: #161b22;
+                        color: #f0f6fc;
+                        border-color: #f0f6fc;
+                    }
+                    QToolButton:checked {
+                        background-color: #388bfd;
+                        color: #ffffff;
                         border-color: #f0f6fc;
                     }
                 ''')
@@ -496,11 +527,11 @@ class plotWindow(QtWidgets.QMainWindow):
                         background-color: #fff;
                         border: 2px solid #d0d7de;
                         border-radius: 8px;
-                        padding: 8px;
-                        margin: 2px;
-                        min-width: 36px;
-                        min-height: 36px;
-                        font-size: 14px;
+                        padding: 4px;
+                        margin: 0px;
+                        min-width: 28px;
+                        min-height: 28px;
+                        font-size: 13px;
                         color: #24292f;
                         box-shadow: 0 2px 8px rgba(0,0,0,0.05);
                         transition: background 0.2s, border 0.2s;
@@ -517,17 +548,27 @@ class plotWindow(QtWidgets.QMainWindow):
                 ''')
             vbox = QtWidgets.QVBoxLayout()
             vbox.setAlignment(QtCore.Qt.AlignHCenter)
+            vbox.setContentsMargins(0, 0, 0, 0)  # Remove margins between button+label
             vbox.addWidget(btn, alignment=QtCore.Qt.AlignHCenter)
             label = QtWidgets.QLabel()
             label.setAlignment(QtCore.Qt.AlignHCenter)
             tooltip_plain = re.sub('<[^<]+?>', '', action.toolTip())
             label.setText(tooltip_plain)
-            label.setStyleSheet('font-size: 10px; color: gray; margin-top: 2px;')
+            label.setStyleSheet('font-size: 9px; color: gray; margin-top: 0px;')
             vbox.addWidget(label)
             custom_toolbar_layout.addLayout(vbox)
+        # Add a custom QLabel for coordinates display to the far right
+        self.coord_label = QtWidgets.QLabel()
+        self.coord_label.setVisible(True)
+        if self.is_dark_theme:
+            self.coord_label.setStyleSheet('font-size: 12px; padding-left: 8px; color: #f0f6fc;')
+        custom_toolbar_layout.addStretch(1)
+        custom_toolbar_layout.addWidget(self.coord_label, alignment=QtCore.Qt.AlignVCenter)
         custom_toolbar.setLayout(custom_toolbar_layout)
         self.left_vbox.addWidget(custom_toolbar)
         self.left_vbox.addWidget(self.canvas)
+        # Explicitly connect mpl_connect to update coordinates in the custom label
+        self.canvas.mpl_connect('motion_notify_event', self.update_coordinates)
         self.right_vbox = QtWidgets.QVBoxLayout()
         self.right_grid = QtWidgets.QGridLayout()
         self.top_grid = QtWidgets.QGridLayout()
@@ -625,22 +666,31 @@ class plotWindow(QtWidgets.QMainWindow):
         self.right_grid.addWidget(self.funcExample, 4, 1)
         self.right_vbox.addLayout(self.right_grid)
 
+        # Set background colors for full window, right panel, and scroll area
+        bg_color = DARK_BLUE if self.is_dark_theme else LIGHT_BG
+        self.mainFrame.setStyleSheet(f"background-color: {bg_color};")
+        self.right_vbox.setContentsMargins(0, 0, 0, 0)
+        self.right_vbox.setSpacing(4)
+        self.right_grid.setContentsMargins(0, 0, 0, 0)
+        self.right_grid.setSpacing(4)
+        self.top_grid.setContentsMargins(0, 0, 0, 0)
+        self.top_grid.setSpacing(4)
+        # Set right panel background
+        right_panel_widget = QtWidgets.QWidget()
+        right_panel_widget.setLayout(self.right_vbox)
+        right_panel_widget.setStyleSheet(f"background-color: {bg_color};")
+        # Replace right_vbox in hbox with right_panel_widget
         self.hbox = QtWidgets.QHBoxLayout()
-        self.hbox.addLayout(self.left_vbox, stretch=4)  # Give more space to plot
-        self.hbox.addLayout(self.right_vbox, stretch=1)  # Make right panel more compact
-
+        self.hbox.addLayout(self.left_vbox, stretch=4)
+        self.hbox.addWidget(right_panel_widget, stretch=1)
         self.widget = QtWidgets.QWidget()
-        self.widget.setLayout(self.hbox)  # finalvbox
+        self.widget.setLayout(self.hbox)
         self.scrollArea = QtWidgets.QScrollArea()
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setWidget(self.widget)
-        '''
-        Right side box containing checkbox for different inputs and
-        options of plot, multimeter and plot function.
-        '''
+        self.scrollArea.setStyleSheet(f"background-color: {bg_color};")
         self.finalhbox = QtWidgets.QHBoxLayout()
         self.finalhbox.addWidget(self.scrollArea)
-        # Right side window frame showing list of nodes and branches.
         self.mainFrame.setLayout(self.finalhbox)
         self.showMaximized()
 
@@ -882,7 +932,7 @@ class plotWindow(QtWidgets.QMainWindow):
                 self, "Warning!!", "Please select at least one Node OR Branch"
             )
             return
-
+        
         # Reapply theme after plotting
         self.update_plot_theme()
         self.canvas.draw()
@@ -1011,6 +1061,22 @@ class plotWindow(QtWidgets.QMainWindow):
     def getRMSValue(self, dataPoints):
         getcontext().prec = 5
         return np.sqrt(np.mean(np.square(dataPoints)))
+
+    def eventFilter(self, obj, event):
+        # Forward mouse move events from the canvas to the NavigationToolbar for coordinate updates
+        if obj == self.canvas and event.type() == QtCore.QEvent.MouseMove:
+            QtWidgets.QApplication.sendEvent(self.navToolBar, event)
+        return super().eventFilter(obj, event)
+
+    def update_coordinates(self, event):
+        # Directly update the custom coordinates label
+        if hasattr(self, 'coord_label') and self.coord_label:
+            if event.inaxes:
+                x, y = event.xdata, event.ydata
+                msg = f"x={x:.3f}, y={y:.3f}"
+                self.coord_label.setText(msg)
+            else:
+                self.coord_label.setText("")
 
 
 class MultimeterWidgetClass(QtWidgets.QWidget):
