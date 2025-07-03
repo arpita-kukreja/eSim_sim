@@ -743,7 +743,7 @@ class plotWindow(QtWidgets.QMainWindow):
         self.funcLabel.setText(f"<h3 style='color: {ACCENT_HOVER}; margin: 10px 0;'>Function:</h3>")
         self.funcName.setText(
             f"<h3 style='color: {ACCENT_HOVER}'>Standard functions</h3>\
-                <p style='color: {TEXT_COLOR}; font-size: 14px; margin: 5px 0;'>\
+                <p style='color:  #ff0000; font-size: 14px; margin: 5px 0;'>\
                 <b>Addition:</b><br>\
                 <b>Subtraction:</b><br>\
                 <b>Multiplication:</b><br>\
