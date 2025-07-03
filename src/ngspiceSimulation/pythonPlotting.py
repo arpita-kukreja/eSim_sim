@@ -403,7 +403,7 @@ class plotWindow(QtWidgets.QMainWindow):
         if self.is_dark_theme:
             # Dark theme colors
             bg_color = DARK_BLUE
-            text_color = ACCENT_HOVER
+            text_color = TEXT_COLOR  # Use white for all text
             accent_color = ACCENT_BLUE
             grid_color = BORDER_COLOR
             function_color = TEXT_COLOR  # White for dark theme
@@ -416,6 +416,7 @@ class plotWindow(QtWidgets.QMainWindow):
             accent_color = LIGHT_ACCENT
             grid_color = LIGHT_BORDER
             function_color = LIGHT_TEXT  # Black for light theme
+            self.axes.set_prop_cycle(cycler('color', ['#00eaff', '#ff6b6b', '#ffe156', '#6bffb4', '#a55eea', '#fd79a8', '#ffb347', '#f9ca24', '#4ecdc4', '#45b7d1']))
 
         # Update figure and axes colors
         self.fig.patch.set_facecolor(bg_color)
@@ -439,6 +440,14 @@ class plotWindow(QtWidgets.QMainWindow):
         for text in self.axes.texts:
             text.set_color(function_color)
         
+        # Update annotation colors
+        for annotation in self.axes.annotations if hasattr(self.axes, 'annotations') else []:
+            annotation.set_color(function_color)
+        # Update all children that are Text (for annotations, etc.)
+        for child in self.axes.get_children():
+            if hasattr(child, 'set_color') and hasattr(child, 'get_text') and child.get_text() != '':
+                child.set_color(function_color)
+        
         # Update legend colors if it exists
         if self.axes.get_legend():
             legend = self.axes.get_legend()
@@ -450,9 +459,36 @@ class plotWindow(QtWidgets.QMainWindow):
         # Redraw the canvas
         self.canvas.draw()
 
+        # Update coordinates label color for dark mode
+        if hasattr(self, 'coord_label') and self.coord_label:
+            if self.is_dark_theme:
+                self.coord_label.setStyleSheet('font-size: 12px; padding-left: 8px; color: #f0f6fc;')
+            else:
+                self.coord_label.setStyleSheet('font-size: 12px; padding-left: 8px; color: #24292f;')
+
         # Update multimeter themes if they exist
         for widget in self.findChildren(MultimeterWidgetClass):
             widget.toggle_theme()
+
+        # Update right panel label and checkbox colors for theme
+        if self.is_dark_theme:
+            self.analysisType.setStyleSheet('color: #f0f6fc;')
+            self.listNode.setStyleSheet('color: #f0f6fc;')
+            self.listBranch.setStyleSheet('color: #f0f6fc;')
+            self.funcLabel.setStyleSheet('color: #f0f6fc;')
+            self.funcName.setStyleSheet('color: #f0f6fc;')
+            self.funcExample.setStyleSheet('color: #f0f6fc;')
+            for cb in self.chkbox:
+                cb.setStyleSheet('color: #f0f6fc;')
+        else:
+            self.analysisType.setStyleSheet('color: #24292f;')
+            self.listNode.setStyleSheet('color: #24292f;')
+            self.listBranch.setStyleSheet('color: #24292f;')
+            self.funcLabel.setStyleSheet('color: #24292f;')
+            self.funcName.setStyleSheet('color: #24292f;')
+            self.funcExample.setStyleSheet('color: #24292f;')
+            for cb in self.chkbox:
+                cb.setStyleSheet('color: #24292f;')
 
     def createMainFrame(self):
         self.mainFrame = QtWidgets.QWidget()
@@ -581,7 +617,7 @@ class plotWindow(QtWidgets.QMainWindow):
         if self.is_dark_theme:
             self.full_colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a55eea', '#fd79a8', '#00d2d3']
         else:
-            self.full_colors = ['r', 'b', 'g', 'y', 'c', 'm', 'k']
+            self.full_colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a55eea', '#fd79a8', '#00d2d3']
         self.color = []
         for i in range(0, self.a[0] - 1):
             if i % 7 == 0:
@@ -607,7 +643,10 @@ class plotWindow(QtWidgets.QMainWindow):
         self.top_grid.addWidget(self.listBranch, self.a[1] + 2, 0)
         for i in range(0, self.a[1]):  # a[0]-1
             self.chkbox.append(QtWidgets.QCheckBox(self.obj_dataext.NBList[i]))
-            self.chkbox[i].setStyleSheet('color')
+            if self.is_dark_theme:
+                self.chkbox[i].setStyleSheet('color: #f0f6fc;')
+            else:
+                self.chkbox[i].setStyleSheet('color: #24292f;')
             self.chkbox[i].setToolTip('<b>Check To Plot</b>')
             self.top_grid.addWidget(self.chkbox[i], i + 2, 0)
             self.colorLab = QtWidgets.QLabel()
@@ -620,6 +659,10 @@ class plotWindow(QtWidgets.QMainWindow):
 
         for i in range(self.a[1], self.a[0] - 1):  # a[0]-1
             self.chkbox.append(QtWidgets.QCheckBox(self.obj_dataext.NBList[i]))
+            if self.is_dark_theme:
+                self.chkbox[i].setStyleSheet('color: #f0f6fc;')
+            else:
+                self.chkbox[i].setStyleSheet('color: #24292f;')
             self.chkbox[i].setToolTip('<b>Check To Plot</b>')
             self.top_grid.addWidget(self.chkbox[i], i + 3, 0)
             self.colorLab = QtWidgets.QLabel()
@@ -1127,7 +1170,7 @@ class MultimeterWidgetClass(QtWidgets.QWidget):
         if self.is_dark_theme:
             # Dark theme colors
             bg_color = DARK_BLUE
-            text_color = ACCENT_HOVER
+            text_color = TEXT_COLOR  # Use white for all text
             accent_color = ACCENT_BLUE
             grid_color = BORDER_COLOR
             function_color = TEXT_COLOR  # White for dark theme
@@ -1160,6 +1203,14 @@ class MultimeterWidgetClass(QtWidgets.QWidget):
         # Update function text colors
         for text in self.axes.texts:
             text.set_color(function_color)
+        
+        # Update annotation colors
+        for annotation in self.axes.annotations if hasattr(self.axes, 'annotations') else []:
+            annotation.set_color(function_color)
+        # Update all children that are Text (for annotations, etc.)
+        for child in self.axes.get_children():
+            if hasattr(child, 'set_color') and hasattr(child, 'get_text') and child.get_text() != '':
+                child.set_color(function_color)
         
         # Update legend colors if it exists
         if self.axes.get_legend():

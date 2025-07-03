@@ -1,5 +1,5 @@
         * /home/saurabh/esim-workspace/cmos_nand_gate/cmos_nand_gate.cir
-        Transient Analysis  Sat Jun 28 20:50:32  2025
+        Transient Analysis  Thu Jul  3 22:14:35  2025
 --------------------------------------------------------------------------------
 Index   time            inputa          inputb          out             
 --------------------------------------------------------------------------------
@@ -1207,7 +1207,7 @@ Index   time            inputa          inputb          out
 1144	1.000000e-01	5.000000e+00	0.000000e+00	5.000000e+00	
 
         * /home/saurabh/esim-workspace/cmos_nand_gate/cmos_nand_gate.cir
-        Transient Analysis  Sat Jun 28 20:50:32  2025
+        Transient Analysis  Thu Jul  3 22:14:35  2025
 --------------------------------------------------------------------------------
 Index   time            x1.net-_m1-pad1 x1.net-_m2-pad3 
 --------------------------------------------------------------------------------
