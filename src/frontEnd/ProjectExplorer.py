@@ -34,10 +34,6 @@ class ProjectExplorer(QtWidgets.QWidget):
         self.treewidget.setHeaderItem(header)
         self.treewidget.setColumnHidden(1, True)
         
-        # Set widget background to be transparent
-        self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        self.treewidget.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        
         # Initialize with the correct theme
         self.set_theme(is_dark_theme)
         
