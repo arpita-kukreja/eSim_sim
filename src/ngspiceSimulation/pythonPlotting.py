@@ -59,23 +59,25 @@ DARK_STYLESHEET = f"""
     }}
     
     QPushButton {{
-                    background-color: {ACCENT_BLUE};
-            color: {TEXT_COLOR};
-            border: 2px solid {ACCENT_HOVER};
-            padding: 6px 12px;
-            border-radius: 4px;
-            min-width: 80px;
-            font-size: 13px;
-            font-weight: bold;
-            margin: 1px;
+        background-color: {ACCENT_BLUE};
+        color: {TEXT_COLOR};
+        border: 2px solid {ACCENT_HOVER};
+        padding: 6px 12px;
+        border-radius: 4px;
+        min-width: 80px;
+        font-size: 13px;
+        font-weight: bold;
+        margin: 1px;
     }}
     QPushButton:hover {{
         background-color: {ACCENT_HOVER};
         border-color: {TEXT_COLOR};
+        color: {TEXT_COLOR};
     }}
     QPushButton:pressed {{
         background-color: {GRADIENT_START};
         border-color: {ACCENT_HOVER};
+        color: {TEXT_COLOR};
     }}
     
     QLabel {{
@@ -149,10 +151,12 @@ DARK_STYLESHEET = f"""
     QToolButton:hover {{
         background-color: {ACCENT_BLUE};
         border-color: {ACCENT_HOVER};
+        color: {TEXT_COLOR};
     }}
     QToolButton:pressed {{
         background-color: {GRADIENT_START};
         border-color: {TEXT_COLOR};
+        color: {TEXT_COLOR};
     }}
 """
 
@@ -189,7 +193,7 @@ LIGHT_STYLESHEET = f"""
     }}
     QPushButton:hover {{
         background-color: {LIGHT_ACCENT_HOVER};
-        color: #fff;
+        color: #24292f;
         border-color: {LIGHT_TEXT};
     }}
     QPushButton:pressed {{
@@ -269,6 +273,7 @@ LIGHT_STYLESHEET = f"""
     QToolButton:hover {{
         background-color: {LIGHT_ACCENT};
         border-color: {LIGHT_ACCENT_HOVER};
+        color: {LIGHT_TEXT};
     }}
     QToolButton:pressed {{
         background-color: {LIGHT_GRADIENT_START};
@@ -543,7 +548,7 @@ class plotWindow(QtWidgets.QMainWindow):
                     }
                     QToolButton:hover {
                         background-color: #1f6feb;
-                        color: #ffffff;
+                        color: #f0f6fc;
                         border-color: #388bfd;
                     }
                     QToolButton:pressed {
@@ -553,7 +558,7 @@ class plotWindow(QtWidgets.QMainWindow):
                     }
                     QToolButton:checked {
                         background-color: #388bfd;
-                        color: #ffffff;
+                        color: #f0f6fc;
                         border-color: #f0f6fc;
                     }
                 ''')
@@ -575,7 +580,7 @@ class plotWindow(QtWidgets.QMainWindow):
                     QToolButton:hover {
                         background-color: #f6f8fa;
                         border-color: #0969da;
-                        color: #0969da;
+                        color: #24292f;
                     }
                     QToolButton:pressed {
                         background-color: #eaeef2;
@@ -690,6 +695,12 @@ class plotWindow(QtWidgets.QMainWindow):
         self.palette2 = QtGui.QPalette()
         self.plotfuncbtn = QtWidgets.QPushButton("Plot Function")
         self.plotfuncbtn.setToolTip('<b>Press</b> to Plot the function')
+
+        # Set button text color explicitly for dark/light mode
+        self.plotbtn.setStyleSheet(f'color: {"#f0f6fc" if self.is_dark_theme else "#24292f"};')
+        self.clear.setStyleSheet(f'color: {"#f0f6fc" if self.is_dark_theme else "#24292f"};')
+        self.multimeterbtn.setStyleSheet(f'color: {"#f0f6fc" if self.is_dark_theme else "#24292f"};')
+        self.plotfuncbtn.setStyleSheet(f'color: {"#f0f6fc" if self.is_dark_theme else "#24292f"};')
 
         self.palette1.setColor(QtGui.QPalette.Foreground, QtCore.Qt.blue)
         self.palette2.setColor(QtGui.QPalette.Foreground, QtCore.Qt.red)
