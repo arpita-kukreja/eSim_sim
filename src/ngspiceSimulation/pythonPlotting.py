@@ -59,23 +59,25 @@ DARK_STYLESHEET = f"""
     }}
     
     QPushButton {{
-                    background-color: {ACCENT_BLUE};
-            color: {TEXT_COLOR};
-            border: 2px solid {ACCENT_HOVER};
-            padding: 6px 12px;
-            border-radius: 4px;
-            min-width: 80px;
-            font-size: 13px;
-            font-weight: bold;
-            margin: 1px;
+        background-color: {ACCENT_BLUE};
+        color: {TEXT_COLOR};
+        border: 2px solid {ACCENT_HOVER};
+        padding: 6px 12px;
+        border-radius: 4px;
+        min-width: 80px;
+        font-size: 13px;
+        font-weight: bold;
+        margin: 1px;
     }}
     QPushButton:hover {{
         background-color: {ACCENT_HOVER};
         border-color: {TEXT_COLOR};
+        color: {TEXT_COLOR};
     }}
     QPushButton:pressed {{
         background-color: {GRADIENT_START};
         border-color: {ACCENT_HOVER};
+        color: {TEXT_COLOR};
     }}
     
     QLabel {{
@@ -149,10 +151,12 @@ DARK_STYLESHEET = f"""
     QToolButton:hover {{
         background-color: {ACCENT_BLUE};
         border-color: {ACCENT_HOVER};
+        color: {TEXT_COLOR};
     }}
     QToolButton:pressed {{
         background-color: {GRADIENT_START};
         border-color: {TEXT_COLOR};
+        color: {TEXT_COLOR};
     }}
 """
 
@@ -189,7 +193,7 @@ LIGHT_STYLESHEET = f"""
     }}
     QPushButton:hover {{
         background-color: {LIGHT_ACCENT_HOVER};
-        color: #fff;
+        color: #24292f;
         border-color: {LIGHT_TEXT};
     }}
     QPushButton:pressed {{
@@ -269,6 +273,7 @@ LIGHT_STYLESHEET = f"""
     QToolButton:hover {{
         background-color: {LIGHT_ACCENT};
         border-color: {LIGHT_ACCENT_HOVER};
+        color: {LIGHT_TEXT};
     }}
     QToolButton:pressed {{
         background-color: {LIGHT_GRADIENT_START};
@@ -403,7 +408,7 @@ class plotWindow(QtWidgets.QMainWindow):
         if self.is_dark_theme:
             # Dark theme colors
             bg_color = DARK_BLUE
-            text_color = ACCENT_HOVER
+            text_color = TEXT_COLOR  # Use white for all text
             accent_color = ACCENT_BLUE
             grid_color = BORDER_COLOR
             function_color = TEXT_COLOR  # White for dark theme
@@ -416,6 +421,7 @@ class plotWindow(QtWidgets.QMainWindow):
             accent_color = LIGHT_ACCENT
             grid_color = LIGHT_BORDER
             function_color = LIGHT_TEXT  # Black for light theme
+            self.axes.set_prop_cycle(cycler('color', ['#00eaff', '#ff6b6b', '#ffe156', '#6bffb4', '#a55eea', '#fd79a8', '#ffb347', '#f9ca24', '#4ecdc4', '#45b7d1']))
 
         # Update figure and axes colors
         self.fig.patch.set_facecolor(bg_color)
@@ -439,6 +445,14 @@ class plotWindow(QtWidgets.QMainWindow):
         for text in self.axes.texts:
             text.set_color(function_color)
         
+        # Update annotation colors
+        for annotation in self.axes.annotations if hasattr(self.axes, 'annotations') else []:
+            annotation.set_color(function_color)
+        # Update all children that are Text (for annotations, etc.)
+        for child in self.axes.get_children():
+            if hasattr(child, 'set_color') and hasattr(child, 'get_text') and child.get_text() != '':
+                child.set_color(function_color)
+        
         # Update legend colors if it exists
         if self.axes.get_legend():
             legend = self.axes.get_legend()
@@ -450,9 +464,36 @@ class plotWindow(QtWidgets.QMainWindow):
         # Redraw the canvas
         self.canvas.draw()
 
+        # Update coordinates label color for dark mode
+        if hasattr(self, 'coord_label') and self.coord_label:
+            if self.is_dark_theme:
+                self.coord_label.setStyleSheet('font-size: 12px; padding-left: 8px; color: #f0f6fc;')
+            else:
+                self.coord_label.setStyleSheet('font-size: 12px; padding-left: 8px; color: #24292f;')
+
         # Update multimeter themes if they exist
         for widget in self.findChildren(MultimeterWidgetClass):
             widget.toggle_theme()
+
+        # Update right panel label and checkbox colors for theme
+        if self.is_dark_theme:
+            self.analysisType.setStyleSheet('color: #f0f6fc;')
+            self.listNode.setStyleSheet('color: #f0f6fc;')
+            self.listBranch.setStyleSheet('color: #f0f6fc;')
+            self.funcLabel.setStyleSheet('color: #f0f6fc;')
+            self.funcName.setStyleSheet('color: #f0f6fc;')
+            self.funcExample.setStyleSheet('color: #f0f6fc;')
+            for cb in self.chkbox:
+                cb.setStyleSheet('color: #f0f6fc;')
+        else:
+            self.analysisType.setStyleSheet('color: #24292f;')
+            self.listNode.setStyleSheet('color: #24292f;')
+            self.listBranch.setStyleSheet('color: #24292f;')
+            self.funcLabel.setStyleSheet('color: #24292f;')
+            self.funcName.setStyleSheet('color: #24292f;')
+            self.funcExample.setStyleSheet('color: #24292f;')
+            for cb in self.chkbox:
+                cb.setStyleSheet('color: #24292f;')
 
     def createMainFrame(self):
         self.mainFrame = QtWidgets.QWidget()
@@ -507,7 +548,7 @@ class plotWindow(QtWidgets.QMainWindow):
                     }
                     QToolButton:hover {
                         background-color: #1f6feb;
-                        color: #ffffff;
+                        color: #f0f6fc;
                         border-color: #388bfd;
                     }
                     QToolButton:pressed {
@@ -517,7 +558,7 @@ class plotWindow(QtWidgets.QMainWindow):
                     }
                     QToolButton:checked {
                         background-color: #388bfd;
-                        color: #ffffff;
+                        color: #f0f6fc;
                         border-color: #f0f6fc;
                     }
                 ''')
@@ -539,7 +580,7 @@ class plotWindow(QtWidgets.QMainWindow):
                     QToolButton:hover {
                         background-color: #f6f8fa;
                         border-color: #0969da;
-                        color: #0969da;
+                        color: #24292f;
                     }
                     QToolButton:pressed {
                         background-color: #eaeef2;
@@ -581,7 +622,7 @@ class plotWindow(QtWidgets.QMainWindow):
         if self.is_dark_theme:
             self.full_colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a55eea', '#fd79a8', '#00d2d3']
         else:
-            self.full_colors = ['r', 'b', 'g', 'y', 'c', 'm', 'k']
+            self.full_colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#a55eea', '#fd79a8', '#00d2d3']
         self.color = []
         for i in range(0, self.a[0] - 1):
             if i % 7 == 0:
@@ -607,7 +648,10 @@ class plotWindow(QtWidgets.QMainWindow):
         self.top_grid.addWidget(self.listBranch, self.a[1] + 2, 0)
         for i in range(0, self.a[1]):  # a[0]-1
             self.chkbox.append(QtWidgets.QCheckBox(self.obj_dataext.NBList[i]))
-            self.chkbox[i].setStyleSheet('color')
+            if self.is_dark_theme:
+                self.chkbox[i].setStyleSheet('color: #f0f6fc;')
+            else:
+                self.chkbox[i].setStyleSheet('color: #24292f;')
             self.chkbox[i].setToolTip('<b>Check To Plot</b>')
             self.top_grid.addWidget(self.chkbox[i], i + 2, 0)
             self.colorLab = QtWidgets.QLabel()
@@ -620,6 +664,10 @@ class plotWindow(QtWidgets.QMainWindow):
 
         for i in range(self.a[1], self.a[0] - 1):  # a[0]-1
             self.chkbox.append(QtWidgets.QCheckBox(self.obj_dataext.NBList[i]))
+            if self.is_dark_theme:
+                self.chkbox[i].setStyleSheet('color: #f0f6fc;')
+            else:
+                self.chkbox[i].setStyleSheet('color: #24292f;')
             self.chkbox[i].setToolTip('<b>Check To Plot</b>')
             self.top_grid.addWidget(self.chkbox[i], i + 3, 0)
             self.colorLab = QtWidgets.QLabel()
@@ -647,6 +695,12 @@ class plotWindow(QtWidgets.QMainWindow):
         self.palette2 = QtGui.QPalette()
         self.plotfuncbtn = QtWidgets.QPushButton("Plot Function")
         self.plotfuncbtn.setToolTip('<b>Press</b> to Plot the function')
+
+        # Set button text color explicitly for dark/light mode
+        self.plotbtn.setStyleSheet(f'color: {"#f0f6fc" if self.is_dark_theme else "#24292f"};')
+        self.clear.setStyleSheet(f'color: {"#f0f6fc" if self.is_dark_theme else "#24292f"};')
+        self.multimeterbtn.setStyleSheet(f'color: {"#f0f6fc" if self.is_dark_theme else "#24292f"};')
+        self.plotfuncbtn.setStyleSheet(f'color: {"#f0f6fc" if self.is_dark_theme else "#24292f"};')
 
         self.palette1.setColor(QtGui.QPalette.Foreground, QtCore.Qt.blue)
         self.palette2.setColor(QtGui.QPalette.Foreground, QtCore.Qt.red)
@@ -700,7 +754,7 @@ class plotWindow(QtWidgets.QMainWindow):
         self.funcLabel.setText(f"<h3 style='color: {ACCENT_HOVER}; margin: 10px 0;'>Function:</h3>")
         self.funcName.setText(
             f"<h3 style='color: {ACCENT_HOVER}'>Standard functions</h3>\
-                <p style='color: {TEXT_COLOR}; font-size: 14px; margin: 5px 0;'>\
+                <p style='color:  #ff0000; font-size: 14px; margin: 5px 0;'>\
                 <b>Addition:</b><br>\
                 <b>Subtraction:</b><br>\
                 <b>Multiplication:</b><br>\
@@ -1127,7 +1181,7 @@ class MultimeterWidgetClass(QtWidgets.QWidget):
         if self.is_dark_theme:
             # Dark theme colors
             bg_color = DARK_BLUE
-            text_color = ACCENT_HOVER
+            text_color = TEXT_COLOR  # Use white for all text
             accent_color = ACCENT_BLUE
             grid_color = BORDER_COLOR
             function_color = TEXT_COLOR  # White for dark theme
@@ -1160,6 +1214,14 @@ class MultimeterWidgetClass(QtWidgets.QWidget):
         # Update function text colors
         for text in self.axes.texts:
             text.set_color(function_color)
+        
+        # Update annotation colors
+        for annotation in self.axes.annotations if hasattr(self.axes, 'annotations') else []:
+            annotation.set_color(function_color)
+        # Update all children that are Text (for annotations, etc.)
+        for child in self.axes.get_children():
+            if hasattr(child, 'set_color') and hasattr(child, 'get_text') and child.get_text() != '':
+                child.set_color(function_color)
         
         # Update legend colors if it exists
         if self.axes.get_legend():

@@ -1,5 +1,5 @@
         * /home/saurabh/esim-workspace/cmos_nand_gate/cmos_nand_gate.cir
-        Transient Analysis  Sat Jun 28 20:50:32  2025
+        Transient Analysis  Fri Jul  4 19:02:18  2025
 --------------------------------------------------------------------------------
 Index   time            v.x1.v1#branch  v1#branch       v2#branch       
 --------------------------------------------------------------------------------
